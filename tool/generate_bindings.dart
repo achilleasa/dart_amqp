@@ -1,6 +1,7 @@
 import "dart:io";
 import "dart:async";
 import "package:xml/xml.dart" as xml;
+import "package:http/http.dart" as http;
 import "package:logging/logging.dart";
 
 final Logger logger = new Logger("tools");
@@ -124,9 +125,14 @@ part "protocol/io/amqp_message_decoder.dart";
   Future<xml.XmlDocument> _retrieveSchema(String schemaUrl) {
     logger.info("- Retrieving schema from ${schemaUrl}");
 
-//  return http
-//    .read(schemaUrl)
-    return new File("amqp0-9-1.xml").readAsString()
+    // Check for cached copy
+    File cachedCopy = new File(schemaUrl.split('/').last);
+    return cachedCopy.exists()
+    .then((bool exists) {
+      return exists
+      ? cachedCopy.readAsString()
+      : http.read(schemaUrl);
+    })
     .then((String data) {
       logger.info("- Parsing schema");
       return xml.parse(data);
