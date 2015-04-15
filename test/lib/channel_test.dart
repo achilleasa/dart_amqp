@@ -1,12 +1,8 @@
 library dart_amqp.test.channels;
 
-import "dart:async";
-import "dart:typed_data";
-
 import "../../packages/unittest/unittest.dart";
 
 import "../../lib/src/client.dart";
-import "../../lib/src/protocol.dart";
 import "../../lib/src/enums.dart";
 import "../../lib/src/exceptions.dart";
 

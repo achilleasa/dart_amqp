@@ -6,8 +6,6 @@ import "dart:async";
 import "dart:convert";
 import "package:logging/logging.dart";
 
-import "../../../lib/src/protocol.dart";
-
 final Logger mockLogger = new Logger("MockLogger");
 bool initializedLogger = false;
 

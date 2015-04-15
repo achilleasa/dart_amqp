@@ -4,7 +4,6 @@ import "dart:async";
 import "dart:io";
 import "dart:typed_data";
 import "dart:collection";
-import "dart:convert";
 
 // Internal lib dependencies
 import "logging.dart";

@@ -5,14 +5,73 @@ import "dart:typed_data";
 
 import "../packages/unittest/unittest.dart";
 import "../packages/mock/mock.dart";
-import "../packages/stack_trace/stack_trace.dart";
 
-import "../../lib/src/client.dart";
 import "../../lib/src/enums.dart";
 import "../../lib/src/protocol.dart";
 import "../../lib/src/exceptions.dart";
 
 import "mocks/mocks.dart" as mock;
+
+class ConnectionStartMock extends Mock implements ConnectionStart {
+  final bool msgHasContent = false;
+  final int msgClassId = 10;
+  final int msgMethodId = 10;
+
+  // Message arguments
+  int versionMajor;
+  int versionMinor;
+  Map<String, Object> serverProperties;
+  String mechanisms;
+  String locales;
+
+  void serialize(TypeEncoder encoder) {
+    encoder
+      ..writeUInt16(msgClassId)
+      ..writeUInt16(msgMethodId)
+      ..writeUInt8(versionMajor)
+      ..writeUInt8(versionMinor)
+      ..writeFieldTable(serverProperties)
+      ..writeLongString(mechanisms)
+      ..writeLongString(locales)
+    ;
+  }
+}
+
+class ConnectionTuneMock extends Mock implements ConnectionTune {
+  final bool msgHasContent = false;
+  final int msgClassId = 10;
+  final int msgMethodId = 30;
+
+  // Message arguments
+  int channelMax;
+  int frameMax;
+  int heartbeat;
+
+  void serialize(TypeEncoder encoder) {
+    encoder
+      ..writeUInt16(msgClassId)
+      ..writeUInt16(msgMethodId)
+      ..writeUInt16(channelMax)
+      ..writeUInt32(frameMax)
+      ..writeUInt16(heartbeat)
+    ;
+  }
+}
+
+class ConnectionOpenOkMock extends Mock implements ConnectionOpenOk {
+  final bool msgHasContent = false;
+  final int msgClassId = 10;
+  final int msgMethodId = 41;
+  String reserved_1;
+
+  void serialize(TypeEncoder encoder) {
+    encoder
+      ..writeUInt16(msgClassId)
+      ..writeUInt16(msgMethodId)
+      ..writeShortString(reserved_1)
+    ;
+  }
+}
 
 class BasicDeliverMock extends Mock implements BasicDeliver {
   final bool msgHasContent = true;

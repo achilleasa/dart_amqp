@@ -1,10 +1,9 @@
 import "dart:io";
 import "dart:async";
 import "package:dart_amqp/dart_amqp.dart";
-import "package:uuid/uuid.dart";
 
 class FibonacciRpcClient {
-  final Uuid _uuidFactory = new Uuid();
+  int _nextCorrelationId = 1;
   final Completer connected = new Completer();
   final Client client;
   final Map<String, Completer> _pendingOperations = new Map<String, Completer>();
@@ -44,7 +43,7 @@ class FibonacciRpcClient {
     // Make sure we are connected before sending the request
     return connected.future
     .then((_) {
-      String uuid = _uuidFactory.v4();
+      String uuid = "${_nextCorrelationId++}";
       Completer<int> completer = new Completer<int>();
 
       MessageProperties properties = new MessageProperties()

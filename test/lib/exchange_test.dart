@@ -2,7 +2,6 @@ library dart_amqp.test.exchanges;
 
 import "dart:async";
 import "../../packages/unittest/unittest.dart";
-import "../../packages/stack_trace/stack_trace.dart";
 
 import "../../lib/src/client.dart";
 import "../../lib/src/protocol.dart";

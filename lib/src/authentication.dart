@@ -1,9 +1,6 @@
 library dart_amqp.authentication;
 
-import "dart:async";
-import "dart:io";
 import "dart:typed_data";
-import "dart:convert";
 
 import "protocol.dart";
 

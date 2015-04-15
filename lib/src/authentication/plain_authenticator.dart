@@ -1,4 +1,4 @@
-part of dart_ampq.authentication;
+part of dart_amqp.authentication;
 
 class PlainAuthenticator implements Authenticator {
 

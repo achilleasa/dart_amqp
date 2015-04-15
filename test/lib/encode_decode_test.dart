@@ -4,12 +4,8 @@ import "dart:async";
 import "dart:typed_data";
 
 import "../packages/unittest/unittest.dart";
-import "../packages/mock/mock.dart";
-import "../packages/stack_trace/stack_trace.dart";
 
-import "../../lib/src/client.dart";
 import "../../lib/src/protocol.dart";
-import "../../lib/src/exceptions.dart";
 
 import "mocks/mocks.dart" as mock;
 

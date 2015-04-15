@@ -1,7 +1,5 @@
 import "dart:io";
-import "dart:convert";
 import "dart:async";
-import "package:http/http.dart" as http;
 import "package:xml/xml.dart" as xml;
 import "package:logging/logging.dart";
 
@@ -155,11 +153,11 @@ part "protocol/io/amqp_message_decoder.dart";
 
     bool implementedByClient = amqpMethod
     .findAllElements("chassis")
-    .any((XmlElement elem) => elem.getAttribute("name") == "client");
+    .any((xml.XmlElement elem) => elem.getAttribute("name") == "client");
 
     bool implementedByServer = amqpMethod
     .findAllElements("chassis")
-    .any((XmlElement elem) => elem.getAttribute("name") == "server");
+    .any((xml.XmlElement elem) => elem.getAttribute("name") == "server");
 
     // Update message factory
     if (implementedByClient) {
@@ -389,7 +387,7 @@ part of dart_amqp.protocol;
     amqpClass
     .descendants
     .where((xml.XmlNode node) => node is xml.XmlElement && node.name.local == "method")
-    .where((xml.XmlNode node) {
+    .where((xml.XmlElement node) {
       // Apply method exclusion list
       String methodName = node
       .getAttribute("name")

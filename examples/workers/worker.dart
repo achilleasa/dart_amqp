@@ -4,7 +4,7 @@ import "package:dart_amqp/dart_amqp.dart";
 void main() {
   Client client = new Client();
 
-  // Setup a signal hundler to cleanly exit if CTRL+C is pressed
+  // Setup a signal handler to cleanly exit if CTRL+C is pressed
   ProcessSignal.SIGINT.watch().listen((_) {
     client.close().then((_) {
       exit(0);

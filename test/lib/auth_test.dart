@@ -1,11 +1,7 @@
 library dart_amqp.test.auth;
 
-import "dart:async";
-import "dart:typed_data";
-
 import "../packages/unittest/unittest.dart";
 import "../packages/mock/mock.dart";
-import "../packages/stack_trace/stack_trace.dart";
 
 import "../../lib/src/authentication.dart";
 import "../../lib/src/client.dart";
@@ -81,6 +77,7 @@ class ConnectionOpenOkMock extends Mock implements ConnectionOpenOk {
   final bool msgHasContent = false;
   final int msgClassId = 10;
   final int msgMethodId = 41;
+  String reserved_1;
 
   void serialize(TypeEncoder encoder) {
     encoder
