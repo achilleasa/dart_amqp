@@ -42,7 +42,6 @@ class FrameWriter {
 
       // Serialize content
       Uint8List serializedContent;
-      String contentType;
       if (payloadContent is Uint8List) {
         serializedContent = payloadContent;
       } else if (payloadContent is Map || payloadContent is Iterable) {
@@ -51,7 +50,7 @@ class FrameWriter {
           ..contentType = "application/json"
           ..contentEncoding = "UTF-8";
       } else if (payloadContent is String) {
-        serializedContent = new Uint8List.fromList((payloadContent as String).codeUnits);
+        serializedContent = new Uint8List.fromList(payloadContent.codeUnits);
       } else {
         throw new ArgumentError("Message payload should be either a Map, an Iterable, a String or an UInt8List instance");
       }

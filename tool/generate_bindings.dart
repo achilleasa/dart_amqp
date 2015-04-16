@@ -73,7 +73,6 @@ import "dart:math" as math;
 // Internal lib dependencies
 import "enums.dart";
 import "exceptions.dart";
-import "logging.dart";
 
 // Stream reader/writers
 part "protocol/stream/chunked_input_reader.dart";
@@ -331,7 +330,7 @@ ${new String.fromCharCodes(new List<int>.filled(className.length + methodName.le
 
     // Finish c-tor block
     if (implementedByClient) {
-      ctors.write(" }");
+      ctors.write("  }");
     }
 
     // End casacade
@@ -347,6 +346,14 @@ ${new String.fromCharCodes(new List<int>.filled(className.length + methodName.le
       generatedClass
         ..write("\n")
         ..write(serializerMethod);
+    } else {
+      // Write an empty serializer stub to avoid warnings
+      generatedClass
+        ..write("\n\n")
+        ..write("""
+  void serialize( TypeEncoder encoder ) {
+  }
+""");
     }
 //      ..write("\n")
 //      ..write(toStringMethod)
