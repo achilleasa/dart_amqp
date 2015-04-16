@@ -236,7 +236,7 @@ main({bool enableLogger : true}) {
       .open()
       .catchError(expectAsync((e) {
         expect(e, new isInstanceOf<FatalException>());
-        expect(e.message, equals("Selected authentication provider 'foo' is unsupported by the server (server supports: AMQPLAIN PLAIN)"));
+        expect(e.message, startsWith("Selected authentication provider 'foo' is unsupported by the server"));
       }));
     });
 
