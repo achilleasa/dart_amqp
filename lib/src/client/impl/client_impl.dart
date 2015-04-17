@@ -46,7 +46,11 @@ class _ClientImpl implements Client {
       _socket
       .transform(new RawFrameParser(tuningSettings).transformer)
       .transform(new AmqpMessageDecoder().transformer)
-      .listen(_handleMessage, onError : _handleException, onDone : _onSocketClosed);
+      .listen(
+          _handleMessage,
+          onError : _handleException,
+          onDone : () => _handleException(new SocketException("Socket closed"))
+      );
 
       // Allocate channel 0 for handshaking and transmit the AMQP header to bootstrap the handshake
       _channels.clear();
@@ -80,20 +84,6 @@ class _ClientImpl implements Client {
    * Check if a connection is currently in handshake state
    */
   bool get handshaking => _socket != null && _connected != null && !_connected.isCompleted;
-
-  void _onSocketClosed() {
-    // If we are still handshaking, it could be that the server disconnected us
-    // due to a failed SASL auth atttempt. In this case we should trigger a connection
-    // exception
-    if (handshaking && _channels.containsKey(0) &&
-    (_channels[0]._lastHandshakeMessage is ConnectionStartOk ||
-    _channels[0]._lastHandshakeMessage is ConnectionSecureOk)
-    ) {
-      _handleException(new FatalException("Authentication failed"));
-    } else {
-      _handleException(new FatalException("Lost connection to the server"));
-    }
-  }
 
   void _handleMessage(DecodedMessage serverMessage) {
     try {
@@ -145,9 +135,25 @@ class _ClientImpl implements Client {
   }
 
   void _handleException(ex) {
+
     // Ignore exceptions while shutting down
     if (_clientClosed != null) {
       return;
+    }
+
+    // If we are still handshaking, it could be that the server disconnected us
+    // due to a failed SASL auth atttempt. In this case we should trigger a connection
+    // exception
+    if( ex is SocketException ){
+      // Wrap the exception
+      if (handshaking && _channels.containsKey(0) &&
+      (_channels[0]._lastHandshakeMessage is ConnectionStartOk ||
+      _channels[0]._lastHandshakeMessage is ConnectionSecureOk)
+      ) {
+        ex = new FatalException("Authentication failed");
+      } else {
+        ex = new FatalException("Lost connection to the server");
+      }
     }
 
     connectionLogger.severe(ex);
@@ -170,7 +176,7 @@ class _ClientImpl implements Client {
         .reversed
         .forEach((_ChannelImpl channel) => channel.handleException(ex));
 
-        _close();
+        close();
         break;
       case ChannelException:
       // Forward to the appropriate channel and remove it from our list
@@ -182,38 +188,6 @@ class _ClientImpl implements Client {
 
         break;
     }
-  }
-
-  Future _close() {
-
-    if (_socket == null) {
-      return new Future.value();
-    }
-
-    // Already shutting down
-    if (_clientClosed != null) {
-      return _clientClosed.future;
-    }
-
-    // Close all channels in reverse order so we send a connection close message when we close channel 0
-    _clientClosed = new Completer();
-    Future.wait(
-        _channels
-        .values
-        .toList()
-        .reversed
-        .map((_ChannelImpl channel) => channel.close())
-    )
-    .then((_) => _socket.flush())
-    .then((_) => _socket.close())
-    .then((_) {
-      _socket.destroy();
-      _socket = null;
-      _connected = null;
-      _clientClosed.complete();
-    });
-
-    return _clientClosed.future;
   }
 
   /**
@@ -235,7 +209,38 @@ class _ClientImpl implements Client {
    * Shutdown any open channels and disconnect the socket. Return a [Future] to be completed
    * when the client has shut down
    */
-  Future close() => _close();
+  Future close(){
+      if (_socket == null) {
+        return new Future.value();
+      }
+
+      // Already shutting down
+      if (_clientClosed != null) {
+        return _clientClosed.future;
+      }
+
+      // Close all channels in reverse order so we send a connection close message when we close channel 0
+      _clientClosed = new Completer();
+      Future.wait(
+          _channels
+          .values
+          .toList()
+          .reversed
+          .map((_ChannelImpl channel) => channel.close())
+      )
+      .then((_) => _socket.flush())
+      .then((_) => _socket.close(), onError : (e){
+        // Mute exception as the socket may be already closed
+      })
+      .whenComplete(() {
+        _socket.destroy();
+        _socket = null;
+        _connected = null;
+        _clientClosed.complete();
+      });
+
+      return _clientClosed.future;
+  }
 
   Future<Channel> channel() {
     return open()
