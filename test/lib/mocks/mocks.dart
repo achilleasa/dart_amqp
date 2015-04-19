@@ -1,4 +1,4 @@
-library dart_cassandra_cql.tests.mocks;
+library dart_amqp.tests.mocks;
 
 import "dart:typed_data";
 import "dart:io";
