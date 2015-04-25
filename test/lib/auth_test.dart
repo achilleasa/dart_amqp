@@ -168,7 +168,7 @@ main({bool enableLogger : true}) {
       client = new Client(settings : settings);
 
       client
-      .open()
+      .connect()
       .then(expectAsync((_) {
       }));
     });
@@ -180,7 +180,7 @@ main({bool enableLogger : true}) {
       client = new Client(settings : settings);
 
       client
-      .open()
+      .connect()
       .then(expectAsync((_) {
       }));
     });
@@ -214,7 +214,7 @@ main({bool enableLogger : true}) {
       frameWriter.outputEncoder.writer.clear();
 
       client
-      .open()
+      .connect()
       .then(expectAsync((_) {
       }));
     });
@@ -233,7 +233,7 @@ main({bool enableLogger : true}) {
       client = new Client(settings : settings);
 
       client
-      .open()
+      .connect()
       .catchError(expectAsync((e) {
         expect(e, new isInstanceOf<FatalException>());
         expect(e.message, startsWith("Selected authentication provider 'foo' is unsupported by the server"));
@@ -246,7 +246,7 @@ main({bool enableLogger : true}) {
       client = new Client(settings : settings);
 
       client
-      .open()
+      .connect()
       .catchError(expectAsync((e) {
         expect(e, new isInstanceOf<FatalException>());
         expect(e.message, equals("Authentication failed"));

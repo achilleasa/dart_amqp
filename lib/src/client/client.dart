@@ -18,7 +18,7 @@ abstract class Client {
    * keyspace [defaultKeyspace]. Returns a [Future] to be completed on a successful protocol handshake
    */
 
-  Future open();
+  Future connect();
 
   /**
    * Shutdown any open channels and disconnect the socket. Return a [Future] to be completed

@@ -31,7 +31,7 @@ main({bool enableLogger : true}) {
       client = new Client(settings : settings);
 
       client
-      .open()
+      .connect()
       .catchError(expectAsync((ex) {
         expect(ex, new isInstanceOf<ConnectionFailedException>());
         expect(ex.toString(), startsWith('ConnectionFailedException'));
@@ -42,9 +42,9 @@ main({bool enableLogger : true}) {
     test("multiple open attampts should return the same future", () {
       client = new Client();
 
-      Future connectFuture = client.open();
+      Future connectFuture = client.connect();
 
-      expect(client.open(), equals(connectFuture));
+      expect(client.connect(), equals(connectFuture));
 
       return connectFuture;
     });
@@ -52,7 +52,7 @@ main({bool enableLogger : true}) {
     test("multiple close attampts should return the same future", () {
       client = new Client();
 
-      return client.open()
+      return client.connect()
       .then((_) {
         Future closeFuture = client.close();
 

@@ -155,7 +155,7 @@ main({bool enableLogger : true}) {
         }
 
         client
-        .open()
+        .connect()
         .then((_) {
           fail("Expected a FatalException to be thrown");
         }).catchError(expectAsync(handleError));
@@ -181,7 +181,7 @@ main({bool enableLogger : true}) {
         }
 
         client
-        .open()
+        .connect()
         .then((_) {
           fail("Expected an exception to be thrown");
         }).catchError(expectAsync(handleError));
@@ -204,7 +204,7 @@ main({bool enableLogger : true}) {
         }
 
         client
-        .open()
+        .connect()
         .then((_) {
           fail("Expected an exception to be thrown");
         }).catchError(expectAsync(handleError));
@@ -242,7 +242,7 @@ main({bool enableLogger : true}) {
         }
 
         client
-        .open()
+        .connect()
         .then((_) {
           fail("Expected an exception to be thrown");
         }).catchError(expectAsync(handleError));
@@ -275,7 +275,7 @@ main({bool enableLogger : true}) {
         }
 
         client
-        .open()
+        .connect()
         .then((_) {
           fail("Expected an exception to be thrown");
         }).catchError(expectAsync(handleError));

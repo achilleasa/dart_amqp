@@ -195,7 +195,7 @@ class _ClientImpl implements Client {
    * keyspace [defaultKeyspace]. Returns a [Future] to be completed on a successful protocol handshake
    */
 
-  Future open() {
+  Future connect() {
     // Prevent multiple connection attempts
     if (_connected != null) {
       return _connected.future;
@@ -243,7 +243,7 @@ class _ClientImpl implements Client {
   }
 
   Future<Channel> channel() {
-    return open()
+    return connect()
     .then((_) {
       // Check if we have exceeded our channel limit (open channels excluding channel 0)
       if (tuningSettings.maxChannels > 0 && _channels.length - 1 >= tuningSettings.maxChannels) {
