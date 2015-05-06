@@ -67,16 +67,17 @@ class FibonacciRpcClient {
   }
 }
 
-main() {
+main(List<String> args) {
   FibonacciRpcClient client = new FibonacciRpcClient();
 
+  int n = args.isEmpty
+    ? 30
+    : num.parse(args[0]);
+
   // Make 10 parallel calls and get fib(1) to fib(10)
-  Future
-  .wait(new Iterable.generate(10, (int index) => client.call(index + 1)))
-  .then((List<int> callValues) {
-    for (int index = 0; index < 10; index++) {
-      print(" [x] fib(${index + 1}) = ${callValues[index]}");
-    }
+  client.call(n)
+  .then((int res) {
+      print(" [x] fib(${n}) = ${res}");
   })
   .then((_) => client.close())
   .then((_) => exit(0));
