@@ -12,6 +12,7 @@ Main features:
 
 Things not working yet:
 - the driver does not currently support recovering client topologies when re-establishing connections. This feature may be implemented in a future version. 
+- heartbeats. The driver will process
 
 # Quick start
 
