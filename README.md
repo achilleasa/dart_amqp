@@ -72,8 +72,8 @@ void main() {
 
 # Api
 
-See the [Api documentation](https://github.com/achilleasa/dart_amqp/blob/master/API.md).
-
+See the [Api documentation](https://github.com/achilleasa/dart_amqp/blob/master/API.md)
+
 # RPC calls over AMQP
 
 This [example](https://github.com/achilleasa/dart_amqp/tree/master/examples/rpc) illustrates how to get a basic RPC server/client up and running using just the provided api calls. 
