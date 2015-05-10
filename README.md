@@ -72,18 +72,18 @@ void main() {
 
 # Api
 
-See the [Api documentation](https://github.com/achilleasa/dart_amqp/blob/master/API.md)
+See the [Api documentation](https://github.com/achilleasa/dart_amqp/blob/master/API.md).
 
 # RPC calls over AMQP
 
-This [example](https://github.com/achilleasa/dart_amqp/tree/master/examples/rpc) illustrates how to get a basic RPC server/client up and running using just the provided api calls. 
+This [example](https://github.com/achilleasa/dart_amqp/tree/master/example/rpc) illustrates how to get a basic RPC server/client up and running using just the provided api calls. 
 
 The driver does not provide any helper classes for easily performing RPC calls over AMQP as not everyone needs this
 functionality. If you need RPC support for your application you may want to consider using the [dart\_amqp\_rpc](https://pub.dartlang.org/packages/dart_amqp_rpc) package.
 
 # Examples
 
-The [examples](https://github.com/achilleasa/dart_amqp/tree/master/examples) folder contains implementations of the six RabbitMQ getting started [tutorials](https://www.rabbitmq.com/getstarted.html).
+The [example](https://github.com/achilleasa/dart_amqp/tree/master/example) folder contains implementations of the six RabbitMQ getting started [tutorials](https://www.rabbitmq.com/getstarted.html).
 
 # Contributing
 
