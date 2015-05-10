@@ -87,7 +87,7 @@ The [examples](https://github.com/achilleasa/dart_amqp/tree/master/examples) fol
 
 # Contributing
 
-See the [Contributing Guide](https://github.com/achilleasa/dart_cassandra_cql/blob/master/CONTRIBUTING.md).
+See the [Contributing Guide](https://github.com/achilleasa/dart_amqp/blob/master/CONTRIBUTING.md).
 
 
 # License
