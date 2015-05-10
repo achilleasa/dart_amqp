@@ -26,5 +26,9 @@ abstract class Client {
    */
   Future close();
 
+  /**
+   * Allocate and initialize a new [Channel]. Return a [Future] to be completed with
+   * the new [Channel]
+   */
   Future<Channel> channel();
 }
