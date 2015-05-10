@@ -6,6 +6,7 @@ import "../../packages/unittest/unittest.dart";
 import "../../lib/src/client.dart";
 import "../../lib/src/protocol.dart";
 import "../../lib/src/enums.dart";
+import "../../lib/src/exceptions.dart";
 
 import "mocks/mocks.dart" as mock;
 
@@ -28,6 +29,18 @@ main({bool enableLogger : true}) {
     tearDown(() {
       return client.close()
       .then((_) => client2.close());
+    });
+
+    test("check if unknown exchange exists", () {
+      client
+      .channel()
+      .then((Channel channel) => channel.exchange("foo123", ExchangeType.DIRECT, passive : true))
+      .then((_) => fail("Expected an exception to be thrown"))
+      .catchError(expectAsync((e) {
+        expect(e, new isInstanceOf<ExchangeNotFoundException>());
+        expect((e as ExchangeNotFoundException).errorType, equals(ErrorType.NOT_FOUND));
+        expect(e.toString(), startsWith("ExchangeNotFoundException: NOT_FOUND"));
+      }));
     });
 
     test("declare exchange", () {

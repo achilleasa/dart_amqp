@@ -142,7 +142,7 @@ class _ClientImpl implements Client {
     }
 
     // If we are still handshaking, it could be that the server disconnected us
-    // due to a failed SASL auth atttempt. In this case we should trigger a connection
+    // due to a failed SASL auth attempt. In this case we should trigger a connection
     // exception
     if( ex is SocketException ){
       // Wrap the exception

@@ -322,9 +322,11 @@ class _ChannelImpl implements Channel {
       case ChannelClose:
         ChannelClose closeResponse = serverResponse as ChannelClose;
 
-        // If we got a NOT_FOUND error and we have a pending Queue payload emit a QueueNotFoundException
+        // If we got a NOT_FOUND error and we have a pending Queue or Exchange payload emit a QueueNotFoundException
         if (closeResponse.replyCode == ErrorType.NOT_FOUND.value && _pendingOperationPayloads.first is Queue) {
           ex = new QueueNotFoundException(closeResponse.replyText, channelId, ErrorType.valueOf(closeResponse.replyCode));
+        } else if (closeResponse.replyCode == ErrorType.NOT_FOUND.value && _pendingOperationPayloads.first is Exchange) {
+          ex = new ExchangeNotFoundException(closeResponse.replyText, channelId, ErrorType.valueOf(closeResponse.replyCode));
         } else {
           ex = new ChannelException(closeResponse.replyText, channelId, ErrorType.valueOf(closeResponse.replyCode));
         }

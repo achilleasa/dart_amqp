@@ -36,7 +36,7 @@ class _ExchangeImpl implements Exchange {
     channel.writeMessage(pubRequest, properties : properties, payloadContent : message);
   }
 
-  Future<Consumer> bindPrivateQueueConsumer(List<String> routingKeys, {String consumerTag, bool noLocal : false, bool noAck: true, bool exclusive : false, bool noWait : false, Map<String, Object> arguments}) {
+  Future<Consumer> bindPrivateQueueConsumer(List<String> routingKeys, {String consumerTag, bool noAck: true}) {
     // Fanout exchanges do not need to specify any keys. Use the default one if none is specified
     if (type == ExchangeType.FANOUT && (routingKeys == null || routingKeys.isEmpty)) {
       routingKeys = [""];
@@ -51,7 +51,7 @@ class _ExchangeImpl implements Exchange {
     .then((Queue queue) {
       return Future
       .forEach(routingKeys, (String routingKey) => queue.bind(this, routingKey))
-      .then((_) => queue.consume(consumerTag : consumerTag, noLocal : noLocal, noAck : noAck, exclusive : exclusive, noWait : noWait, arguments : arguments));
+      .then((_) => queue.consume(consumerTag : consumerTag, noAck : noAck));
     });
   }
 }
