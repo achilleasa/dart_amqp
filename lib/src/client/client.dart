@@ -14,8 +14,7 @@ abstract class Client {
   bool get handshaking;
 
   /**
-   * Open a working connection to the server using [config.cqlVersion] and optionally select
-   * keyspace [defaultKeyspace]. Returns a [Future] to be completed on a successful protocol handshake
+   * Open a working connection to the server. Returns a [Future] to be completed on a successful protocol handshake
    */
 
   Future connect();
