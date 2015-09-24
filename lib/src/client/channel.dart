@@ -99,4 +99,10 @@ abstract class Channel {
    * Returns a [Future<Channel>] with the affected channel.
    */
   Future<Channel> recover(bool requeue);
+
+  /**
+  * Register a listener for basicReturn Messages
+  */
+  StreamSubscription<BasicReturnMessage> basicReturnListener(void onData(BasicReturnMessage message), { Function onError, void onDone(), bool cancelOnError});
+
 }

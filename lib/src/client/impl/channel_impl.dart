@@ -14,6 +14,7 @@ class _ChannelImpl implements Channel {
   Map<String, _ConsumerImpl> _consumers;
   Message _lastHandshakeMessage;
   Exception _channelCloseException;
+  StreamController _basicReturnStream = new StreamController.broadcast();
 
   _ChannelImpl(this.channelId, _ClientImpl this._client) {
     _frameWriter = new FrameWriter(_client.tuningSettings);
@@ -268,6 +269,12 @@ class _ChannelImpl implements Channel {
         _consumers.remove(serverResponse.consumerTag);
         _completeOperation(serverResponse);
         break;
+      case BasicReturn:
+        BasicReturn serverResponse = (serverMessage.message as BasicReturn);
+        if (_basicReturnStream != null && _basicReturnStream.hasListener && !_basicReturnStream.isClosed) {
+          _basicReturnStream.add(new _BasicReturnMessageImpl.fromDecodedMessage(serverResponse, serverMessage));
+        }
+        break;
       case BasicDeliver:
         BasicDeliver serverResponse = (serverMessage.message as BasicDeliver);
         _ConsumerImpl target = _consumers[ serverResponse.consumerTag ];
@@ -463,6 +470,8 @@ class _ChannelImpl implements Channel {
     writeMessage(exchangeRequest, completer : opCompleter, futurePayload : new _ExchangeImpl(this, name, type));
     return opCompleter.future;
   }
+
+  StreamSubscription<BasicReturnMessage> basicReturnListener(void onData(BasicReturnMessage message), { Function onError, void onDone(), bool cancelOnError}) => _basicReturnStream.stream.listen(onData, onError : onError, onDone : onDone, cancelOnError : cancelOnError);
 
   Future<Channel> qos(int prefetchSize, int prefetchCount, {bool global : true}) {
     if (prefetchSize == null) {

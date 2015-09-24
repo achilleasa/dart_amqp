@@ -14,7 +14,6 @@ class AmqpBindingsBuilder {
     "BasicGet",
     "BasicGetOk",
     "BasicGetEmpty",
-    "BasicReturn",
     "BasicRecoverAsync"
   ];
 
