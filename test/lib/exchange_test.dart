@@ -110,6 +110,21 @@ main({bool enableLogger : true}) {
 
     });
 
+    test("publish unrouteable message", () {
+      Completer testCompleter = new Completer();
+      client
+      .channel()
+      .then((Channel channel) {
+        channel.basicReturnListener((BasicReturnMessage message){
+          expect(message.replyCode, equals(312));
+          expect(message.routingKey, equals("test"));
+          testCompleter.complete();
+        });
+        return channel.exchange("ex_test_1", ExchangeType.DIRECT);
+      }).then((Exchange exchange)=>exchange.publish("Test message 1234", "test", mandatory:true));
+      return testCompleter.future;
+    });
+
     test("two client json conversation through an exchange", () {
       Completer testCompleter = new Completer();
       client
