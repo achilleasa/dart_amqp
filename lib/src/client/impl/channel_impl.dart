@@ -196,8 +196,8 @@ class _ChannelImpl implements Channel {
         ..classId = classId
         ..methodId = methodId;
     }
-    _basicReturnStream.close();
     writeMessage(closeRequest, completer : _channelClosed, futurePayload : this);
+    _channelClosed.future.then((_) => _basicReturnStream.close());
     return _channelClosed.future;
   }
 
