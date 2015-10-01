@@ -21,6 +21,7 @@ part "client/queue.dart";
 part "client/consumer.dart";
 part "client/exchange.dart";
 part "client/amqp_message.dart";
+part "client/basicreturn_message.dart";
 
 // client implementations
 part "client/impl/amqp_message_impl.dart";
@@ -29,3 +30,4 @@ part "client/impl/channel_impl.dart";
 part "client/impl/queue_impl.dart";
 part "client/impl/consumer_impl.dart";
 part "client/impl/exchange_impl.dart";
+part "client/impl/basic_return_message_impl.dart";
