@@ -8,7 +8,7 @@ Dart AMQP client implementing protocol version 0.9.1
 Main features:
  - asynchronous API based on [Futures](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart:async.Future) and [Streams](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart-async.Stream)
  - supports PLAIN and AMQPLAIN authentication providers while other authentication schemes can be plugged in by implementing the appropriate interface.
- - implements the entire 0.9.1 protocol specification (except basic get, return and recover-async)
+ - implements the entire 0.9.1 protocol specification (except basic get and recover-async)
 
 Things not working yet:
 - the driver does not currently support recovering client topologies when re-establishing connections. This feature may be implemented in a future version. 

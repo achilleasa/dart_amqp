@@ -72,6 +72,7 @@ The following table summarizes the methods available to an AMQP channel obtained
 | rollback()         | Rollback a transaction.
 | flow()             | Control message flow.
 | recover()          | Recover unacknowledged messages.
+| basicReturnListener()| Get a StreamSubscription for handling undelivered messages.
 
 ## Exchanges
 
