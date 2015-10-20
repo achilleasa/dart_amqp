@@ -19,6 +19,9 @@ class _ClientImpl implements Client {
   Completer _connected;
   Completer _clientClosed;
 
+  //Error Stream
+  StreamController _error = new StreamController.broadcast();
+
   _ClientImpl({ConnectionSettings settings}) {
 
     // Use defaults if no settings specified
@@ -166,6 +169,10 @@ class _ClientImpl implements Client {
       return;
     }
 
+    if (_error != null && _error.hasListener && !_error.isClosed) {
+      _error.add(ex);
+    }
+
     switch (ex.runtimeType) {
       case FatalException:
       case ConnectionException:
@@ -236,6 +243,7 @@ class _ClientImpl implements Client {
         _socket.destroy();
         _socket = null;
         _connected = null;
+        _error.close();
         _clientClosed.complete();
       });
 
@@ -270,4 +278,7 @@ class _ClientImpl implements Client {
       return userChannel._channelOpened.future;
     });
   }
+
+  StreamSubscription<Exception> errorListener(void onData(Exception error), { Function onError, void onDone(), bool cancelOnError}) => _error.stream.listen(onData, onError : onError, onDone : onDone, cancelOnError : cancelOnError);
+
 }
