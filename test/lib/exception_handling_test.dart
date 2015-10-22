@@ -357,7 +357,7 @@ main({bool enableLogger : true}) {
           expect(ex, new isInstanceOf<FatalException>());
         }
         server.shutdown()
-            .then((_) => server.listen("127.0.0.1", 9000))
+            .then((_) => server.listen(client.settings.host, client.settings.port))
             .then((_) {
               generateHandshakeMessages(frameWriter, server);
               return client
