@@ -1,6 +1,7 @@
 library dart_amqp.test.exceptions;
 
 import "dart:typed_data";
+import "dart:async";
 
 import "../packages/unittest/unittest.dart";
 import "../packages/mock/mock.dart";
@@ -350,6 +351,26 @@ main({bool enableLogger : true}) {
         }).catchError(expectAsync(handleError));
       });
     });
-
+    group("error stream:", () {
+      test("fatal exception", () async {
+        void handleError(ex) {
+          expect(ex, new isInstanceOf<FatalException>());
+        }
+        server.shutdown()
+            .then((_) => server.listen(client.settings.host, client.settings.port))
+            .then((_) {
+              generateHandshakeMessages(frameWriter, server);
+              return client
+                  .connect()
+                  .then((_) {
+                    client.errorListener((ex) => handleError(ex));
+                    return server.shutdown()
+                        .then((_) => new Future.delayed(
+                        new Duration(seconds: 5) + server.responseDelay))
+                        .then((_) => fail("Expected an exception to be thrown"));
+          });
+        });
+      });
+    });
   });
 }
