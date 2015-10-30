@@ -52,8 +52,8 @@ The following table summarizes the methods available to an AMQP client. For deta
 |--------------------|------------------
 | connect()          | Connect to the AMQP server and return a ```Future``` to be completed on a successfull connection.
 | close()            | Clean up any open channels and shutdown the connection. Returns a ```Future``` to be completed when the shutdown is complete.
-| channel()			 | Allocate a user channel and return a ```Future<Channel>```.
-
+| channel()	     | Allocate a user channel and return a ```Future<Channel>```.
+| errorListener()    | Register a listener for exceptions caught by the client.
 
 ## Channels
 
@@ -138,6 +138,7 @@ All api methods return back ```Future```. If the server reports an error then th
 
 When the application catches a server error, it should throw away the current channel and allocate a new one for further interaction with the server. Any attempt to invoke a method on a closed channel will cause an exception to be thrown.
 
+The application can also register an error listener for handling socket and protocol exceptions via the `errorListener()` method provided by the client.
 
 ## Logger support
 
