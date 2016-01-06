@@ -1,7 +1,7 @@
 name: dart_amqp
 description: >
   Dart AMQP client implementing protocol version 0.9.1
-version: 0.0.3
+version: 0.0.4
 author: Achilleas Anagnostopoulos
 homepage: https://github.com/achilleasa/dart_amqp
 dependencies:

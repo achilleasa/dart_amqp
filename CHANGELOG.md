@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.4
+
+- Merged Faisal Abid's [PR](https://github.com/achilleasa/dart_amqp/pull/5) that
+forces the client to request a 0 heartbeat timeout
+
 ## 0.0.3
 
 - Merged Raj Maniar's [PR](https://github.com/achilleasa/dart_amqp/pull/3) that
