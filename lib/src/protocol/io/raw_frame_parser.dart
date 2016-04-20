@@ -18,68 +18,77 @@ class RawFrameParser {
         _inputBuffer.add(chunk);
       }
 
-      // Are we extracting header bytes?
-      if (_parsedHeader == null) {
-
-        // Not enough bytes to parse header; wait till we get more
-        if (_inputBuffer.length < FrameHeader.LENGTH_IN_BYTES) {
-          return;
-        }
-
-        // Peek the first value in the stream. If it is character 'A' (char code 65) then the server
-        // rejected our protocol header and responded with the one it supports
-        if( _inputBuffer.peekNextByte() == 65){
-          // Make sure we can parse the entire header
-          if (_inputBuffer.length < ProtocolHeader.LENGTH_IN_BYTES) {
+      // Process frames till we exhaust our input buffer
+      while (_inputBuffer.length > 0) {
+        // Are we extracting header bytes?
+        if (_parsedHeader == null) {
+          // Not enough bytes to parse header; wait till we get more
+          if (_inputBuffer.length < FrameHeader.LENGTH_IN_BYTES) {
             return;
           }
 
-          Uint8List headerBytes = new Uint8List(ProtocolHeader.LENGTH_IN_BYTES);
-          _inputBuffer.read(headerBytes, ProtocolHeader.LENGTH_IN_BYTES);
-          ProtocolHeader protocolHeader = new ProtocolHeader.fromByteData(new TypeDecoder.fromBuffer(new ByteData.view(headerBytes.buffer)));
-          throw new FatalException("Could not negotiate a valid AMQP protocol version. Server supports AMQP ${protocolHeader.majorVersion}.${protocolHeader.minorVersion}.${protocolHeader.revision}");
+          // Peek the first value in the stream. If it is character 'A' (char code 65) then the server
+          // rejected our protocol header and responded with the one it supports
+          if (_inputBuffer.peekNextByte() == 65) {
+            // Make sure we can parse the entire header
+            if (_inputBuffer.length < ProtocolHeader.LENGTH_IN_BYTES) {
+              return;
+            }
+
+            Uint8List headerBytes =
+                new Uint8List(ProtocolHeader.LENGTH_IN_BYTES);
+            _inputBuffer.read(headerBytes, ProtocolHeader.LENGTH_IN_BYTES);
+            ProtocolHeader protocolHeader = new ProtocolHeader.fromByteData(
+                new TypeDecoder.fromBuffer(
+                    new ByteData.view(headerBytes.buffer)));
+            throw new FatalException(
+                "Could not negotiate a valid AMQP protocol version. Server supports AMQP ${protocolHeader.majorVersion}.${protocolHeader.minorVersion}.${protocolHeader.revision}");
+          }
+
+          // Extract header bytes and parse them
+          Uint8List headerBytes = new Uint8List(FrameHeader.LENGTH_IN_BYTES);
+          _inputBuffer.read(headerBytes, FrameHeader.LENGTH_IN_BYTES);
+          _parsedHeader = new FrameHeader.fromByteData(
+              new TypeDecoder.fromBuffer(
+                  new ByteData.view(headerBytes.buffer)));
+          headerBytes = null;
+
+          if (_parsedHeader.size > tuningSettings.maxFrameSize) {
+            throw new ConnectionException(
+                "Frame size cannot be larger than ${tuningSettings.maxFrameSize} bytes. Server sent ${_parsedHeader.size} bytes",
+                ErrorType.FRAME_ERROR,
+                0,
+                0);
+          }
+
+          // Allocate buffer for body (and frame terminator); then reset write offset
+          _bodyData = new Uint8List(_parsedHeader.size + 1);
+          _bodyWriteOffset = 0;
+        } else {
+          // Copy pending body data + expected frame terminator (0xCE)
+          _bodyWriteOffset += _inputBuffer.read(_bodyData,
+              _parsedHeader.size + 1 - _bodyWriteOffset, _bodyWriteOffset);
         }
 
-        // Extract header bytes and parse them
-        Uint8List headerBytes = new Uint8List(FrameHeader.LENGTH_IN_BYTES);
-        _inputBuffer.read(headerBytes, FrameHeader.LENGTH_IN_BYTES);
-        _parsedHeader = new FrameHeader.fromByteData(new TypeDecoder.fromBuffer(new ByteData.view(headerBytes.buffer)));
-        headerBytes = null;
+        // If we are done emit the frame to the next pipeline stage and cleanup
+        if (_bodyWriteOffset == _parsedHeader.size + 1) {
+          // Ensure that the last byte of the payload is our frame terminator
+          if (_bodyData.last != FRAME_TERMINATOR) {
+            throw new FatalException(
+                "Frame did not end with the expected frame terminator (0xCE)");
+          }
 
-        if (_parsedHeader.size > tuningSettings.maxFrameSize) {
-          throw new ConnectionException("Frame size cannot be larger than ${tuningSettings.maxFrameSize} bytes. Server sent ${_parsedHeader.size} bytes", ErrorType.FRAME_ERROR, 0, 0);
+          // Emit a raw frame excluding the frame terminator
+          sink.add(new RawFrame(
+              _parsedHeader,
+              new ByteData.view(
+                  _bodyData.buffer, 0, _bodyData.lengthInBytes - 1)));
+
+          _parsedHeader = null;
+          _bodyData = null;
         }
-
-        // Allocate buffer for body (and frame terminator); then reset write offset
-        _bodyData = new Uint8List(_parsedHeader.size + 1);
-        _bodyWriteOffset = 0;
-      } else {
-        // Copy pending body data + expected frame terminator (0xCE)
-        _bodyWriteOffset += _inputBuffer.read(_bodyData, _parsedHeader.size + 1 - _bodyWriteOffset, _bodyWriteOffset);
-      }
-
-      // If we are done emit the frame to the next pipeline stage and cleanup
-      if (_bodyWriteOffset == _parsedHeader.size + 1) {
-
-        // Ensure that the last byte of the payload is our frame terminator
-        if (_bodyData.last != FRAME_TERMINATOR) {
-          throw new FatalException("Frame did not end with the expected frame terminator (0xCE)");
-        }
-
-        // Emit a raw frame excluding the frame terminator
-        sink.add(new RawFrame(_parsedHeader, new ByteData.view(_bodyData.buffer, 0, _bodyData.lengthInBytes - 1)));
-
-        _parsedHeader = null;
-        _bodyData = null;
-      }
-
-      // If we have not exhausted our data buffers, trigger this method
-      // again to process the remaining data before resuming processing
-      if (_inputBuffer.length > 0) {
-        handleData(null, sink);
       }
     } catch (ex) {
-
       _parsedHeader = null;
       _bodyData = null;
 
@@ -91,14 +100,14 @@ class RawFrameParser {
     sink.close();
   }
 
-  void handleError(Object error, StackTrace stackTrace, EventSink<RawFrame> sink) {
+  void handleError(
+      Object error, StackTrace stackTrace, EventSink<RawFrame> sink) {
     sink.addError(error, stackTrace);
   }
 
-  StreamTransformer<List<int>, RawFrame> get transformer => new StreamTransformer<List<int>, RawFrame>.fromHandlers(
-      handleData: handleData,
-      handleDone: handleDone,
-      handleError: handleError
-      );
-
+  StreamTransformer<List<int>, RawFrame> get transformer =>
+      new StreamTransformer<List<int>, RawFrame>.fromHandlers(
+          handleData: handleData,
+          handleDone: handleDone,
+          handleError: handleError);
 }
