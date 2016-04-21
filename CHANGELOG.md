@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.5
+
+- Fixes #6 (stack overflow when processing large TCP packets)
+
 ## 0.0.4
 
 - Merged Faisal Abid's [PR](https://github.com/achilleasa/dart_amqp/pull/5) that
