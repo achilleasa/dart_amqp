@@ -22,7 +22,9 @@ class _ExchangeImpl implements Exchange {
   }
 
   void publish(Object message, String routingKey, { MessageProperties properties, bool mandatory : false, bool immediate : false}) {
-    if (type != ExchangeType.FANOUT && (routingKey == null || routingKey.isEmpty)) {
+    if(type is CustomExchangeType && (type as CustomExchangeType).routingKeyRequired && (routingKey == null || routingKey.isEmpty)){
+      throw new ArgumentError("A valid routing key needs to be specified");
+    }else if (type != ExchangeType.FANOUT && (routingKey == null || routingKey.isEmpty)) {
       throw new ArgumentError("A valid routing key needs to be specified");
     }
 

@@ -31,3 +31,13 @@ class ExchangeType extends Enum<String> {
     return name;
   }
 }
+
+class CustomExchangeType extends ExchangeType {
+
+  final bool routingKeyRequired;
+
+  const CustomExchangeType(String value, {this.routingKeyRequired:true}):super._(value);
+
+  static String nameOf(ExchangeType value) => value is CustomExchangeType ? value.toString().toUpperCase(): ExchangeType.nameOf(value);
+
+}
