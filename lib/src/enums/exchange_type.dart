@@ -1,12 +1,14 @@
 part of dart_amqp.enums;
 
-class ExchangeType extends Enum<String> {
+class ExchangeType extends BaseExchange {
   static const ExchangeType FANOUT = const ExchangeType._("fanout");
   static const ExchangeType DIRECT = const ExchangeType._("direct");
   static const ExchangeType TOPIC = const ExchangeType._("topic");
   static const ExchangeType HEADERS = const ExchangeType._("headers");
 
-  const ExchangeType._(String value) : super(value);
+  const ExchangeType._(String value) : super(value, false);
+
+  const ExchangeType.custom(String value) : super(value, true);
 
   String toString() => "${value}";
 
@@ -14,7 +16,7 @@ class ExchangeType extends Enum<String> {
     ExchangeType fromValue = value == FANOUT._value ? FANOUT :
                              value == DIRECT._value ? DIRECT :
                              value == TOPIC._value ? TOPIC :
-                             value == HEADERS._value ? HEADERS : null;
+                             value == HEADERS._value ? HEADERS : new ExchangeType.custom(value);
 
     if (fromValue == null) {
       throw new ArgumentError("Invalid exchange type value ${value}");
@@ -26,18 +28,17 @@ class ExchangeType extends Enum<String> {
     String name = value == FANOUT ? "FANOUT" :
                   value == DIRECT ? "DIRECT" :
                   value == TOPIC ? "TOPIC" :
-                  value == HEADERS ? "HEADERS" : null;
+                  value == HEADERS ? "HEADERS" :
+                  value.isCustom ? "CUSTOM" : null;
 
     return name;
   }
 }
 
-class CustomExchangeType extends ExchangeType {
+class BaseExchange extends Enum<String> {
 
-  final bool routingKeyRequired;
+  final bool isCustom;
 
-  const CustomExchangeType(String value, {this.routingKeyRequired:true}):super._(value);
-
-  static String nameOf(ExchangeType value) => value is CustomExchangeType ? value.toString().toUpperCase(): ExchangeType.nameOf(value);
+  const BaseExchange(String value, this.isCustom):super(value);
 
 }
