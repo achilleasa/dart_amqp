@@ -2,7 +2,7 @@
 
 ## 0.0.6
 
-- Add support for custom exchanges via the `ExchangeType.custom()` constructor
+- Add support for [custom exchanges](https://github.com/achilleasa/dart_amqp/pull/7) via the `ExchangeType.custom()` constructor
 
 ## 0.0.5
 
