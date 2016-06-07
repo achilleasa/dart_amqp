@@ -61,10 +61,19 @@ main({bool enableLogger : true}) {
           Object formattedJunkValue = junkValue is String
                                       ? "\"BADFOOD\""
                                       : "0xBADF00D";
-
-          test("valueOf(${formattedJunkValue}) throws ArgumentError", () {
-            expect(() => cm.invoke(#valueOf, [ junkValue ]).reflectee, throwsArgumentError);
-          });
+          if (cm.reflectedType == ExchangeType)
+            test("valueOf(${formattedJunkValue}) creates Custom Exchange", () {
+              ExchangeType customExchange = cm
+                  .invoke(#valueOf, [ junkValue])
+                  .reflectee;
+              expect(customExchange.isCustom, isTrue);
+            });
+          else
+            test("valueOf(${formattedJunkValue}) throws ArgumentError", () {
+              expect(() => cm
+                  .invoke(#valueOf, [ junkValue])
+                  .reflectee, throwsArgumentError);
+            });
         });
       }
 

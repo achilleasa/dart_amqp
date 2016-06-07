@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.6
+
+- Add support for custom exchanges via the `ExchangeType.custom()` constructor
+
 ## 0.0.5
 
 - Fixes #6 (stack overflow when processing large TCP packets)
