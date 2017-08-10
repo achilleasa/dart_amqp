@@ -111,6 +111,7 @@ class _QueueImpl implements Queue {
       ..noLocal = noLocal
       ..noAck = noAck
       ..noWait = noWait
+      ..exclusive = exclusive
       ..arguments = arguments;
 
     Completer completer = new Completer();
