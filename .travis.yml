@@ -1,0 +1,13 @@
+language: dart
+dart:
+  - stable
+services:
+  - rabbitmq
+script:
+  - export PATH="$PATH":"~/.pub-cache/bin"
+  - pub get --packages-dir
+  - pub global activate coverage
+  - cd test 
+  - bash run.sh
+  - bash test_coverage.sh
+  - bash <(curl -s https://codecov.io/bash) -X gcov -f '*.lcov'
