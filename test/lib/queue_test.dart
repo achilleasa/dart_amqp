@@ -164,7 +164,7 @@ main({bool enableLogger : true}) {
 
         // Use second accuracy
         DateTime now = new DateTime.now();
-        now = now.subtract(new Duration(milliseconds : now.millisecond));
+        now = now.subtract(new Duration(milliseconds : now.millisecond, microseconds: now.microsecond));
 
         consumer.listen(expectAsync((AmqpMessage message) {
           expect(message.payloadAsJson, equals({"message" : "Test payload"}));
