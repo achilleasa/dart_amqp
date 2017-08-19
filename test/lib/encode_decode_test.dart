@@ -148,7 +148,7 @@ main({bool enableLogger : true}) {
     test("timestamp", () {
       // Use second accuracy
       DateTime now = new DateTime.now();
-      now = now.subtract(new Duration(milliseconds : now.millisecond));
+      now = now.subtract(new Duration(milliseconds : now.millisecond, microseconds: now.microsecond));
 
       encoder.writeTimestamp(now);
       decoder = decoderFromEncoder(encoder);
@@ -176,7 +176,7 @@ main({bool enableLogger : true}) {
     test("table", () {
       // Use second accuracy
       DateTime now = new DateTime.now();
-      now = now.subtract(new Duration(milliseconds : now.millisecond));
+      now = now.subtract(new Duration(milliseconds : now.millisecond, microseconds: now.microsecond));
 
       Map tableData = {
         "map" : {
@@ -211,7 +211,7 @@ main({bool enableLogger : true}) {
     test("table (unsupported field exception)", () {
       // Use second accuracy
       DateTime now = new DateTime.now();
-      now = now.subtract(new Duration(milliseconds : now.millisecond));
+      now = now.subtract(new Duration(milliseconds : now.millisecond, microseconds: now.microsecond));
 
       Map tableData = {
         "unsupported" : new StreamController()
