@@ -281,4 +281,5 @@ class _ClientImpl implements Client {
 
   StreamSubscription<Exception> errorListener(void onData(Exception error), { Function onError, void onDone(), bool cancelOnError}) => _error.stream.listen(onData, onError : onError, onDone : onDone, cancelOnError : cancelOnError);
 
+  _ChannelImpl _removeChannel(int channelId)=>_channels.remove(channelId);
 }
