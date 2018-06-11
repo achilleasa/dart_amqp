@@ -2,6 +2,7 @@ library dart_amqp.test.exceptions;
 
 import "dart:typed_data";
 import "dart:async";
+import "dart:math";
 
 import "../packages/unittest/unittest.dart";
 import "../packages/mock/mock.dart";
@@ -115,6 +116,7 @@ void generateHandshakeMessages(FrameWriter frameWriter, mock.MockServer server) 
 }
 
 main({bool enableLogger : true}) {
+  Random rnd = new Random();
   if (enableLogger) {
     mock.initLogger();
   }
@@ -124,13 +126,15 @@ main({bool enableLogger : true}) {
     mock.MockServer server;
     FrameWriter frameWriter;
     TuningSettings tuningSettings;
+    int port;
 
     setUp(() {
       tuningSettings = new TuningSettings();
       frameWriter = new FrameWriter(tuningSettings);
       server = new mock.MockServer();
-      client = new Client(settings : new ConnectionSettings(port : 9000));
-      return server.listen('127.0.0.1', 9000);
+      port = 9000 + rnd.nextInt(100);
+      client = new Client(settings : new ConnectionSettings(port : port));
+      return server.listen('127.0.0.1', port);
     });
 
     tearDown(() {
