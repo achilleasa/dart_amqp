@@ -211,7 +211,8 @@ ${new String.fromCharCodes(new List<int>.filled(className.length + methodName.le
     amqpMethod
     .descendants
     .where((xml.XmlNode node) => node is xml.XmlElement && node.name.local == "field")
-    .forEach((xml.XmlElement amqpMethodField) {
+    .forEach((xml.XmlNode node) {
+      xml.XmlElement amqpMethodField = node as xml.XmlElement;
 
       // Convert dashed field name to camelCase
       String fieldName = amqpMethodField
@@ -399,7 +400,9 @@ part of dart_amqp.protocol;
     amqpClass
     .descendants
     .where((xml.XmlNode node) => node is xml.XmlElement && node.name.local == "method")
-    .where((xml.XmlElement node) {
+    .where((xml.XmlNode elemNode) {
+      xml.XmlElement node = elemNode as xml.XmlElement;
+
       // Apply method exclusion list
       String methodName = node
       .getAttribute("name")
@@ -413,7 +416,9 @@ part of dart_amqp.protocol;
       String fullClassName = "${className}${methodName}";
       return !excludedMessages.contains(fullClassName);
     })
-    .forEach((xml.XmlElement node) {
+    .forEach((xml.XmlNode elemNode) {
+      xml.XmlElement node = elemNode as xml.XmlElement;
+
       generatedMethodsFile
         ..write("\n")
         ..write(_parseMethod(className, classId, node));
@@ -462,7 +467,9 @@ part of dart_amqp.protocol;
     schema
     .descendants
     .where((xml.XmlNode node) => node is xml.XmlElement && node.name.local == "class")
-    .forEach((xml.XmlElement amqpClassElement) {
+    .forEach((xml.XmlNode elemNode) {
+      xml.XmlElement amqpClassElement = elemNode as xml.XmlElement;
+
       String className = amqpClassElement.getAttribute("name").toLowerCase();
       generatedLibraryFile.write("part \"protocol/messages/bindings/${className}.dart\";\n");
       _parseClass(amqpClassElement);

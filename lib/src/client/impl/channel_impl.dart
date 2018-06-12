@@ -410,11 +410,11 @@ class _ChannelImpl implements Channel {
   }
 
   /**
-   * Close the channel and return a [Future] to be completed when the channel is closed.
+   * Close the channel and return a [Future<Channel>] to be completed when the channel is closed.
    *
    * After closing the channel any attempt to send a message over it will cause a [StateError]
    */
-  Future close() => _close(replyCode : ErrorType.SUCCESS, replyText : "Normal shutdown");
+  Future<Channel> close() => _close(replyCode : ErrorType.SUCCESS, replyText : "Normal shutdown");
 
   Future<Queue> queue(String name, {bool passive : false, bool durable : false, bool exclusive : false, bool autoDelete : false, bool noWait : false, Map<String, Object> arguments }) {
     QueueDeclare queueRequest = new QueueDeclare()

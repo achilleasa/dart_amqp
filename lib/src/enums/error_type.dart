@@ -23,7 +23,7 @@ class ErrorType extends Enum<int> {
 
   final bool isHardError;
 
-  const ErrorType._(int value, bool hardError) : super(value), isHardError = hardError;
+  const ErrorType._(int value, bool hardError) : isHardError = hardError, super(value); 
 
   String toString() => "${value}";
 
