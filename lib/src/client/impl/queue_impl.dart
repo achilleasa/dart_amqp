@@ -22,7 +22,7 @@ class _QueueImpl implements Queue {
       ..ifEmpty = IfEmpty
       ..noWait = noWait;
 
-    Completer completer = new Completer();
+    Completer<Queue> completer = new Completer<Queue>();
     channel.writeMessage(deleteRequest, completer : completer, futurePayload : this);
     return completer.future;
   }
@@ -33,7 +33,7 @@ class _QueueImpl implements Queue {
       ..queue = name
       ..noWait = noWait;
 
-    Completer completer = new Completer();
+    Completer<Queue> completer = new Completer<Queue>();
     channel.writeMessage(purgeRequest, completer : completer, futurePayload : this);
     return completer.future;
   }
@@ -58,7 +58,7 @@ class _QueueImpl implements Queue {
       ..routingKey = routingKey
       ..noWait = noWait;
 
-    Completer completer = new Completer();
+    Completer<Queue> completer = new Completer<Queue>();
     channel.writeMessage(bindRequest, completer : completer, futurePayload : this);
     return completer.future;
   }
@@ -82,7 +82,7 @@ class _QueueImpl implements Queue {
       ..exchange = exchange.name
       ..routingKey = routingKey;
 
-    Completer completer = new Completer();
+    Completer<Queue> completer = new Completer<Queue>();
     channel.writeMessage(unbindRequest, completer : completer, futurePayload : this);
     return completer.future;
   }
@@ -114,7 +114,7 @@ class _QueueImpl implements Queue {
       ..exclusive = exclusive
       ..arguments = arguments;
 
-    Completer completer = new Completer();
+    Completer<Consumer> completer = new Completer<Consumer>();
     channel.writeMessage(consumeRequest, completer : completer, futurePayload : new _ConsumerImpl(channel, this, ""));
     return completer.future;
   }

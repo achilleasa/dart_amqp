@@ -16,7 +16,7 @@ class _ExchangeImpl implements Exchange {
       ..ifUnused = ifUnused
       ..noWait = noWait;
 
-    Completer completer = new Completer();
+    Completer<Exchange> completer = new Completer<Exchange>();
     channel.writeMessage(deleteRequest, completer : completer, futurePayload : this);
     return completer.future;
   }

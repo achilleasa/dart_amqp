@@ -8,7 +8,7 @@ class _ConsumerImpl implements Consumer {
 
   String get tag => _tag;
 
-  _ConsumerImpl(_ChannelImpl this.channel, _QueueImpl this.queue, String this._tag) : _controller = new StreamController();
+  _ConsumerImpl(_ChannelImpl this.channel, _QueueImpl this.queue, String this._tag) : _controller = new StreamController<AmqpMessage>();
 
   StreamSubscription<AmqpMessage> listen(void onData(AmqpMessage event), { Function onError, void onDone(), bool cancelOnError}) => _controller.stream.listen(onData, onError : onError, onDone : onDone, cancelOnError : cancelOnError);
 
@@ -17,7 +17,7 @@ class _ConsumerImpl implements Consumer {
       ..consumerTag = _tag
       ..noWait = noWait;
 
-    Completer completer = new Completer();
+    Completer<Consumer> completer = new Completer<Consumer>();
     channel.writeMessage(cancelRequest, completer : completer, futurePayload : this);
     completer.future.then((_) => _controller.close());
     return completer.future;

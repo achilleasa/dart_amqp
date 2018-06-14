@@ -259,7 +259,7 @@ class _ChannelImpl implements Channel {
         break;
       case BasicConsumeOk:
         BasicConsumeOk serverResponse = (serverMessage.message as BasicConsumeOk);
-        Consumer consumer = (_pendingOperationPayloads.first as _ConsumerImpl)
+        _ConsumerImpl consumer = (_pendingOperationPayloads.first as _ConsumerImpl)
           .._tag = serverResponse.consumerTag;
         _consumers[serverResponse.consumerTag] = consumer;
         _completeOperation(serverResponse);
@@ -427,7 +427,7 @@ class _ChannelImpl implements Channel {
       ..noWait = noWait
       ..arguments = arguments;
 
-    Completer opCompleter = new Completer();
+    Completer<Queue> opCompleter = new Completer<Queue>();
     writeMessage(queueRequest, completer : opCompleter, futurePayload : new _QueueImpl(this, name));
     return opCompleter.future;
   }
@@ -443,7 +443,7 @@ class _ChannelImpl implements Channel {
       ..noWait = noWait
       ..arguments = arguments;
 
-    Completer opCompleter = new Completer();
+    Completer<Queue> opCompleter = new Completer<Queue>();
     writeMessage(queueRequest, completer : opCompleter, futurePayload : new _QueueImpl(this, ""));
     return opCompleter.future;
   }
@@ -466,7 +466,7 @@ class _ChannelImpl implements Channel {
       ..noWait = noWait
       ..arguments = arguments;
 
-    Completer opCompleter = new Completer();
+    Completer<Exchange> opCompleter = new Completer<Exchange>();
     writeMessage(exchangeRequest, completer : opCompleter, futurePayload : new _ExchangeImpl(this, name, type));
     return opCompleter.future;
   }
@@ -485,7 +485,7 @@ class _ChannelImpl implements Channel {
       ..prefetchCount = prefetchCount
       ..global = global;
 
-    Completer opCompleter = new Completer();
+    Completer<Channel> opCompleter = new Completer<Channel>();
     writeMessage(qosRequest, completer : opCompleter, futurePayload : this);
     return opCompleter.future;
   }
@@ -500,21 +500,21 @@ class _ChannelImpl implements Channel {
 
   Future<Channel> select() {
     TxSelect selectRequest = new TxSelect();
-    Completer opCompleter = new Completer();
+    Completer<Channel> opCompleter = new Completer<Channel>();
     writeMessage(selectRequest, completer : opCompleter, futurePayload : this);
     return opCompleter.future;
   }
 
   Future<Channel> commit() {
     TxCommit commitRequest = new TxCommit();
-    Completer opCompleter = new Completer();
+    Completer<Channel> opCompleter = new Completer<Channel>();
     writeMessage(commitRequest, completer : opCompleter, futurePayload : this);
     return opCompleter.future;
   }
 
   Future<Channel> rollback() {
     TxRollback rollbackRequest = new TxRollback();
-    Completer opCompleter = new Completer();
+    Completer<Channel> opCompleter = new Completer<Channel>();
     writeMessage(rollbackRequest, completer : opCompleter, futurePayload : this);
     return opCompleter.future;
   }
@@ -523,7 +523,7 @@ class _ChannelImpl implements Channel {
     ChannelFlow flowRequest = new ChannelFlow()
       ..active = active;
 
-    Completer opCompleter = new Completer();
+    Completer<Channel> opCompleter = new Completer<Channel>();
     writeMessage(flowRequest, completer : opCompleter, futurePayload : this);
     return opCompleter.future;
   }
@@ -532,7 +532,7 @@ class _ChannelImpl implements Channel {
     BasicRecover recoverRequest = new BasicRecover()
       ..requeue = requeue;
 
-    Completer opCompleter = new Completer();
+    Completer<Channel> opCompleter = new Completer<Channel>();
     writeMessage(recoverRequest, completer : opCompleter, futurePayload : this);
     return opCompleter.future;
   }
