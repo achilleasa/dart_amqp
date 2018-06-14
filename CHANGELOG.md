@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.9
+
+- Merged [#14](https://github.com/achilleasa/dart_amqp/pull/14) and [#15](https://github.com/achilleasa/dart_amqp/pull/15)
+to fix some type errors reported by dartanalyzer when running with Dart2/Flutter.
+
 ## 0.0.6
 
 - Add support for [custom exchanges](https://github.com/achilleasa/dart_amqp/pull/7) via the `ExchangeType.custom()` constructor
