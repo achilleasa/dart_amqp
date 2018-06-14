@@ -193,7 +193,7 @@ main({bool enableLogger : true}) {
           "int8" : -0x80,
           "int16" : -0x8000,
           "int32" : -0x80000000,
-          "int64" : -0x8000000000000000
+          "int64" : -0x800000000000000
         },
         "string" : "Hello world",
         "float" : -3.141,

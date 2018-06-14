@@ -37,7 +37,10 @@ class MockServer {
       mockLogger.info("Shutting down server [${_server.address}:${_server.port}]");
 
       List<Future> cleanupFutures = []
-        ..addAll(clients.map((Socket client) => new Future.value(client.destroy())))
+        ..addAll(clients.map((Socket client){
+	  client.destroy();
+	  return new Future.value(true);
+	}))
         ..add(_server.close().then((_) => new Future.delayed(new Duration(milliseconds:20), () => true)));
 
       clients.clear();
