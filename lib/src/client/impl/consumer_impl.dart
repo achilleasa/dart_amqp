@@ -10,7 +10,7 @@ class _ConsumerImpl implements Consumer {
 
   _ConsumerImpl(_ChannelImpl this.channel, _QueueImpl this.queue, String this._tag) : _controller = new StreamController<AmqpMessage>();
 
-  StreamSubscription<AmqpMessage> listen(void onData(AmqpMessage event), { Function onError, void onDone(), bool cancelOnError}) => _controller.stream.listen(onData, onError : onError, onDone : onDone, cancelOnError : cancelOnError);
+  StreamSubscription<AmqpMessage> listen(void onData(AmqpMessage event), { Function onError, void onDone(), bool cancelOnError}) => _controller.stream.listen((dynamic obj) { onData(obj as AmqpMessage); }, onError : onError, onDone : onDone, cancelOnError : cancelOnError);
 
   Future<Consumer> cancel({bool noWait : false}) {
     BasicCancel cancelRequest = new BasicCancel()
