@@ -3,12 +3,12 @@ library dart_amqp.test.decoder;
 import "dart:async";
 import "dart:typed_data";
 
-import "../packages/unittest/unittest.dart";
-import "../packages/mock/mock.dart";
+import "package:unittest/unittest.dart";
+import "package:mock/mock.dart";
 
-import "../../lib/src/enums.dart";
-import "../../lib/src/protocol.dart";
-import "../../lib/src/exceptions.dart";
+import "package:dart_amqp/src/enums.dart";
+import "package:dart_amqp/src/protocol.dart";
+import "package:dart_amqp/src/exceptions.dart";
 
 import "mocks/mocks.dart" as mock;
 

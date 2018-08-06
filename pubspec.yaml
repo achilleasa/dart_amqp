@@ -1,17 +1,17 @@
 name: dart_amqp
 description: >
   Dart AMQP client implementing protocol version 0.9.1
-version: 0.0.9
+version: 0.1.0
 author: Achilleas Anagnostopoulos
 homepage: https://github.com/achilleasa/dart_amqp
 environment:
-  sdk: '>=1.0.0 <2.0.0'
+  sdk: '>=2.0.0-dev <3.0.0'
 dependencies:
   logging: ">=0.9.3 <0.12.0"
 dev_dependencies:
   unittest: any
-  mock: ">=0.11.0+2 <0.12.0"
-  http: ">=0.11.1+1 <0.12.0"
-  xml: ">=2.2.3 <3.0.0"
-  coverage: "^0.7.0"
-  dart_codecov_generator: "^0.4.0"
+  mock: ^0.12.0
+  http: ^0.11.1+1
+  xml: ^3.2.0
+#  coverage: ^0.12.2
+#  dart_codecov_generator: "^0.4.0"

@@ -4,7 +4,7 @@ class TypeEncoder {
 
   ChunkedOutputWriter _writer;
 
-  final Endianness endianess = Endianness.BIG_ENDIAN;
+  final Endian endianess = Endian.big;
 
   TypeEncoder({ChunkedOutputWriter withWriter : null}) {
     _writer = withWriter == null
@@ -97,7 +97,7 @@ class TypeEncoder {
       return;
     }
 
-    List<int> data = UTF8.encode(value);
+    List<int> data = utf8.encode(value);
 
     if (data.length > 255) {
       throw new ArgumentError("Short string values should have a length <= 255");
@@ -114,7 +114,7 @@ class TypeEncoder {
       return;
     }
 
-    List<int> data = UTF8.encode(value);
+    List<int> data = utf8.encode(value);
 
     // Write the length followed by the actual bytes
     writeUInt32(data.length);

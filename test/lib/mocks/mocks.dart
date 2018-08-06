@@ -114,7 +114,7 @@ class _RotEncoder extends Converter<Map, Uint8List> {
     if (throwOnConvert) {
       throw new Exception("Something has gone awfully wrong...");
     }
-    String serializedMap = JSON.encode(input);
+    String serializedMap = json.encode(input);
     Uint8List result = new Uint8List(serializedMap.length);
 
     for (int i = 0; i < serializedMap.length; i++) {
@@ -142,7 +142,7 @@ class _RotDecoder extends Converter<Uint8List, Map> {
       result[i] = (input[i] + _key) % 256;
     }
 
-    return JSON.decode(new String.fromCharCodes(result));
+    return json.decode(new String.fromCharCodes(result));
   }
 }
 

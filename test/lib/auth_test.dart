@@ -1,7 +1,7 @@
 library dart_amqp.test.auth;
 
-import "../packages/unittest/unittest.dart";
-import "../packages/mock/mock.dart";
+import "package:unittest/unittest.dart";
+import "package:mock/mock.dart";
 
 import "../../lib/src/authentication.dart";
 import "../../lib/src/client.dart";

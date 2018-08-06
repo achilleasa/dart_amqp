@@ -4,8 +4,8 @@ import "dart:typed_data";
 import "dart:async";
 import "dart:math";
 
-import "../packages/unittest/unittest.dart";
-import "../packages/mock/mock.dart";
+import "package:unittest/unittest.dart";
+import "package:mock/mock.dart";
 
 import "../../lib/src/client.dart";
 import "../../lib/src/enums.dart";

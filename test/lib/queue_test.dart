@@ -2,7 +2,7 @@ library dart_amqp.test.queues;
 
 import "dart:async";
 
-import "../../packages/unittest/unittest.dart";
+import "package:unittest/unittest.dart";
 
 import "../../lib/src/client.dart";
 import "../../lib/src/protocol.dart";
