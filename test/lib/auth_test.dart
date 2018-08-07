@@ -1,6 +1,6 @@
 library dart_amqp.test.auth;
 
-import "package:unittest/unittest.dart";
+import "package:test/test.dart";
 import "package:mock/mock.dart";
 
 import "../../lib/src/authentication.dart";
@@ -169,7 +169,7 @@ main({bool enableLogger : true}) {
 
       client
       .connect()
-      .then(expectAsync((_) {
+      .then(expectAsync1((_) {
       }));
     });
 
@@ -181,7 +181,7 @@ main({bool enableLogger : true}) {
 
       client
       .connect()
-      .then(expectAsync((_) {
+      .then(expectAsync1((_) {
       }));
     });
   });
@@ -215,7 +215,7 @@ main({bool enableLogger : true}) {
 
       client
       .connect()
-      .then(expectAsync((_) {
+      .then(expectAsync1((_) {
       }));
     });
   });
@@ -234,8 +234,8 @@ main({bool enableLogger : true}) {
 
       client
       .connect()
-      .catchError(expectAsync((e) {
-        expect(e, new isInstanceOf<FatalException>());
+      .catchError(expectAsync1((e) {
+        expect(e, const TypeMatcher<FatalException>());
         expect(e.message, startsWith("Selected authentication provider 'foo' is unsupported by the server"));
       }));
     });
@@ -247,8 +247,8 @@ main({bool enableLogger : true}) {
 
       client
       .connect()
-      .catchError(expectAsync((e) {
-        expect(e, new isInstanceOf<FatalException>());
+      .catchError(expectAsync1((e) {
+        expect(e, const TypeMatcher<FatalException>());
         expect(e.message, equals("Authentication failed"));
       }));
     });

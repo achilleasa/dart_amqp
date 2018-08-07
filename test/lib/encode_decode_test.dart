@@ -3,7 +3,7 @@ library dart_amqp.test.encode_decode;
 import "dart:async";
 import "dart:typed_data";
 
-import "package:unittest/unittest.dart";
+import "package:test/test.dart";
 
 import "../../lib/src/protocol.dart";
 

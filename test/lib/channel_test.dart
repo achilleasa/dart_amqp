@@ -1,6 +1,6 @@
 library dart_amqp.test.channels;
 
-import "package:unittest/unittest.dart";
+import "package:test/test.dart";
 
 import "../../lib/src/client.dart";
 import "../../lib/src/enums.dart";
@@ -64,8 +64,8 @@ main({bool enableLogger : true}) {
         .channel()
         .then((Channel channel) => channel.commit())
         .then((_) => fail("Expected an exception to be thrown"))
-        .catchError(expectAsync((e) {
-          expect(e, new isInstanceOf<ChannelException>());
+        .catchError(expectAsync1((e) {
+          expect(e, const TypeMatcher<ChannelException>());
           expect((e as ChannelException).errorType, equals(ErrorType.PRECONDITION_FAILED));
         }));
       });
@@ -75,8 +75,8 @@ main({bool enableLogger : true}) {
         .channel()
         .then((Channel channel) => channel.rollback())
         .then((_) => fail("Expected an exception to be thrown"))
-        .catchError(expectAsync((e) {
-          expect(e, new isInstanceOf<ChannelException>());
+        .catchError(expectAsync1((e) {
+          expect(e, const TypeMatcher<ChannelException>());
           expect((e as ChannelException).errorType, equals(ErrorType.PRECONDITION_FAILED));
           expect(e.toString(), startsWith("ChannelException(PRECONDITION_FAILED)"));
         }));
