@@ -3,15 +3,15 @@ services:
   - rabbitmq
 jobs:
   include:
-    - stage: run tests
-      dart: stable
-      script:
-        - export PATH=$PATH:"~/.pub-cache/bin"
-        - pub get
-        - pub global activate coverage
-        - dartanalyzer --fatal-warnings --fatal-hints --fatal-lints ./
-        - cd test
-        - bash run.sh
+#    - stage: run tests
+#      dart: stable
+#      script:
+#        - export PATH=$PATH:"~/.pub-cache/bin"
+#        - pub get
+#        - pub global activate coverage
+#        - dartanalyzer --fatal-warnings --fatal-hints --fatal-lints ./
+#        - cd test
+#        - bash run.sh
     - stage: run tests
       dart: dev
       script:
