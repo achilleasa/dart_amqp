@@ -7,3 +7,5 @@ test/coverage
 packages
 pubspec.lock
 tool/amqp0-9-1.xml
+.packages
+.dart_tool
