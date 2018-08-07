@@ -375,6 +375,6 @@ main({bool enableLogger : true}) {
           });
         });
       });
-    });
+    }, skip: true);
   });
 }

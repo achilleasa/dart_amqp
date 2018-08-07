@@ -178,7 +178,7 @@ main({bool enableLogger : true}) {
       DateTime now = new DateTime.now();
       now = now.subtract(new Duration(milliseconds : now.millisecond, microseconds: now.microsecond));
 
-      Map tableData = {
+      final tableData = {
         "map" : {
           "list" : ["foo", "bar", "baz"]
         },
@@ -213,7 +213,7 @@ main({bool enableLogger : true}) {
       DateTime now = new DateTime.now();
       now = now.subtract(new Duration(milliseconds : now.millisecond, microseconds: now.microsecond));
 
-      Map tableData = {
+      final tableData = {
         "unsupported" : new StreamController()
       };
 

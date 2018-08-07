@@ -14,7 +14,7 @@ class _ChannelImpl implements Channel {
   Map<String, _ConsumerImpl> _consumers;
   Message _lastHandshakeMessage;
   Exception _channelCloseException;
-  StreamController _basicReturnStream = new StreamController.broadcast();
+  final _basicReturnStream = new StreamController<BasicReturnMessage>.broadcast();
 
   _ChannelImpl(this.channelId, _ClientImpl this._client) {
     _frameWriter = new FrameWriter(_client.tuningSettings);
