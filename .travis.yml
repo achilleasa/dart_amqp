@@ -3,24 +3,24 @@ services:
   - rabbitmq
 jobs:
   include:
-    - stage: run tests (dart 1)
+    - stage: run tests
       dart: stable
-      script: 
+      script:
         - export PATH=$PATH:"~/.pub-cache/bin"
-        - pub get --packages-dir
+        - pub get
         - pub global activate coverage
-        - dartanalyzer --no-hints ./
-        - cd test 
+        - dartanalyzer --fatal-warnings --fatal-hints --fatal-lints ./
+        - cd test
         - bash run.sh
-    - stage: run tests (dart 2)
+    - stage: run tests
       dart: dev
-      script: 
+      script:
         - export PATH=$PATH:"~/.pub-cache/bin"
-        - pub get --packages-dir
+        - pub get
         - pub global activate coverage
-        - dartanalyzer --no-hints ./
-        - cd test 
+        - dartanalyzer --fatal-warnings --fatal-hints --fatal-lints ./
+        - cd test
         - bash run.sh
-      after_success:
-        - bash test_coverage.sh
-        - bash <(curl -s https://codecov.io/bash) -X gcov -f '*.lcov'
+#      after_success:
+#        - bash test_coverage.sh
+#        - bash <(curl -s https://codecov.io/bash) -X gcov -f '*.lcov'
