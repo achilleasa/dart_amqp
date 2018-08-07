@@ -3,10 +3,10 @@ library dart_amqp.test.auth;
 import "package:test/test.dart";
 import "package:mock/mock.dart";
 
-import "../../lib/src/authentication.dart";
-import "../../lib/src/client.dart";
-import "../../lib/src/protocol.dart";
-import "../../lib/src/exceptions.dart";
+import "package:dart_amqp/src/authentication.dart";
+import "package:dart_amqp/src/client.dart";
+import "package:dart_amqp/src/protocol.dart";
+import "package:dart_amqp/src/exceptions.dart";
 
 import "mocks/mocks.dart" as mock;
 

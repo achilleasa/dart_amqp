@@ -5,7 +5,7 @@ import "dart:typed_data";
 
 import "package:test/test.dart";
 
-import "../../lib/src/protocol.dart";
+import "package:dart_amqp/src/protocol.dart";
 
 import "mocks/mocks.dart" as mock;
 

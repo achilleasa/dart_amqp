@@ -4,10 +4,10 @@ import "dart:async";
 
 import "package:test/test.dart";
 
-import "../../lib/src/client.dart";
-import "../../lib/src/protocol.dart";
-import "../../lib/src/enums.dart";
-import "../../lib/src/exceptions.dart";
+import "package:dart_amqp/src/client.dart";
+import "package:dart_amqp/src/protocol.dart";
+import "package:dart_amqp/src/enums.dart";
+import "package:dart_amqp/src/exceptions.dart";
 
 import "mocks/mocks.dart" as mock;
 

@@ -2,7 +2,7 @@ library dart_amqp.test.enums;
 
 import "dart:mirrors";
 import "package:test/test.dart";
-import "../../lib/src/enums.dart";
+import "package:dart_amqp/src/enums.dart";
 
 Type _getMethodArgType(MethodMirror methodMirror) {
   ParameterMirror paramMirror = methodMirror.parameters.first;
