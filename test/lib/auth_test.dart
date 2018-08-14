@@ -1,12 +1,12 @@
 library dart_amqp.test.auth;
 
-import "../packages/unittest/unittest.dart";
-import "../packages/mock/mock.dart";
+import "package:test/test.dart";
+import "package:mock/mock.dart";
 
-import "../../lib/src/authentication.dart";
-import "../../lib/src/client.dart";
-import "../../lib/src/protocol.dart";
-import "../../lib/src/exceptions.dart";
+import "package:dart_amqp/src/authentication.dart";
+import "package:dart_amqp/src/client.dart";
+import "package:dart_amqp/src/protocol.dart";
+import "package:dart_amqp/src/exceptions.dart";
 
 import "mocks/mocks.dart" as mock;
 
@@ -169,7 +169,7 @@ main({bool enableLogger : true}) {
 
       client
       .connect()
-      .then(expectAsync((_) {
+      .then(expectAsync1((_) {
       }));
     });
 
@@ -181,7 +181,7 @@ main({bool enableLogger : true}) {
 
       client
       .connect()
-      .then(expectAsync((_) {
+      .then(expectAsync1((_) {
       }));
     });
   });
@@ -215,7 +215,7 @@ main({bool enableLogger : true}) {
 
       client
       .connect()
-      .then(expectAsync((_) {
+      .then(expectAsync1((_) {
       }));
     });
   });
@@ -234,8 +234,8 @@ main({bool enableLogger : true}) {
 
       client
       .connect()
-      .catchError(expectAsync((e) {
-        expect(e, new isInstanceOf<FatalException>());
+      .catchError(expectAsync1((e) {
+        expect(e, const TypeMatcher<FatalException>());
         expect(e.message, startsWith("Selected authentication provider 'foo' is unsupported by the server"));
       }));
     });
@@ -247,8 +247,8 @@ main({bool enableLogger : true}) {
 
       client
       .connect()
-      .catchError(expectAsync((e) {
-        expect(e, new isInstanceOf<FatalException>());
+      .catchError(expectAsync1((e) {
+        expect(e, const TypeMatcher<FatalException>());
         expect(e.message, equals("Authentication failed"));
       }));
     });

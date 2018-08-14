@@ -2,12 +2,12 @@ library dart_amqp.test.queues;
 
 import "dart:async";
 
-import "../../packages/unittest/unittest.dart";
+import "package:test/test.dart";
 
-import "../../lib/src/client.dart";
-import "../../lib/src/protocol.dart";
-import "../../lib/src/enums.dart";
-import "../../lib/src/exceptions.dart";
+import "package:dart_amqp/src/client.dart";
+import "package:dart_amqp/src/protocol.dart";
+import "package:dart_amqp/src/enums.dart";
+import "package:dart_amqp/src/exceptions.dart";
 
 import "mocks/mocks.dart" as mock;
 
@@ -33,8 +33,8 @@ main({bool enableLogger : true}) {
       .channel()
       .then((Channel channel) => channel.queue("foo", passive : true))
       .then((_) => fail("Expected an exception to be thrown"))
-      .catchError(expectAsync((e) {
-        expect(e, new isInstanceOf<QueueNotFoundException>());
+      .catchError(expectAsync1((e) {
+        expect(e, const TypeMatcher<QueueNotFoundException>());
         expect((e as QueueNotFoundException).errorType, equals(ErrorType.NOT_FOUND));
         expect(e.toString(), startsWith("QueueNotFoundException: NOT_FOUND"));
       }));
@@ -44,8 +44,8 @@ main({bool enableLogger : true}) {
       client
       .channel()
       .then((Channel channel) => channel.privateQueue())
-      .then(expectAsync((Queue queue) {
-        expect(queue.channel, new isInstanceOf<Channel>());
+      .then(expectAsync1((Queue queue) {
+        expect(queue.channel, const TypeMatcher<Channel>());
         expect(queue.name, isNotEmpty);
         expect(queue.consumerCount, equals(0));
         expect(queue.messageCount, equals(0));
@@ -56,8 +56,8 @@ main({bool enableLogger : true}) {
       client
       .channel()
       .then((Channel channel) => channel.queue("test_1"))
-      .then(expectAsync((Queue queue) {
-        expect(queue.channel, new isInstanceOf<Channel>());
+      .then(expectAsync1((Queue queue) {
+        expect(queue.channel, const TypeMatcher<Channel>());
         expect(queue.name, isNotEmpty);
         expect(queue.consumerCount, equals(0));
         expect(queue.messageCount, equals(0));
@@ -68,10 +68,10 @@ main({bool enableLogger : true}) {
       client
       .channel()
       .then((Channel channel) => channel.privateQueue())
-      .then(expectAsync((Queue privateQueue) {
+      .then(expectAsync1((Queue privateQueue) {
         // Check existance
         privateQueue.channel.queue(privateQueue.name, passive : true)
-        .then(expectAsync((Queue queue) {
+        .then(expectAsync1((Queue queue) {
           expect(queue.name, equals(privateQueue.name));
         }));
       }));
@@ -103,11 +103,11 @@ main({bool enableLogger : true}) {
       .then((Channel channel) => channel.queue("test_2"))
       .then((Queue testQueue) => testQueue.consume())
       .then((Consumer consumer) {
-        expect(consumer.channel, new isInstanceOf<Channel>());
-        expect(consumer.queue, new isInstanceOf<Queue>());
+        expect(consumer.channel, const TypeMatcher<Channel>());
+        expect(consumer.queue, const TypeMatcher<Queue>());
         expect(consumer.tag, isNotEmpty);
 
-        consumer.listen(expectAsync((AmqpMessage message) {
+        consumer.listen(expectAsync1((AmqpMessage message) {
           expect(message.payloadAsString, equals("Test payload"));
           testCompleter.complete();
         }));
@@ -130,11 +130,11 @@ main({bool enableLogger : true}) {
       .then((Channel channel) => channel.queue("test_2"))
       .then((Queue testQueue) => testQueue.consume())
       .then((Consumer consumer) {
-        expect(consumer.channel, new isInstanceOf<Channel>());
-        expect(consumer.queue, new isInstanceOf<Queue>());
+        expect(consumer.channel, const TypeMatcher<Channel>());
+        expect(consumer.queue, const TypeMatcher<Queue>());
         expect(consumer.tag, isNotEmpty);
 
-        consumer.listen(expectAsync((AmqpMessage message) {
+        consumer.listen(expectAsync1((AmqpMessage message) {
           expect(message.payloadAsJson, equals({"message" : "Test payload"}));
           expect(message.properties.contentType, equals("application/json"));
           testCompleter.complete();
@@ -158,15 +158,15 @@ main({bool enableLogger : true}) {
       .then((Channel channel) => channel.queue("test_2"))
       .then((Queue testQueue) => testQueue.consume())
       .then((Consumer consumer) {
-        expect(consumer.channel, new isInstanceOf<Channel>());
-        expect(consumer.queue, new isInstanceOf<Queue>());
+        expect(consumer.channel, const TypeMatcher<Channel>());
+        expect(consumer.queue, const TypeMatcher<Queue>());
         expect(consumer.tag, isNotEmpty);
 
         // Use second accuracy
         DateTime now = new DateTime.now();
         now = now.subtract(new Duration(milliseconds : now.millisecond, microseconds: now.microsecond));
 
-        consumer.listen(expectAsync((AmqpMessage message) {
+        consumer.listen(expectAsync1((AmqpMessage message) {
           expect(message.payloadAsJson, equals({"message" : "Test payload"}));
           expect(message.properties.contentType, equals("application/json"));
           expect(message.properties.headers, equals({
@@ -217,11 +217,11 @@ main({bool enableLogger : true}) {
       .then((Channel channel) => channel.queue("test_3"))
       .then((Queue testQueue) => testQueue.consume(noAck : false))
       .then((Consumer consumer) {
-        expect(consumer.channel, new isInstanceOf<Channel>());
-        expect(consumer.queue, new isInstanceOf<Queue>());
+        expect(consumer.channel, const TypeMatcher<Channel>());
+        expect(consumer.queue, const TypeMatcher<Queue>());
         expect(consumer.tag, isNotEmpty);
 
-        consumer.listen(expectAsync((AmqpMessage message) {
+        consumer.listen(expectAsync1((AmqpMessage message) {
           expect(message.payloadAsString, equals("Test payload"));
           message.ack();
           testCompleter.complete();
@@ -245,11 +245,11 @@ main({bool enableLogger : true}) {
       .then((Channel channel) => channel.queue("test_3"))
       .then((Queue testQueue) => testQueue.consume(noAck : false))
       .then((Consumer consumer) {
-        expect(consumer.channel, new isInstanceOf<Channel>());
-        expect(consumer.queue, new isInstanceOf<Queue>());
+        expect(consumer.channel, const TypeMatcher<Channel>());
+        expect(consumer.queue, const TypeMatcher<Queue>());
         expect(consumer.tag, isNotEmpty);
 
-        consumer.listen(expectAsync((AmqpMessage message) {
+        consumer.listen(expectAsync1((AmqpMessage message) {
           expect(message.payloadAsString, equals("Test payload"));
           message.reject(false);
           testCompleter.complete();
@@ -291,7 +291,7 @@ main({bool enableLogger : true}) {
       .channel()
       .then((Channel channel) => channel.queue("test_3"))
       .then((Queue testQueue) => testQueue.delete())
-      .then(expectAsync((Queue queue) {
+      .then(expectAsync1((Queue queue) {
 
       }));
     });
@@ -329,8 +329,8 @@ main({bool enableLogger : true}) {
         .channel()
         .then((Channel channel) => channel.queue("test_99"))
         .then((Queue queue) => queue.publish(new StreamController()))
-        .catchError(expectAsync((ex) {
-          expect(ex, new isInstanceOf<ArgumentError>());
+        .catchError(expectAsync1((ex) {
+          expect(ex, const TypeMatcher<ArgumentError>());
           expect(ex.message, equals("Message payload should be either a Map, an Iterable, a String or an UInt8List instance"));
         }));
 
@@ -349,8 +349,8 @@ main({bool enableLogger : true}) {
 
           return queue.channel.queue("other_queue");
         })
-        .catchError(expectAsync((ex) {
-          expect(ex, new isInstanceOf<ChannelException>());
+        .catchError(expectAsync1((ex) {
+          expect(ex, const TypeMatcher<ChannelException>());
           expect(ex.toString(), equals("ChannelException(PRECONDITION_FAILED): PRECONDITION_FAILED - invalid expiration 'undefined': no_integer"));
         }));
 
@@ -372,8 +372,8 @@ main({bool enableLogger : true}) {
           .then((_) {
             queue.publish("test");
           })
-          .catchError(expectAsync((ex) {
-            expect(ex, new isInstanceOf<ChannelException>());
+          .catchError(expectAsync1((ex) {
+            expect(ex, const TypeMatcher<ChannelException>());
             expect(ex.toString(), equals("ChannelException(PRECONDITION_FAILED): PRECONDITION_FAILED - invalid expiration 'undefined': no_integer"));
 
             testCompleter.complete();

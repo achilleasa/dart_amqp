@@ -1,12 +1,12 @@
 library dart_amqp.test.exchanges;
 
 import "dart:async";
-import "../../packages/unittest/unittest.dart";
+import "package:test/test.dart";
 
-import "../../lib/src/client.dart";
-import "../../lib/src/protocol.dart";
-import "../../lib/src/enums.dart";
-import "../../lib/src/exceptions.dart";
+import "package:dart_amqp/src/client.dart";
+import "package:dart_amqp/src/protocol.dart";
+import "package:dart_amqp/src/enums.dart";
+import "package:dart_amqp/src/exceptions.dart";
 
 import "mocks/mocks.dart" as mock;
 
@@ -36,8 +36,8 @@ main({bool enableLogger : true}) {
       .channel()
       .then((Channel channel) => channel.exchange("foo123", ExchangeType.DIRECT, passive : true))
       .then((_) => fail("Expected an exception to be thrown"))
-      .catchError(expectAsync((e) {
-        expect(e, new isInstanceOf<ExchangeNotFoundException>());
+      .catchError(expectAsync1((e) {
+        expect(e, const TypeMatcher<ExchangeNotFoundException>());
         expect((e as ExchangeNotFoundException).errorType, equals(ErrorType.NOT_FOUND));
         expect(e.toString(), startsWith("ExchangeNotFoundException: NOT_FOUND"));
       }));
@@ -47,8 +47,8 @@ main({bool enableLogger : true}) {
       client
       .channel()
       .then((Channel channel) => channel.exchange("ex_test_1", ExchangeType.DIRECT))
-      .then(expectAsync((Exchange exchange) {
-        expect(exchange.channel, new isInstanceOf<Channel>());
+      .then(expectAsync1((Exchange exchange) {
+        expect(exchange.channel, const TypeMatcher<Channel>());
         expect(exchange.name, equals("ex_test_1"));
         expect(exchange.type, equals(ExchangeType.DIRECT));
       }));
@@ -59,9 +59,9 @@ main({bool enableLogger : true}) {
       .channel()
       .then((Channel channel) => channel.exchange("ex_test_1", ExchangeType.DIRECT))
       .then((Exchange exchange) => exchange.bindPrivateQueueConsumer(["test"]))
-      .then(expectAsync((Consumer consumer) {
-        expect(consumer.channel, new isInstanceOf<Channel>());
-        expect(consumer.queue, new isInstanceOf<Queue>());
+      .then(expectAsync1((Consumer consumer) {
+        expect(consumer.channel, const TypeMatcher<Channel>());
+        expect(consumer.queue, const TypeMatcher<Queue>());
         expect(consumer.tag, isNotEmpty);
       }));
 
@@ -73,9 +73,9 @@ main({bool enableLogger : true}) {
       .then((Channel channel) => channel.qos(null, 1))
       .then((Channel channel) => channel.exchange("ex_test_1", ExchangeType.DIRECT))
       .then((Exchange exchange) => exchange.bindPrivateQueueConsumer(["test", "foo", "bar"]))
-      .then(expectAsync((Consumer consumer) {
-        expect(consumer.channel, new isInstanceOf<Channel>());
-        expect(consumer.queue, new isInstanceOf<Queue>());
+      .then(expectAsync1((Consumer consumer) {
+        expect(consumer.channel, const TypeMatcher<Channel>());
+        expect(consumer.queue, const TypeMatcher<Queue>());
         expect(consumer.tag, isNotEmpty);
       }));
 
@@ -89,7 +89,7 @@ main({bool enableLogger : true}) {
       .then((Exchange exchange) => exchange.bindPrivateQueueConsumer(["test"]))
       .then((Consumer consumer) {
         // Listen for messages
-        consumer.listen(expectAsync((AmqpMessage message) {
+        consumer.listen(expectAsync1((AmqpMessage message) {
           expect(message.payloadAsString, equals("Test message 1234"));
           expect(message.routingKey, equals("test"));
 
@@ -187,7 +187,7 @@ main({bool enableLogger : true}) {
       .then((Channel channel) => channel.qos(0, 1))
       .then((Channel channel) => channel.exchange("ex_test_1", ExchangeType.DIRECT))
       .then((Exchange exchange) => exchange.delete())
-      .then(expectAsync((Exchange exchange) {
+      .then(expectAsync1((Exchange exchange) {
       }));
 
     });
@@ -197,7 +197,7 @@ main({bool enableLogger : true}) {
       .channel()
       .then((Channel channel) => channel.exchange("ex_test_2", ExchangeType.FANOUT))
       .then((Exchange exchange) => exchange.publish("Hello", ""))
-      .then(expectAsync((Exchange exchange) {
+      .then(expectAsync1((_) {
       }));
 
     });
@@ -207,7 +207,7 @@ main({bool enableLogger : true}) {
       .channel()
       .then((Channel channel) => channel.exchange("ex_test_2", ExchangeType.FANOUT))
       .then((Exchange exchange) => exchange.bindPrivateQueueConsumer([]))
-      .then(expectAsync((Consumer consumer) {
+      .then(expectAsync1((Consumer consumer) {
       }));
 
     });

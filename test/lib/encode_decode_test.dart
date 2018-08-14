@@ -3,9 +3,9 @@ library dart_amqp.test.encode_decode;
 import "dart:async";
 import "dart:typed_data";
 
-import "../packages/unittest/unittest.dart";
+import "package:test/test.dart";
 
-import "../../lib/src/protocol.dart";
+import "package:dart_amqp/src/protocol.dart";
 
 import "mocks/mocks.dart" as mock;
 
@@ -178,7 +178,7 @@ main({bool enableLogger : true}) {
       DateTime now = new DateTime.now();
       now = now.subtract(new Duration(milliseconds : now.millisecond, microseconds: now.microsecond));
 
-      Map tableData = {
+      final tableData = {
         "map" : {
           "list" : ["foo", "bar", "baz"]
         },
@@ -213,7 +213,7 @@ main({bool enableLogger : true}) {
       DateTime now = new DateTime.now();
       now = now.subtract(new Duration(milliseconds : now.millisecond, microseconds: now.microsecond));
 
-      Map tableData = {
+      final tableData = {
         "unsupported" : new StreamController()
       };
 

@@ -45,11 +45,11 @@ class DecodedMessageImpl implements DecodedMessage {
 //  }
 
   String get payloadAsString {
-    return UTF8.decode(payload);
+    return utf8.decode(payload);
   }
 
   Map get payloadAsJson {
-    return JSON.decode(UTF8.decode(payload));
+    return json.decode(utf8.decode(payload));
   }
 
 }

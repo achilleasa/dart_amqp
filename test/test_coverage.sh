@@ -15,7 +15,7 @@ rm -f coverage/coverage.lcov
 rm -f coverage/filtered.lcov
 
 # Run tests in checked mode and start observatory; block when tests complete so we can collect coverage data
-dart --checked --enable-vm-service --package-root=../packages/ --pause-isolates-on-exit run_all.dart > /dev/null &
+dart --enable-vm-service --pause-isolates-on-exit run_all.dart > /dev/null &
 
 # Run coverage collection tool
 echo "Waiting for unit tests to run..."
@@ -32,7 +32,7 @@ PROJECT_ROOT=`pwd | sed -e "s/\\/[^\\/]*$//"`
 sed -n '\:^SF.*'"$PROJECT_ROOT"'/lib:,\:end_of_record:p' coverage/coverage.lcov > coverage/filtered.lcov
 
 # Format LCOV data to HTML
-if [ -n "genhtml" ]; then 
+if [ -n "genhtml" ]; then
     echo "Rendering HTML coverage report to: coverage/html"
     genhtml coverage/filtered.lcov --output-directory coverage/html --ignore-errors source --quiet
     echo "The generated coverage data is available here: "`pwd`"/coverage/html/index.html"

@@ -20,7 +20,7 @@ class _ClientImpl implements Client {
   Completer _clientClosed;
 
   //Error Stream
-  StreamController _error = new StreamController.broadcast();
+  final _error = new StreamController<Exception>.broadcast();
 
   _ClientImpl({ConnectionSettings settings}) {
 

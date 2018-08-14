@@ -21,7 +21,7 @@ void main(List<String> args) {
   Client client = new Client();
 
   // Setup a signal handler to cleanly exit if CTRL+C is pressed
-  ProcessSignal.SIGINT.watch().listen((_) {
+  ProcessSignal.sigint.watch().listen((_) {
     client.close().then((_) {
       exit(0);
     });

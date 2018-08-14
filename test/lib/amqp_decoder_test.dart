@@ -3,12 +3,12 @@ library dart_amqp.test.decoder;
 import "dart:async";
 import "dart:typed_data";
 
-import "../packages/unittest/unittest.dart";
-import "../packages/mock/mock.dart";
+import "package:test/test.dart";
+import "package:mock/mock.dart";
 
-import "../../lib/src/enums.dart";
-import "../../lib/src/protocol.dart";
-import "../../lib/src/exceptions.dart";
+import "package:dart_amqp/src/enums.dart";
+import "package:dart_amqp/src/protocol.dart";
+import "package:dart_amqp/src/exceptions.dart";
 
 import "mocks/mocks.dart" as mock;
 
@@ -132,8 +132,8 @@ main({bool enableLogger : true}) {
   }
 
   group("AMQP decoder:", () {
-    StreamController controller;
-    Stream rawStream;
+    StreamController<RawFrame> controller;
+    Stream<DecodedMessage> rawStream;
     RawFrame rawFrame;
     FrameWriter frameWriter;
     TuningSettings tuningSettings;
@@ -150,7 +150,7 @@ main({bool enableLogger : true}) {
 
     test("HEADER frame with empty payload size should emit message without waiting for BODY frames", () {
       rawStream
-      .listen(expectAsync((DecodedMessage data) {
+      .listen(expectAsync1((data) {
         expect(data.payload, isNull);
       }));
 
@@ -196,8 +196,8 @@ main({bool enableLogger : true}) {
         .listen((data) {
           fail("Expected exception to be thrown");
         },
-        onError : expectAsync((error) {
-          expect(error, new isInstanceOf<ConnectionException>());
+        onError : expectAsync1((error) {
+          expect(error, const TypeMatcher<ConnectionException>());
           expect(error.toString(), equals("ConnectionException(UNEXPECTED_FRAME): Received a new METHOD frame while processing an incomplete METHOD frame"));
         }));
 
@@ -228,8 +228,8 @@ main({bool enableLogger : true}) {
         .listen((data) {
           fail("Expected exception to be thrown");
         },
-        onError : expectAsync((error) {
-          expect(error, new isInstanceOf<ConnectionException>());
+        onError : expectAsync1((error) {
+          expect(error, const TypeMatcher<ConnectionException>());
           expect(error.toString(), equals("ConnectionException(UNEXPECTED_FRAME): Received a HEADER frame without a matching METHOD frame"));
         }));
 
@@ -256,8 +256,8 @@ main({bool enableLogger : true}) {
         .listen((data) {
           fail("Expected exception to be thrown");
         },
-        onError : expectAsync((error) {
-          expect(error, new isInstanceOf<ConnectionException>());
+        onError : expectAsync1((error) {
+          expect(error, const TypeMatcher<ConnectionException>());
           expect(error.toString(), equals("ConnectionException(UNEXPECTED_FRAME): Received a HEADER frame that does not match the METHOD frame class id"));
         }));
 
@@ -302,8 +302,8 @@ main({bool enableLogger : true}) {
         .listen((data) {
           fail("Expected exception to be thrown");
         },
-        onError : expectAsync((error) {
-          expect(error, new isInstanceOf<ConnectionException>());
+        onError : expectAsync1((error) {
+          expect(error, const TypeMatcher<ConnectionException>());
           expect(error.toString(), equals("ConnectionException(UNEXPECTED_FRAME): Received a duplicate HEADER frame for an incomplete METHOD frame"));
         }));
 
@@ -350,8 +350,8 @@ main({bool enableLogger : true}) {
         .listen((data) {
           fail("Expected exception to be thrown");
         },
-        onError : expectAsync((error) {
-          expect(error, new isInstanceOf<ConnectionException>());
+        onError : expectAsync1((error) {
+          expect(error, const TypeMatcher<ConnectionException>());
           expect(error.toString(), equals("ConnectionException(UNEXPECTED_FRAME): Received a BODY frame without a matching METHOD frame"));
         }));
 
@@ -370,8 +370,8 @@ main({bool enableLogger : true}) {
         .listen((data) {
           fail("Expected exception to be thrown");
         },
-        onError : expectAsync((error) {
-          expect(error, new isInstanceOf<ConnectionException>());
+        onError : expectAsync1((error) {
+          expect(error, const TypeMatcher<ConnectionException>());
           expect(error.toString(), equals("ConnectionException(UNEXPECTED_FRAME): Received a BODY frame before a HEADER frame"));
         }));
 

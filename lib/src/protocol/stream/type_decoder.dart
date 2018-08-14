@@ -3,7 +3,7 @@ part of dart_amqp.protocol;
 class TypeDecoder {
   int _offset = 0;
   ByteData _buffer;
-  final Endianness endianess = Endianness.BIG_ENDIAN;
+  final Endian endianess = Endian.big;
 
   TypeDecoder.fromBuffer(ByteData this._buffer);
 
@@ -78,13 +78,13 @@ class TypeDecoder {
   String readShortString() {
     int len = readUInt8();
     _offset += len;
-    return UTF8.decode(new Uint8List.view(_buffer.buffer, _offset - len, len));
+    return utf8.decode(new Uint8List.view(_buffer.buffer, _offset - len, len));
   }
 
   String readLongString() {
     int len = readUInt32();
     _offset += len;
-    return UTF8.decode(new Uint8List.view(_buffer.buffer, _offset - len, len));
+    return utf8.decode(new Uint8List.view(_buffer.buffer, _offset - len, len));
   }
 
   DateTime readTimestamp() {

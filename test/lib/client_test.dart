@@ -2,11 +2,11 @@ library dart_amqp.test.client;
 
 import "dart:async";
 
-import "../packages/unittest/unittest.dart";
+import "package:test/test.dart";
 
-import "../../lib/src/client.dart";
-import "../../lib/src/protocol.dart";
-import "../../lib/src/exceptions.dart";
+import "package:dart_amqp/src/client.dart";
+import "package:dart_amqp/src/protocol.dart";
+import "package:dart_amqp/src/exceptions.dart";
 
 import "mocks/mocks.dart" as mock;
 
@@ -32,8 +32,8 @@ main({bool enableLogger : true}) {
 
       client
       .connect()
-      .catchError(expectAsync((ex) {
-        expect(ex, new isInstanceOf<ConnectionFailedException>());
+      .catchError(expectAsync1((ex) {
+        expect(ex, const TypeMatcher<ConnectionFailedException>());
         expect(ex.toString(), startsWith('ConnectionFailedException'));
       }));
 
@@ -74,7 +74,7 @@ main({bool enableLogger : true}) {
       .channel()
       .then((_) => client.channel())
       .catchError((ex) {
-        expect(ex, new isInstanceOf<StateError>());
+        expect(ex, const TypeMatcher<StateError>());
         expect(ex.message, equals("Cannot allocate channel; channel limit exceeded (max 1)"));
       });
     });

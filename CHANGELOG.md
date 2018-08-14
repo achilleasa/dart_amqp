@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.0
+
+- Migrate to Dart 2
+
 ## 0.0.9
 
 - Merged [#14](https://github.com/achilleasa/dart_amqp/pull/14) and [#15](https://github.com/achilleasa/dart_amqp/pull/15)
