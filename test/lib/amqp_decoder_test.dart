@@ -4,7 +4,7 @@ import "dart:async";
 import "dart:typed_data";
 
 import "package:test/test.dart";
-import "package:mock/mock.dart";
+import "package:mockito/mockito.dart";
 
 import "package:dart_amqp/src/enums.dart";
 import "package:dart_amqp/src/protocol.dart";

@@ -1,7 +1,7 @@
 # dart_ampq
 
 [![Build Status](https://travis-ci.org/achilleasa/dart_amqp.svg?branch=master)](https://travis-ci.org/achilleasa/dart_amqp)
-[![codecov](https://codecov.io/gh/achilleasa/dart_amqp/branch/master/graph/badge.svg)](https://codecov.io/gh/achilleasa/dart_amqp)
+[![Coverage Status](https://coveralls.io/repos/github/achilleasa/dart_amqp/badge.svg)](https://coveralls.io/github/achilleasa/dart_amqp)
 
 Dart AMQP client implementing protocol version 0.9.1
 
