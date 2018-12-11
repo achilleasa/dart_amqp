@@ -42,9 +42,9 @@ class _QueueImpl implements Queue {
     if (exchange == null) {
       throw new ArgumentError("Exchange cannot be null");
     }
-    // Fanout exchanges do not need to specify any keys. Use the default one if none is specified
+    // Fanout and headers exchanges do not need to specify any keys. Use the default one if none is specified
     if (routingKey == null || routingKey.isEmpty) {
-      if (exchange.type == ExchangeType.FANOUT) {
+      if (exchange.type == ExchangeType.FANOUT || exchange.type == ExchangeType.HEADERS) {
         routingKey = "";
       } else {
         throw new ArgumentError("A routing key needs to be specified to bind to this exchange type");
@@ -67,9 +67,9 @@ class _QueueImpl implements Queue {
     if (exchange == null) {
       throw new ArgumentError("Exchange cannot be null");
     }
-    // Fanout exchanges do not need to specify any keys. Use the default one if none is specified
+    // Fanout and headers exchanges do not need to specify any keys. Use the default one if none is specified
     if (routingKey == null || routingKey.isEmpty) {
-      if (exchange.type == ExchangeType.FANOUT) {
+      if (exchange.type == ExchangeType.FANOUT || exchange.type == ExchangeType.HEADERS) {
         routingKey = "";
       } else {
         throw new ArgumentError("A routing key needs to be specified to unbind from this exchange type");
