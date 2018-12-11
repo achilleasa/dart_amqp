@@ -56,7 +56,8 @@ class _QueueImpl implements Queue {
       ..queue = name
       ..exchange = exchange.name
       ..routingKey = routingKey
-      ..noWait = noWait;
+      ..noWait = noWait
+      ..arguments = arguments;
 
     Completer<Queue> completer = new Completer<Queue>();
     channel.writeMessage(bindRequest, completer : completer, futurePayload : this);
@@ -80,7 +81,8 @@ class _QueueImpl implements Queue {
       ..reserved_1 = 0
       ..queue = name
       ..exchange = exchange.name
-      ..routingKey = routingKey;
+      ..routingKey = routingKey
+      ..arguments = arguments;
 
     Completer<Queue> completer = new Completer<Queue>();
     channel.writeMessage(unbindRequest, completer : completer, futurePayload : this);
