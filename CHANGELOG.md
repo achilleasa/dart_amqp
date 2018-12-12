@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- Merged [#19](https://github.com/achilleasa/dart_amqp/pull/19) to improve support for `HEADER` exchanges.
+
 ## 0.1.0
 
 - Migrate to Dart 2
