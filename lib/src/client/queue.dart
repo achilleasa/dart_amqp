@@ -37,7 +37,7 @@ abstract class Queue {
   /**
    * Bind this queue to [exchange] using [routingKey] and return a [Future<Queue>] to the bound queue.
    *
-   * The [routingKey] parameter cannot be empty or null unless [exchange] is of type [ExchangeType.FANOUT].
+   * The [routingKey] parameter cannot be empty or null unless [exchange] is of type [ExchangeType.FANOUT] or [ExchangeType.HEADERS].
    * For any other [exchange] type, passing an empty or null [routingKey] will cause an [ArgumentError]
    * to be thrown.
    */
@@ -46,7 +46,7 @@ abstract class Queue {
   /**
    * Unbind this queue from [exchange] with [routingKey] and return a [Future<Queue>] to the unbound queue.
    *
-   * The [routingKey] parameter cannot be empty or null unless [exchange] is of type [ExchangeType.FANOUT].
+   * The [routingKey] parameter cannot be empty or null unless [exchange] is of type [ExchangeType.FANOUT] or [ExchangeType.HEADERS].
    * For any other [exchange] type, passing an empty or null [routingKey] will cause an [ArgumentError]
    * to be thrown.
    */

@@ -22,7 +22,7 @@ class _ExchangeImpl implements Exchange {
   }
 
   void publish(Object message, String routingKey, { MessageProperties properties, bool mandatory : false, bool immediate : false}) {
-    if (!type.isCustom && type != ExchangeType.FANOUT && (routingKey == null || routingKey.isEmpty)) {
+    if (!type.isCustom && type != ExchangeType.FANOUT && type != ExchangeType.HEADERS && (routingKey == null || routingKey.isEmpty)) {
       throw new ArgumentError("A valid routing key needs to be specified");
     }
 
@@ -37,8 +37,8 @@ class _ExchangeImpl implements Exchange {
   }
 
   Future<Consumer> bindPrivateQueueConsumer(List<String> routingKeys, {String consumerTag, bool noAck: true}) {
-    // Fanout exchanges do not need to specify any keys. Use the default one if none is specified
-    if (type == ExchangeType.FANOUT && (routingKeys == null || routingKeys.isEmpty)) {
+    // Fanout and headers exchanges do not need to specify any keys. Use the default one if none is specified
+    if ((type == ExchangeType.FANOUT || type == ExchangeType.HEADERS) && (routingKeys == null || routingKeys.isEmpty)) {
       routingKeys = [""];
     }
 
