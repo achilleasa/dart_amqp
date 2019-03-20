@@ -11,27 +11,18 @@ class FrameType extends Enum<int> {
   String toString() => "${value}";
 
   static FrameType valueOf(int value) {
-    FrameType fromValue = value == METHOD._value
-        ? METHOD
-        : value == HEADER._value
-            ? HEADER
-            : value == BODY._value
-                ? BODY
-                : value == HEARTBEAT._value ? HEARTBEAT : null;
-
-    if (fromValue == null) {
-      throw ArgumentError("Invalid frame type value ${value}");
-    }
-    return fromValue;
+    if (value == METHOD.value) return METHOD;
+    if (value == HEADER.value) return HEADER;
+    if (value == BODY.value) return BODY;
+    if (value == HEARTBEAT.value) return HEARTBEAT;
+    throw ArgumentError("Invalid frame type value $value");
   }
 
   static String nameOf(FrameType value) {
-    String name = value == METHOD
-        ? "METHOD"
-        : value == HEADER
-            ? "HEADER"
-            : value == BODY ? "BODY" : value == HEARTBEAT ? "HEARTBEAT" : null;
-
-    return name;
+    if (value == METHOD) return "METHOD";
+    if (value == HEADER) return "HEADER";
+    if (value == BODY) return "BODY";
+    if (value == HEARTBEAT) return "HEARTBEAT";
+    return null;
   }
 }

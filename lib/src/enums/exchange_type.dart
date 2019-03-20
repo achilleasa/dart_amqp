@@ -13,31 +13,20 @@ class ExchangeType extends BaseExchange<String> {
   String toString() => "${value}";
 
   static ExchangeType valueOf(String value) {
-    ExchangeType fromValue = value == FANOUT._value
-        ? FANOUT
-        : value == DIRECT._value
-            ? DIRECT
-            : value == TOPIC._value
-                ? TOPIC
-                : value == HEADERS._value
-                    ? HEADERS
-                    : ExchangeType.custom(value);
-
-    return fromValue;
+    if (value == FANOUT.value) return FANOUT;
+    if (value == DIRECT.value) return DIRECT;
+    if (value == TOPIC.value) return TOPIC;
+    if (value == HEADERS.value) return HEADERS;
+    return ExchangeType.custom(value);
   }
 
   static String nameOf(ExchangeType value) {
-    String name = value == FANOUT
-        ? "FANOUT"
-        : value == DIRECT
-            ? "DIRECT"
-            : value == TOPIC
-                ? "TOPIC"
-                : value == HEADERS
-                    ? "HEADERS"
-                    : value.isCustom ? "CUSTOM" : null;
-
-    return name;
+    if (value == FANOUT) return "FANOUT";
+    if (value == DIRECT) return "DIRECT";
+    if (value == TOPIC) return "TOPIC";
+    if (value == HEADERS) return "HEADERS";
+    if (value.isCustom) return "CUSTOM";
+    return null;
   }
 }
 

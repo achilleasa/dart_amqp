@@ -7,19 +7,14 @@ class DeliveryMode extends Enum<int> {
   const DeliveryMode._(int value) : super(value);
 
   static DeliveryMode valueOf(int value) {
-    DeliveryMode fromValue = value == TRANSIENT._value
-        ? TRANSIENT
-        : value == PERSISTENT._value ? PERSISTENT : null;
-
-    if (fromValue == null) {
-      throw ArgumentError("Invalid delivery mode value ${value}");
-    }
-    return fromValue;
+    if (value == TRANSIENT.value) return TRANSIENT;
+    if (value == PERSISTENT.value) return PERSISTENT;
+    throw ArgumentError("Invalid delivery mode value $value");
   }
 
   static String nameOf(DeliveryMode value) {
-    return value == TRANSIENT
-        ? "TRANSIENT"
-        : value == PERSISTENT ? "PERSISTENT" : null;
+    if (value == TRANSIENT) return "TRANSIENT";
+    if (value == PERSISTENT) return "PERSISTENT";
+    return null;
   }
 }

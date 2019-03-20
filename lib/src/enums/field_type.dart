@@ -23,101 +23,46 @@ class FieldType extends Enum<int> {
   const FieldType._(int value) : super(value);
 
   static FieldType valueOf(int value) {
-    FieldType fromValue = value == BOOLEAN._value
-        ? BOOLEAN
-        : value == SHORT_SHORT_INT._value
-            ? SHORT_SHORT_INT
-            : value == SHORT_SHORT_UINT._value
-                ? SHORT_SHORT_UINT
-                : value == SHORT_INT._value
-                    ? SHORT_INT
-                    : value == SHORT_UINT._value
-                        ? SHORT_UINT
-                        : value == LONG_INT._value
-                            ? LONG_INT
-                            : value == LONG_UINT._value
-                                ? LONG_UINT
-                                : value == LONG_LONG_INT._value
-                                    ? LONG_LONG_INT
-                                    : value == LONG_LONG_UINT._value
-                                        ? LONG_LONG_UINT
-                                        : value == FLOAT._value
-                                            ? FLOAT
-                                            : value == DOUBLE._value
-                                                ? DOUBLE
-                                                : value == DECIMAL._value
-                                                    ? DECIMAL
-                                                    : value ==
-                                                            SHORT_STRING._value
-                                                        ? SHORT_STRING
-                                                        : value ==
-                                                                LONG_STRING
-                                                                    ._value
-                                                            ? LONG_STRING
-                                                            : value ==
-                                                                    FIELD_ARRAY
-                                                                        ._value
-                                                                ? FIELD_ARRAY
-                                                                : value ==
-                                                                        TIMESTAMP
-                                                                            ._value
-                                                                    ? TIMESTAMP
-                                                                    : value ==
-                                                                            FIELD_TABLE
-                                                                                ._value
-                                                                        ? FIELD_TABLE
-                                                                        : value ==
-                                                                                VOID._value
-                                                                            ? VOID
-                                                                            : null;
-
-    if (fromValue == null) {
-      throw ArgumentError("Invalid field type value ${value}");
-    }
-    return fromValue;
+    if (value == BOOLEAN.value) return BOOLEAN;
+    if (value == SHORT_SHORT_INT.value) return SHORT_SHORT_INT;
+    if (value == SHORT_SHORT_UINT.value) return SHORT_SHORT_UINT;
+    if (value == SHORT_INT.value) return SHORT_INT;
+    if (value == SHORT_UINT.value) return SHORT_UINT;
+    if (value == LONG_INT.value) return LONG_INT;
+    if (value == LONG_UINT.value) return LONG_UINT;
+    if (value == LONG_LONG_INT.value) return LONG_LONG_INT;
+    if (value == LONG_LONG_UINT.value) return LONG_LONG_UINT;
+    if (value == FLOAT.value) return FLOAT;
+    if (value == DOUBLE.value) return DOUBLE;
+    if (value == DECIMAL.value) return DECIMAL;
+    if (value == SHORT_STRING.value) return SHORT_STRING;
+    if (value == LONG_STRING.value) return LONG_STRING;
+    if (value == FIELD_ARRAY.value) return FIELD_ARRAY;
+    if (value == TIMESTAMP.value) return TIMESTAMP;
+    if (value == FIELD_TABLE.value) return FIELD_TABLE;
+    if (value == VOID.value) return VOID;
+    throw ArgumentError("Invalid field type value $value");
   }
 
   static String nameOf(FieldType value) {
-    return value == BOOLEAN
-        ? "BOOLEAN"
-        : value == SHORT_SHORT_INT
-            ? "SHORT_SHORT_INT"
-            : value == SHORT_SHORT_UINT
-                ? "SHORT_SHORT_UINT"
-                : value == SHORT_INT
-                    ? "SHORT_INT"
-                    : value == SHORT_UINT
-                        ? "SHORT_UINT"
-                        : value == LONG_INT
-                            ? "LONG_INT"
-                            : value == LONG_UINT
-                                ? "LONG_UINT"
-                                : value == LONG_LONG_INT
-                                    ? "LONG_LONG_INT"
-                                    : value == LONG_LONG_UINT
-                                        ? "LONG_LONG_UINT"
-                                        : value == FLOAT
-                                            ? "FLOAT"
-                                            : value == DOUBLE
-                                                ? "DOUBLE"
-                                                : value == DECIMAL
-                                                    ? "DECIMAL"
-                                                    : value == SHORT_STRING
-                                                        ? "SHORT_STRING"
-                                                        : value == LONG_STRING
-                                                            ? "LONG_STRING"
-                                                            : value ==
-                                                                    FIELD_ARRAY
-                                                                ? "FIELD_ARRAY"
-                                                                : value ==
-                                                                        TIMESTAMP
-                                                                    ? "TIMESTAMP"
-                                                                    : value ==
-                                                                            FIELD_TABLE
-                                                                        ? "FIELD_TABLE"
-                                                                        : value ==
-                                                                                VOID
-                                                                            ? "VOID"
-                                                                            : null;
+    if (value == BOOLEAN) return "BOOLEAN";
+    if (value == SHORT_SHORT_INT) return "SHORT_SHORT_INT";
+    if (value == SHORT_SHORT_UINT) return "SHORT_SHORT_UINT";
+    if (value == SHORT_INT) return "SHORT_INT";
+    if (value == SHORT_UINT) return "SHORT_UINT";
+    if (value == LONG_INT) return "LONG_INT";
+    if (value == LONG_UINT) return "LONG_UINT";
+    if (value == LONG_LONG_INT) return "LONG_LONG_INT";
+    if (value == LONG_LONG_UINT) return "LONG_LONG_UINT";
+    if (value == FLOAT) return "FLOAT";
+    if (value == DOUBLE) return "DOUBLE";
+    if (value == DECIMAL) return "DECIMAL";
+    if (value == SHORT_STRING) return "SHORT_STRING";
+    if (value == LONG_STRING) return "LONG_STRING";
+    if (value == FIELD_ARRAY) return "FIELD_ARRAY";
+    if (value == TIMESTAMP) return "TIMESTAMP";
+    if (value == FIELD_TABLE) return "FIELD_TABLE";
+    if (value == VOID) return "VOID";
+    return null;
   }
 }
