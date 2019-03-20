@@ -1,7 +1,6 @@
 part of dart_amqp.protocol;
 
 abstract class DecodedMessage {
-
   int get channel;
 
   Message get message;

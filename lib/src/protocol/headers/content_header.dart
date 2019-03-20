@@ -1,7 +1,6 @@
 part of dart_amqp.protocol;
 
 class ContentHeader implements Header {
-
   int classId;
   final int weight = 0;
   int bodySize;
@@ -10,7 +9,7 @@ class ContentHeader implements Header {
 
   ContentHeader();
 
-  ContentHeader.fromByteData(TypeDecoder decoder){
+  ContentHeader.fromByteData(TypeDecoder decoder) {
     classId = decoder.readUInt16();
     decoder.skipBytes(2); // Skip weight
     bodySize = decoder.readUInt64();
@@ -20,7 +19,7 @@ class ContentHeader implements Header {
       return;
     }
 
-    properties = new MessageProperties();
+    properties = MessageProperties();
 
     // Read properties depending on the property presence mask.
     // Property presense bits are stored from high -> low starting at bit 15

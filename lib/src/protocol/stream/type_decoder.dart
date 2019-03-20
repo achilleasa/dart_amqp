@@ -78,20 +78,18 @@ class TypeDecoder {
   String readShortString() {
     int len = readUInt8();
     _offset += len;
-    return utf8.decode(new Uint8List.view(_buffer.buffer, _offset - len, len));
+    return utf8.decode(Uint8List.view(_buffer.buffer, _offset - len, len));
   }
 
   String readLongString() {
     int len = readUInt32();
     _offset += len;
-    return utf8.decode(new Uint8List.view(_buffer.buffer, _offset - len, len));
+    return utf8.decode(Uint8List.view(_buffer.buffer, _offset - len, len));
   }
 
   DateTime readTimestamp() {
     int value = readUInt64();
-    return value > 0
-    ? new DateTime.fromMillisecondsSinceEpoch(value * 1000)
-    : null;
+    return value > 0 ? DateTime.fromMillisecondsSinceEpoch(value * 1000) : null;
   }
 
   Iterable readArray(String fieldName) {
@@ -105,9 +103,9 @@ class TypeDecoder {
 
   Map<String, Object> readFieldTable(String fieldName) {
     int tableEndOffset = readInt32() + _offset;
-    Map<String, Object> items = new HashMap<String, Object>();
+    Map<String, Object> items = HashMap<String, Object>();
     while (_offset < tableEndOffset) {
-      items[ readShortString() ] = _readField(fieldName);
+      items[readShortString()] = _readField(fieldName);
     }
     return items;
   }
@@ -117,8 +115,7 @@ class TypeDecoder {
     FieldType type = null;
     try {
       type = FieldType.valueOf(typeValue);
-    } catch (e) {
-    }
+    } catch (e) {}
 
     switch (type) {
       case FieldType.BOOLEAN:
@@ -144,7 +141,7 @@ class TypeDecoder {
       case FieldType.DOUBLE:
         return readDouble();
       case FieldType.DECIMAL:
-        throw new ArgumentError("Not implemented");
+        throw ArgumentError("Not implemented");
         break;
       case FieldType.SHORT_STRING:
         return readShortString();
@@ -159,7 +156,8 @@ class TypeDecoder {
       case FieldType.VOID:
         return null;
       default:
-        throw new ArgumentError("Could not decode field ${fieldName} with type 0x${typeValue.toRadixString(16)}");
+        throw ArgumentError(
+            "Could not decode field ${fieldName} with type 0x${typeValue.toRadixString(16)}");
     }
   }
 }

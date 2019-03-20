@@ -11,10 +11,11 @@ import "mocks/mocks.dart" as mock;
 
 TypeDecoder decoderFromEncoder(TypeEncoder encoder) {
   Uint8List data = encoder.writer.joinChunks();
-  return new TypeDecoder.fromBuffer(new ByteData.view(data.buffer, 0, data.lengthInBytes));
+  return TypeDecoder.fromBuffer(
+      ByteData.view(data.buffer, 0, data.lengthInBytes));
 }
 
-main({bool enableLogger : true}) {
+main({bool enableLogger = true}) {
   if (enableLogger) {
     mock.initLogger();
   }
@@ -24,7 +25,7 @@ main({bool enableLogger : true}) {
     TypeDecoder decoder;
 
     setUp(() {
-      encoder = new TypeEncoder();
+      encoder = TypeEncoder();
     });
 
     test("uint8", () {
@@ -99,7 +100,8 @@ main({bool enableLogger : true}) {
     });
 
     test("bitmap", () {
-      encoder.writeBits([false, true, false, true, false, true, false, true, false, true]);
+      encoder.writeBits(
+          [false, true, false, true, false, true, false, true, false, true]);
       decoder = decoderFromEncoder(encoder);
 
       // 0XAA   = 10101010
@@ -126,9 +128,11 @@ main({bool enableLogger : true}) {
     });
 
     test("shortString max length", () {
-      String longString = new String.fromCharCodes(new List<int>.generate(256, (int index) => index));
+      String longString =
+          String.fromCharCodes(List<int>.generate(256, (int index) => index));
 
-      expect(() => encoder.writeShortString(longString), throwsA((e) => e is ArgumentError));
+      expect(() => encoder.writeShortString(longString),
+          throwsA((e) => e is ArgumentError));
     });
 
     test("longString", () {
@@ -147,8 +151,9 @@ main({bool enableLogger : true}) {
 
     test("timestamp", () {
       // Use second accuracy
-      DateTime now = new DateTime.now();
-      now = now.subtract(new Duration(milliseconds : now.millisecond, microseconds: now.microsecond));
+      DateTime now = DateTime.now();
+      now = now.subtract(Duration(
+          milliseconds: now.millisecond, microseconds: now.microsecond));
 
       encoder.writeTimestamp(now);
       decoder = decoderFromEncoder(encoder);
@@ -157,7 +162,6 @@ main({bool enableLogger : true}) {
     });
 
     test("timestamp (null)", () {
-
       encoder.writeTimestamp(null);
       decoder = decoderFromEncoder(encoder);
 
@@ -175,31 +179,32 @@ main({bool enableLogger : true}) {
 
     test("table", () {
       // Use second accuracy
-      DateTime now = new DateTime.now();
-      now = now.subtract(new Duration(milliseconds : now.millisecond, microseconds: now.microsecond));
+      DateTime now = DateTime.now();
+      now = now.subtract(Duration(
+          milliseconds: now.millisecond, microseconds: now.microsecond));
 
       final tableData = {
-        "map" : {
-          "list" : ["foo", "bar", "baz"]
+        "map": {
+          "list": ["foo", "bar", "baz"]
         },
-        "bool" : true,
-        "unsigned" : {
-          "uint8" : 0xFF,
-          "uint16" : 0xFFFF,
-          "uint32" : 0xFFFFFFFF,
-          "uint64" : 0xFFFFFFFFFFFFFFFF
+        "bool": true,
+        "unsigned": {
+          "uint8": 0xFF,
+          "uint16": 0xFFFF,
+          "uint32": 0xFFFFFFFF,
+          "uint64": 0xFFFFFFFFFFFFFFFF
         },
-        "signed" : {
-          "int8" : -0x80,
-          "int16" : -0x8000,
-          "int32" : -0x80000000,
-          "int64" : -0x800000000000000
+        "signed": {
+          "int8": -0x80,
+          "int16": -0x8000,
+          "int32": -0x80000000,
+          "int64": -0x800000000000000
         },
-        "string" : "Hello world",
-        "float" : -3.141,
-        "double" : 3.14151617,
-        "timestamp" : now,
-        "void" : null
+        "string": "Hello world",
+        "float": -3.141,
+        "double": 3.14151617,
+        "timestamp": now,
+        "void": null
       };
 
       encoder.writeFieldTable(tableData);
@@ -210,15 +215,17 @@ main({bool enableLogger : true}) {
 
     test("table (unsupported field exception)", () {
       // Use second accuracy
-      DateTime now = new DateTime.now();
-      now = now.subtract(new Duration(milliseconds : now.millisecond, microseconds: now.microsecond));
+      DateTime now = DateTime.now();
+      now = now.subtract(Duration(
+          milliseconds: now.millisecond, microseconds: now.microsecond));
 
-      final tableData = {
-        "unsupported" : new StreamController()
-      };
+      final tableData = {"unsupported": StreamController()};
 
-      expect(() => encoder.writeFieldTable(tableData), throwsA((ex) => ex is ArgumentError && ex.message.startsWith("Could not encode field unsupported")));
+      expect(
+          () => encoder.writeFieldTable(tableData),
+          throwsA((ex) =>
+              ex is ArgumentError &&
+              ex.message.startsWith("Could not encode field unsupported")));
     });
-
   });
 }

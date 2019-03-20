@@ -7,6 +7,4 @@ import "package:logging/logging.dart";
 part "logging/logger.dart";
 
 // A indenting json encoder used by the toString() method of messages
-JsonEncoder indentingJsonEncoder = new JsonEncoder.withIndent(" ");
-
-
+JsonEncoder indentingJsonEncoder = JsonEncoder.withIndent(" ");

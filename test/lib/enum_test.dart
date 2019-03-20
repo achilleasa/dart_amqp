@@ -13,14 +13,13 @@ Type _getGenericType(ClassMirror classMirror) {
   return classMirror.superclass.typeArguments.first.reflectedType;
 }
 
-main({bool enableLogger : true}) {
-
+main({bool enableLogger = true}) {
   List enumClasses = [
-      DeliveryMode
-      , ErrorType
-      , ExchangeType
-      , FieldType
-      , FrameType
+    DeliveryMode,
+    ErrorType,
+    ExchangeType,
+    FieldType,
+    FrameType
   ];
 
   for (Type enumClass in enumClasses) {
@@ -32,7 +31,10 @@ main({bool enableLogger : true}) {
 
     // Run a first pass to detect which methods we can use
     cm.declarations.forEach((Symbol enumSymbol, declarationMirror) {
-      String declName = enumSymbol.toString().replaceAll("Symbol(\"", "").replaceAll("\")", "");
+      String declName = enumSymbol
+          .toString()
+          .replaceAll("Symbol(\"", "")
+          .replaceAll("\")", "");
       if (declarationMirror is MethodMirror) {
         if (declName == "valueOf") {
           valueOfMirror = declarationMirror;
@@ -45,42 +47,42 @@ main({bool enableLogger : true}) {
     });
 
     // Nothing to test here...
-    if (nameOfMirror == null && valueOfMirror == null && toStringMirror == null) {
+    if (nameOfMirror == null &&
+        valueOfMirror == null &&
+        toStringMirror == null) {
       continue;
     }
 
     group("${enumClass.toString()}:", () {
-
       // Generate tests for exceptions
       if (valueOfMirror != null) {
         group("Exceptions:", () {
           Object junkValue = _getMethodArgType(valueOfMirror) == String
-                             ? "BADFOOD"
-                             : 0xBADF00D;
+              ? "BADFOOD"
+              : 0xBADF00D;
 
-          Object formattedJunkValue = junkValue is String
-                                      ? "\"BADFOOD\""
-                                      : "0xBADF00D";
+          Object formattedJunkValue =
+              junkValue is String ? "\"BADFOOD\"" : "0xBADF00D";
           if (cm.reflectedType == ExchangeType)
             test("valueOf(${formattedJunkValue}) creates Custom Exchange", () {
-              ExchangeType customExchange = cm
-                  .invoke(#valueOf, [ junkValue])
-                  .reflectee;
+              ExchangeType customExchange =
+                  cm.invoke(#valueOf, [junkValue]).reflectee;
               expect(customExchange.isCustom, isTrue);
             });
           else
             test("valueOf(${formattedJunkValue}) throws ArgumentError", () {
-              expect(() => cm
-                  .invoke(#valueOf, [ junkValue])
-                  .reflectee, throwsArgumentError);
+              expect(() => cm.invoke(#valueOf, [junkValue]).reflectee,
+                  throwsArgumentError);
             });
         });
       }
 
       // Generate tests depending on which methods are available
       cm.declarations.forEach((Symbol enumSymbol, declarationMirror) {
-
-        String declName = enumSymbol.toString().replaceAll("Symbol(\"", "").replaceAll("\")", "");
+        String declName = enumSymbol
+            .toString()
+            .replaceAll("Symbol(\"", "")
+            .replaceAll("\")", "");
 
         // Only process public Enum instances
         if (declarationMirror is MethodMirror || declarationMirror.isPrivate) {
@@ -97,8 +99,10 @@ main({bool enableLogger : true}) {
           if (valueOfMirror != null) {
             test("valueOf(${declName}.value) == ${declName}", () {
               dynamic staticEnumInstance = cm.getField(enumSymbol).reflectee;
-              dynamic enumValue = cm.getField(enumSymbol).getField(#value).reflectee;
-              expect(cm.invoke(#valueOf, [ enumValue ]).reflectee, equals(staticEnumInstance));
+              dynamic enumValue =
+                  cm.getField(enumSymbol).getField(#value).reflectee;
+              expect(cm.invoke(#valueOf, [enumValue]).reflectee,
+                  equals(staticEnumInstance));
             });
           }
 
@@ -106,24 +110,25 @@ main({bool enableLogger : true}) {
           if (nameOfMirror != null) {
             test("nameOf(${declName}) == \"${declName}\"", () {
               dynamic staticEnumInstance = cm.getField(enumSymbol).reflectee;
-              expect(cm.invoke(#nameOf, [ staticEnumInstance ]).reflectee, equals(declName));
+              expect(cm.invoke(#nameOf, [staticEnumInstance]).reflectee,
+                  equals(declName));
             });
           }
 
           // Generate toString tests
           if (toStringMirror != null) {
             test("${declName}.toString()", () {
-              Enum<Object> staticEnumInstance = cm.getField(enumSymbol).reflectee;
+              Enum<Object> staticEnumInstance =
+                  cm.getField(enumSymbol).reflectee;
               Object enumValue = staticEnumInstance.value;
 
               Object expectedValue = _getGenericType(cm) == String
-                                     ? enumValue
-                                     : "${(enumValue as int).toRadixString(10)}";
+                  ? enumValue
+                  : "${(enumValue as int).toRadixString(10)}";
 
               expect(staticEnumInstance.toString(), equals(expectedValue));
             });
           }
-
         });
       });
     });

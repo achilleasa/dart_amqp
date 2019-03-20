@@ -32,8 +32,7 @@ class ConnectionStartMock extends Mock implements ConnectionStart {
       ..writeUInt8(versionMinor)
       ..writeFieldTable(serverProperties)
       ..writeLongString(mechanisms)
-      ..writeLongString(locales)
-    ;
+      ..writeLongString(locales);
   }
 }
 
@@ -53,8 +52,7 @@ class ConnectionTuneMock extends Mock implements ConnectionTune {
       ..writeUInt16(msgMethodId)
       ..writeUInt16(channelMax)
       ..writeUInt32(frameMax)
-      ..writeUInt16(heartbeat)
-    ;
+      ..writeUInt16(heartbeat);
   }
 }
 
@@ -68,8 +66,7 @@ class ConnectionOpenOkMock extends Mock implements ConnectionOpenOk {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
-      ..writeShortString(reserved_1)
-    ;
+      ..writeShortString(reserved_1);
   }
 }
 
@@ -93,40 +90,41 @@ class BasicDeliverMock extends Mock implements BasicDeliver {
       ..writeUInt64(deliveryTag)
       ..writeUInt8(0)
       ..writeShortString(exchange)
-      ..writeShortString(routingKey)
-    ;
+      ..writeShortString(routingKey);
   }
 }
 
-
-void generateHandshakeMessages(FrameWriter frameWriter, mock.MockServer server) {
+void generateHandshakeMessages(
+    FrameWriter frameWriter, mock.MockServer server) {
   // Connection start
-  frameWriter.writeMessage(0, new ConnectionStartMock()
-    ..versionMajor = 0
-    ..versionMinor = 9
-    ..serverProperties = {
-    "product" : "foo"
-  }
-    ..mechanisms = "PLAIN"
-    ..locales = "en");
+  frameWriter.writeMessage(
+      0,
+      ConnectionStartMock()
+        ..versionMajor = 0
+        ..versionMinor = 9
+        ..serverProperties = {"product": "foo"}
+        ..mechanisms = "PLAIN"
+        ..locales = "en");
   server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
   frameWriter.outputEncoder.writer.clear();
 
   // Connection tune
-  frameWriter.writeMessage(0, new ConnectionTuneMock()
-    ..channelMax = 0
-    ..frameMax = (new TuningSettings()).maxFrameSize
-    ..heartbeat = 0);
+  frameWriter.writeMessage(
+      0,
+      ConnectionTuneMock()
+        ..channelMax = 0
+        ..frameMax = (TuningSettings()).maxFrameSize
+        ..heartbeat = 0);
   server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
   frameWriter.outputEncoder.writer.clear();
 
   // Connection open ok
-  frameWriter.writeMessage(0, new ConnectionOpenOkMock());
+  frameWriter.writeMessage(0, ConnectionOpenOkMock());
   server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
   frameWriter.outputEncoder.writer.clear();
 }
 
-main({bool enableLogger : true}) {
+main({bool enableLogger = true}) {
   if (enableLogger) {
     mock.initLogger();
   }
@@ -139,83 +137,93 @@ main({bool enableLogger : true}) {
     TuningSettings tuningSettings;
 
     setUp(() {
-      tuningSettings = new TuningSettings();
-      frameWriter = new FrameWriter(tuningSettings);
+      tuningSettings = TuningSettings();
+      frameWriter = FrameWriter(tuningSettings);
 
-      controller = new StreamController();
-      rawStream = controller
-      .stream
-      .transform(new AmqpMessageDecoder().transformer);
+      controller = StreamController();
+      rawStream = controller.stream.transform(AmqpMessageDecoder().transformer);
     });
 
-    test("HEADER frame with empty payload size should emit message without waiting for BODY frames", () {
-      rawStream
-      .listen(expectAsync1((data) {
+    test(
+        "HEADER frame with empty payload size should emit message without waiting for BODY frames",
+        () {
+      rawStream.listen(expectAsync1((data) {
         expect(data.payload, isNull);
       }));
 
-      new BasicDeliverMock()
+      BasicDeliverMock()
         ..routingKey = ""
         ..exchange = ""
         ..deliveryTag = 0
         ..redelivered = false
         ..serialize(frameWriter.outputEncoder);
 
-      FrameHeader header = new FrameHeader();
+      FrameHeader header = FrameHeader();
       header.channel = 1;
       header.type = FrameType.METHOD;
       header.size = frameWriter.outputEncoder.writer.lengthInBytes;
 
       Uint8List serializedData = frameWriter.outputEncoder.writer.joinChunks();
       frameWriter.outputEncoder.writer.clear();
-      rawFrame = new RawFrame(header, new ByteData.view(serializedData.buffer, 0, serializedData.lengthInBytes));
+      rawFrame = RawFrame(
+          header,
+          ByteData.view(
+              serializedData.buffer, 0, serializedData.lengthInBytes));
       controller.add(rawFrame);
 
       // Header frame with 0 payload data
-      new ContentHeader()
+      ContentHeader()
         ..bodySize = 0
         ..classId = 60
         ..serialize(frameWriter.outputEncoder);
 
-      header = new FrameHeader();
+      header = FrameHeader();
       header.channel = 1;
       header.type = FrameType.HEADER;
-      header.size = frameWriter.outputEncoder.writer.lengthInBytes;;
+      header.size = frameWriter.outputEncoder.writer.lengthInBytes;
+      ;
 
       serializedData = frameWriter.outputEncoder.writer.joinChunks();
       frameWriter.outputEncoder.writer.clear();
-      rawFrame = new RawFrame(header, new ByteData.view(serializedData.buffer, 0, serializedData.lengthInBytes));
+      rawFrame = RawFrame(
+          header,
+          ByteData.view(
+              serializedData.buffer, 0, serializedData.lengthInBytes));
 
       controller.add(rawFrame);
     });
 
     group("exception handling", () {
       test("METHOD frame while still processing previous METHOD frame", () {
-
-        rawStream
-        .listen((data) {
+        rawStream.listen((data) {
           fail("Expected exception to be thrown");
-        },
-        onError : expectAsync1((error) {
+        }, onError: expectAsync1((error) {
           expect(error, const TypeMatcher<ConnectionException>());
-          expect(error.toString(), equals("ConnectionException(UNEXPECTED_FRAME): Received a new METHOD frame while processing an incomplete METHOD frame"));
+          expect(
+              error.toString(),
+              equals(
+                  "ConnectionException(UNEXPECTED_FRAME): Received a new METHOD frame while processing an incomplete METHOD frame"));
         }));
 
-        new BasicDeliverMock()
+        BasicDeliverMock()
           ..routingKey = ""
           ..exchange = ""
           ..deliveryTag = 0
           ..redelivered = false
           ..serialize(frameWriter.outputEncoder);
 
-        FrameHeader header = new FrameHeader();
+        FrameHeader header = FrameHeader();
         header.channel = 1;
         header.type = FrameType.METHOD;
         header.size = frameWriter.outputEncoder.writer.lengthInBytes;
 
-        Uint8List serializedData = frameWriter.outputEncoder.writer.joinChunks();
+        Uint8List serializedData =
+            frameWriter.outputEncoder.writer.joinChunks();
         frameWriter.outputEncoder.writer.clear();
-        rawFrame = new RawFrame(header, new ByteData.view(serializedData.buffer, 0, serializedData.lengthInBytes));
+        rawFrame = RawFrame(
+            header,
+            ByteData.view(
+                serializedData.buffer, 0, serializedData.lengthInBytes));
 
         // The second method frame should trigger the exception
         controller.add(rawFrame);
@@ -223,121 +231,139 @@ main({bool enableLogger : true}) {
       });
 
       test("HEADER frame without a previous METHOD frame", () {
-
-        rawStream
-        .listen((data) {
+        rawStream.listen((data) {
           fail("Expected exception to be thrown");
-        },
-        onError : expectAsync1((error) {
+        }, onError: expectAsync1((error) {
           expect(error, const TypeMatcher<ConnectionException>());
-          expect(error.toString(), equals("ConnectionException(UNEXPECTED_FRAME): Received a HEADER frame without a matching METHOD frame"));
+          expect(
+              error.toString(),
+              equals(
+                  "ConnectionException(UNEXPECTED_FRAME): Received a HEADER frame without a matching METHOD frame"));
         }));
 
-        new ContentHeader()
+        ContentHeader()
           ..bodySize = 0
           ..classId = 1
           ..serialize(frameWriter.outputEncoder);
 
-        FrameHeader header = new FrameHeader();
+        FrameHeader header = FrameHeader();
         header.channel = 1;
         header.type = FrameType.HEADER;
         header.size = frameWriter.outputEncoder.writer.lengthInBytes;
 
-        Uint8List serializedData = frameWriter.outputEncoder.writer.joinChunks();
+        Uint8List serializedData =
+            frameWriter.outputEncoder.writer.joinChunks();
         frameWriter.outputEncoder.writer.clear();
-        rawFrame = new RawFrame(header, new ByteData.view(serializedData.buffer, 0, serializedData.lengthInBytes));
+        rawFrame = RawFrame(
+            header,
+            ByteData.view(
+                serializedData.buffer, 0, serializedData.lengthInBytes));
 
         controller.add(rawFrame);
       });
 
       test("HEADER frame not matching previous METHOD frame class", () {
-
-        rawStream
-        .listen((data) {
+        rawStream.listen((data) {
           fail("Expected exception to be thrown");
-        },
-        onError : expectAsync1((error) {
+        }, onError: expectAsync1((error) {
           expect(error, const TypeMatcher<ConnectionException>());
-          expect(error.toString(), equals("ConnectionException(UNEXPECTED_FRAME): Received a HEADER frame that does not match the METHOD frame class id"));
+          expect(
+              error.toString(),
+              equals(
+                  "ConnectionException(UNEXPECTED_FRAME): Received a HEADER frame that does not match the METHOD frame class id"));
         }));
 
-        new BasicDeliverMock()
+        BasicDeliverMock()
           ..routingKey = ""
           ..exchange = ""
           ..deliveryTag = 0
           ..redelivered = false
           ..serialize(frameWriter.outputEncoder);
 
-        FrameHeader header = new FrameHeader();
+        FrameHeader header = FrameHeader();
         header.channel = 1;
         header.type = FrameType.METHOD;
         header.size = frameWriter.outputEncoder.writer.lengthInBytes;
 
-        Uint8List serializedData = frameWriter.outputEncoder.writer.joinChunks();
+        Uint8List serializedData =
+            frameWriter.outputEncoder.writer.joinChunks();
         frameWriter.outputEncoder.writer.clear();
-        rawFrame = new RawFrame(header, new ByteData.view(serializedData.buffer, 0, serializedData.lengthInBytes));
+        rawFrame = RawFrame(
+            header,
+            ByteData.view(
+                serializedData.buffer, 0, serializedData.lengthInBytes));
         controller.add(rawFrame);
 
         // Write content header with different class id
-        new ContentHeader()
+        ContentHeader()
           ..bodySize = 0
           ..classId = 0
           ..serialize(frameWriter.outputEncoder);
 
-        header = new FrameHeader();
+        header = FrameHeader();
         header.channel = 1;
         header.type = FrameType.HEADER;
         header.size = frameWriter.outputEncoder.writer.lengthInBytes;
 
         serializedData = frameWriter.outputEncoder.writer.joinChunks();
         frameWriter.outputEncoder.writer.clear();
-        rawFrame = new RawFrame(header, new ByteData.view(serializedData.buffer, 0, serializedData.lengthInBytes));
+        rawFrame = RawFrame(
+            header,
+            ByteData.view(
+                serializedData.buffer, 0, serializedData.lengthInBytes));
 
         controller.add(rawFrame);
       });
 
       test("duplicate HEADER frame for incomplete METHOD frame", () {
-
-        rawStream
-        .listen((data) {
+        rawStream.listen((data) {
           fail("Expected exception to be thrown");
-        },
-        onError : expectAsync1((error) {
+        }, onError: expectAsync1((error) {
           expect(error, const TypeMatcher<ConnectionException>());
-          expect(error.toString(), equals("ConnectionException(UNEXPECTED_FRAME): Received a duplicate HEADER frame for an incomplete METHOD frame"));
+          expect(
+              error.toString(),
+              equals(
+                  "ConnectionException(UNEXPECTED_FRAME): Received a duplicate HEADER frame for an incomplete METHOD frame"));
         }));
 
-        new BasicDeliverMock()
+        BasicDeliverMock()
           ..routingKey = ""
           ..exchange = ""
           ..deliveryTag = 0
           ..redelivered = false
           ..serialize(frameWriter.outputEncoder);
 
-        FrameHeader header = new FrameHeader();
+        FrameHeader header = FrameHeader();
         header.channel = 1;
         header.type = FrameType.METHOD;
         header.size = frameWriter.outputEncoder.writer.lengthInBytes;
 
-        Uint8List serializedData = frameWriter.outputEncoder.writer.joinChunks();
+        Uint8List serializedData =
+            frameWriter.outputEncoder.writer.joinChunks();
         frameWriter.outputEncoder.writer.clear();
-        rawFrame = new RawFrame(header, new ByteData.view(serializedData.buffer, 0, serializedData.lengthInBytes));
+        rawFrame = RawFrame(
+            header,
+            ByteData.view(
+                serializedData.buffer, 0, serializedData.lengthInBytes));
         controller.add(rawFrame);
 
         // Write content header with different class id
-        new ContentHeader()
+        ContentHeader()
           ..bodySize = 1
           ..classId = 60
           ..serialize(frameWriter.outputEncoder);
 
-        header = new FrameHeader();
+        header = FrameHeader();
         header.channel = 1;
         header.type = FrameType.HEADER;
         header.size = frameWriter.outputEncoder.writer.lengthInBytes;
 
         serializedData = frameWriter.outputEncoder.writer.joinChunks();
         frameWriter.outputEncoder.writer.clear();
-        rawFrame = new RawFrame(header, new ByteData.view(serializedData.buffer, 0, serializedData.lengthInBytes));
+        rawFrame = RawFrame(
+            header,
+            ByteData.view(
+                serializedData.buffer, 0, serializedData.lengthInBytes));
 
         // The second addition should trigger the error
         controller.add(rawFrame);
@@ -345,60 +371,64 @@ main({bool enableLogger : true}) {
       });
 
       test("BODY frame without matching METHOD frame", () {
-
-        rawStream
-        .listen((data) {
+        rawStream.listen((data) {
           fail("Expected exception to be thrown");
-        },
-        onError : expectAsync1((error) {
+        }, onError: expectAsync1((error) {
           expect(error, const TypeMatcher<ConnectionException>());
-          expect(error.toString(), equals("ConnectionException(UNEXPECTED_FRAME): Received a BODY frame without a matching METHOD frame"));
+          expect(
+              error.toString(),
+              equals(
+                  "ConnectionException(UNEXPECTED_FRAME): Received a BODY frame without a matching METHOD frame"));
         }));
 
-        FrameHeader header = new FrameHeader();
+        FrameHeader header = FrameHeader();
         header.channel = 1;
         header.type = FrameType.BODY;
         header.size = 0;
 
-        rawFrame = new RawFrame(header, null);
+        rawFrame = RawFrame(header, null);
         controller.add(rawFrame);
       });
 
       test("BODY frame without HEADER frame", () {
-
-        rawStream
-        .listen((data) {
+        rawStream.listen((data) {
           fail("Expected exception to be thrown");
-        },
-        onError : expectAsync1((error) {
+        }, onError: expectAsync1((error) {
           expect(error, const TypeMatcher<ConnectionException>());
-          expect(error.toString(), equals("ConnectionException(UNEXPECTED_FRAME): Received a BODY frame before a HEADER frame"));
+          expect(
+              error.toString(),
+              equals(
+                  "ConnectionException(UNEXPECTED_FRAME): Received a BODY frame before a HEADER frame"));
         }));
 
-        new BasicDeliverMock()
+        BasicDeliverMock()
           ..routingKey = ""
           ..exchange = ""
           ..deliveryTag = 0
           ..redelivered = false
           ..serialize(frameWriter.outputEncoder);
 
-        FrameHeader header = new FrameHeader();
+        FrameHeader header = FrameHeader();
         header.channel = 1;
         header.type = FrameType.METHOD;
         header.size = frameWriter.outputEncoder.writer.lengthInBytes;
 
-        Uint8List serializedData = frameWriter.outputEncoder.writer.joinChunks();
+        Uint8List serializedData =
+            frameWriter.outputEncoder.writer.joinChunks();
         frameWriter.outputEncoder.writer.clear();
-        rawFrame = new RawFrame(header, new ByteData.view(serializedData.buffer, 0, serializedData.lengthInBytes));
+        rawFrame = RawFrame(
+            header,
+            ByteData.view(
+                serializedData.buffer, 0, serializedData.lengthInBytes));
         controller.add(rawFrame);
 
         // Write body
-        header = new FrameHeader();
+        header = FrameHeader();
         header.channel = 1;
         header.type = FrameType.BODY;
         header.size = 0;
 
-        rawFrame = new RawFrame(header, null);
+        rawFrame = RawFrame(header, null);
         controller.add(rawFrame);
       });
     });

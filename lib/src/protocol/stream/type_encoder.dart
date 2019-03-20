@@ -1,81 +1,80 @@
 part of dart_amqp.protocol;
 
 class TypeEncoder {
-
   ChunkedOutputWriter _writer;
 
   final Endian endianess = Endian.big;
 
-  TypeEncoder({ChunkedOutputWriter withWriter : null}) {
-    _writer = withWriter == null
-              ? new ChunkedOutputWriter()
-              : withWriter;
+  TypeEncoder({ChunkedOutputWriter withWriter = null}) {
+    _writer = withWriter == null ? ChunkedOutputWriter() : withWriter;
   }
 
   void writeInt8(int value) {
-    Uint8List buf = new Uint8List(1);
-    new ByteData.view(buf.buffer).setInt8(0, value);
+    Uint8List buf = Uint8List(1);
+    ByteData.view(buf.buffer).setInt8(0, value);
     _writer.addLast(buf);
   }
 
   void writeInt16(int value) {
-    Uint8List buf = new Uint8List(2);
-    new ByteData.view(buf.buffer).setInt16(0, value, endianess);
+    Uint8List buf = Uint8List(2);
+    ByteData.view(buf.buffer).setInt16(0, value, endianess);
     _writer.addLast(buf);
   }
 
   void writeInt32(int value) {
-    Uint8List buf = new Uint8List(4);
-    new ByteData.view(buf.buffer).setInt32(0, value, endianess);
+    Uint8List buf = Uint8List(4);
+    ByteData.view(buf.buffer).setInt32(0, value, endianess);
     _writer.addLast(buf);
   }
 
   void writeInt64(int value) {
-    Uint8List buf = new Uint8List(8);
-    new ByteData.view(buf.buffer).setInt64(0, value, endianess);
+    Uint8List buf = Uint8List(8);
+    ByteData.view(buf.buffer).setInt64(0, value, endianess);
     _writer.addLast(buf);
   }
 
   void writeUInt8(int value) {
-    Uint8List buf = new Uint8List(1);
-    new ByteData.view(buf.buffer).setUint8(0, value);
+    Uint8List buf = Uint8List(1);
+    ByteData.view(buf.buffer).setUint8(0, value);
     _writer.addLast(buf);
   }
 
   void writeUInt16(int value) {
-    Uint8List buf = new Uint8List(2);
-    new ByteData.view(buf.buffer).setUint16(0, value, endianess);
+    Uint8List buf = Uint8List(2);
+    ByteData.view(buf.buffer).setUint16(0, value, endianess);
     _writer.addLast(buf);
   }
 
   void writeUInt32(int value) {
-    Uint8List buf = new Uint8List(4);
-    new ByteData.view(buf.buffer).setUint32(0, value, endianess);
+    Uint8List buf = Uint8List(4);
+    ByteData.view(buf.buffer).setUint32(0, value, endianess);
     _writer.addLast(buf);
   }
 
   void writeUInt64(int value) {
-    Uint8List buf = new Uint8List(8);
-    new ByteData.view(buf.buffer).setUint64(0, value, endianess);
+    Uint8List buf = Uint8List(8);
+    ByteData.view(buf.buffer).setUint64(0, value, endianess);
     _writer.addLast(buf);
   }
 
   writeFloat(double value) {
-    Uint8List buf = new Uint8List(4);
-    new ByteData.view(buf.buffer).setFloat32(0, value, endianess);
+    Uint8List buf = Uint8List(4);
+    ByteData.view(buf.buffer).setFloat32(0, value, endianess);
     _writer.addLast(buf);
   }
 
   writeDouble(double value) {
-    Uint8List buf = new Uint8List(8);
-    new ByteData.view(buf.buffer).setFloat64(0, value, endianess);
+    Uint8List buf = Uint8List(8);
+    ByteData.view(buf.buffer).setFloat64(0, value, endianess);
     _writer.addLast(buf);
   }
 
   void writeBits(List<bool> bits) {
     int mask = 0;
 
-    for (int maskOffset = 0, index = 0; index < bits.length; maskOffset++, index++) {
+    for (int maskOffset = 0, index = 0;
+        index < bits.length;
+        maskOffset++, index++) {
       if (index > 0 && index % 8 == 0) {
         writeUInt8(mask);
         mask = 0;
@@ -100,7 +99,7 @@ class TypeEncoder {
     List<int> data = utf8.encode(value);
 
     if (data.length > 255) {
-      throw new ArgumentError("Short string values should have a length <= 255");
+      throw ArgumentError("Short string values should have a length <= 255");
     }
 
     // Write the length followed by the actual bytes
@@ -137,7 +136,7 @@ class TypeEncoder {
       return;
     }
 
-    TypeEncoder buffer = new TypeEncoder();
+    TypeEncoder buffer = TypeEncoder();
 
     // Encode each keypair to the buffer
     table.forEach((String fieldName, Object value) {
@@ -157,7 +156,7 @@ class TypeEncoder {
       return;
     }
 
-    TypeEncoder buffer = new TypeEncoder();
+    TypeEncoder buffer = TypeEncoder();
 
     value.forEach((Object v) => buffer._writeField(fieldName, v));
 
@@ -168,7 +167,6 @@ class TypeEncoder {
   }
 
   void _writeField(String fieldName, Object value) {
-
     if (value is Map) {
       writeUInt8(FieldType.FIELD_TABLE.value);
       writeFieldTable(value);
@@ -218,9 +216,9 @@ class TypeEncoder {
     } else if (value == null) {
       writeUInt8(FieldType.VOID.value);
     } else {
-      throw new ArgumentError("Could not encode field ${fieldName} with value ${value}");
+      throw ArgumentError(
+          "Could not encode field ${fieldName} with value ${value}");
     }
-
   }
 
 //  void dumpToFile(String outputFile) {

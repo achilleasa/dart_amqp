@@ -18,7 +18,7 @@ class ConnectionStart implements Message {
   String mechanisms;
   String locales;
 
-  ConnectionStart.fromStream( TypeDecoder decoder ){
+  ConnectionStart.fromStream(TypeDecoder decoder) {
     versionMajor = decoder.readUInt8();
     versionMinor = decoder.readUInt8();
     serverProperties = decoder.readFieldTable("serverProperties");
@@ -26,8 +26,7 @@ class ConnectionStart implements Message {
     locales = decoder.readLongString();
   }
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class ConnectionStartOk implements Message {
@@ -43,15 +42,14 @@ class ConnectionStartOk implements Message {
 
   ConnectionStartOk();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
       ..writeFieldTable(clientProperties)
       ..writeShortString(mechanism)
       ..writeLongString(response)
-      ..writeShortString(locale)
-    ;
+      ..writeShortString(locale);
   }
 }
 
@@ -63,12 +61,11 @@ class ConnectionSecure implements Message {
   // Message arguments
   String challenge;
 
-  ConnectionSecure.fromStream( TypeDecoder decoder ){
+  ConnectionSecure.fromStream(TypeDecoder decoder) {
     challenge = decoder.readLongString();
   }
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class ConnectionSecureOk implements Message {
@@ -81,12 +78,11 @@ class ConnectionSecureOk implements Message {
 
   ConnectionSecureOk();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
-      ..writeLongString(response)
-    ;
+      ..writeLongString(response);
   }
 }
 
@@ -100,14 +96,13 @@ class ConnectionTune implements Message {
   int frameMax;
   int heartbeat;
 
-  ConnectionTune.fromStream( TypeDecoder decoder ){
+  ConnectionTune.fromStream(TypeDecoder decoder) {
     channelMax = decoder.readUInt16();
     frameMax = decoder.readUInt32();
     heartbeat = decoder.readUInt16();
   }
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class ConnectionTuneOk implements Message {
@@ -122,14 +117,13 @@ class ConnectionTuneOk implements Message {
 
   ConnectionTuneOk();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
       ..writeUInt16(channelMax)
       ..writeUInt32(frameMax)
-      ..writeUInt16(heartbeat)
-    ;
+      ..writeUInt16(heartbeat);
   }
 }
 
@@ -145,14 +139,13 @@ class ConnectionOpen implements Message {
 
   ConnectionOpen();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
       ..writeShortString(virtualHost)
       ..writeShortString(reserved_1)
-      ..writeBits([reserved_2])
-    ;
+      ..writeBits([reserved_2]);
   }
 }
 
@@ -164,12 +157,11 @@ class ConnectionOpenOk implements Message {
   // Message arguments
   String reserved_1;
 
-  ConnectionOpenOk.fromStream( TypeDecoder decoder ){
+  ConnectionOpenOk.fromStream(TypeDecoder decoder) {
     reserved_1 = decoder.readShortString();
   }
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class ConnectionClose implements Message {
@@ -184,21 +176,20 @@ class ConnectionClose implements Message {
   int methodId;
 
   ConnectionClose();
-  ConnectionClose.fromStream( TypeDecoder decoder ){
+  ConnectionClose.fromStream(TypeDecoder decoder) {
     replyCode = decoder.readUInt16();
     replyText = decoder.readShortString();
     classId = decoder.readUInt16();
     methodId = decoder.readUInt16();
   }
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
       ..writeUInt16(replyCode)
       ..writeShortString(replyText)
       ..writeUInt16(classId)
-      ..writeUInt16(methodId)
-    ;
+      ..writeUInt16(methodId);
   }
 }
 
@@ -210,12 +201,8 @@ class ConnectionCloseOk implements Message {
   // Message arguments
 
   ConnectionCloseOk();
-  ConnectionCloseOk.fromStream( TypeDecoder decoder ){
-  }
-  void serialize( TypeEncoder encoder ) {
-    encoder
-      ..writeUInt16(msgClassId)
-      ..writeUInt16(msgMethodId)
-    ;
+  ConnectionCloseOk.fromStream(TypeDecoder decoder) {}
+  void serialize(TypeEncoder encoder) {
+    encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
   }
 }

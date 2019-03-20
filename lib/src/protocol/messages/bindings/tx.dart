@@ -15,11 +15,8 @@ class TxSelect implements Message {
 
   TxSelect();
 
-  void serialize( TypeEncoder encoder ) {
-    encoder
-      ..writeUInt16(msgClassId)
-      ..writeUInt16(msgMethodId)
-    ;
+  void serialize(TypeEncoder encoder) {
+    encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
   }
 }
 
@@ -30,11 +27,9 @@ class TxSelectOk implements Message {
 
   // Message arguments
 
-  TxSelectOk.fromStream( TypeDecoder decoder ){
-  }
+  TxSelectOk.fromStream(TypeDecoder decoder) {}
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class TxCommit implements Message {
@@ -46,11 +41,8 @@ class TxCommit implements Message {
 
   TxCommit();
 
-  void serialize( TypeEncoder encoder ) {
-    encoder
-      ..writeUInt16(msgClassId)
-      ..writeUInt16(msgMethodId)
-    ;
+  void serialize(TypeEncoder encoder) {
+    encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
   }
 }
 
@@ -61,11 +53,9 @@ class TxCommitOk implements Message {
 
   // Message arguments
 
-  TxCommitOk.fromStream( TypeDecoder decoder ){
-  }
+  TxCommitOk.fromStream(TypeDecoder decoder) {}
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class TxRollback implements Message {
@@ -77,11 +67,8 @@ class TxRollback implements Message {
 
   TxRollback();
 
-  void serialize( TypeEncoder encoder ) {
-    encoder
-      ..writeUInt16(msgClassId)
-      ..writeUInt16(msgMethodId)
-    ;
+  void serialize(TypeEncoder encoder) {
+    encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
   }
 }
 
@@ -92,9 +79,7 @@ class TxRollbackOk implements Message {
 
   // Message arguments
 
-  TxRollbackOk.fromStream( TypeDecoder decoder ){
-  }
+  TxRollbackOk.fromStream(TypeDecoder decoder) {}
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }

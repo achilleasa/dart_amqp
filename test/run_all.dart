@@ -11,7 +11,6 @@ import "lib/exchange_test.dart" as exchanges;
 import "lib/client_test.dart" as client;
 
 void main(List<String> args) {
-
   // Check if we need to disable our loggers
   bool enableLogger = args.indexOf('--enable-logger') != -1;
 
@@ -20,39 +19,39 @@ void main(List<String> args) {
 
   //useCompactVMConfiguration();
 //
-  if (runAll || (new RegExp("enums")).hasMatch(allArgs)) {
-    enums.main(enableLogger : enableLogger);
+  if (runAll || (RegExp("enums")).hasMatch(allArgs)) {
+    enums.main(enableLogger: enableLogger);
   }
 
-  if (runAll || (new RegExp("encoder-decoder")).hasMatch(allArgs)) {
-    encode_decode.main(enableLogger : enableLogger);
+  if (runAll || (RegExp("encoder-decoder")).hasMatch(allArgs)) {
+    encode_decode.main(enableLogger: enableLogger);
   }
 
-  if (runAll || (new RegExp("exception-handling")).hasMatch(allArgs)) {
-    exceptions.main(enableLogger : enableLogger);
+  if (runAll || (RegExp("exception-handling")).hasMatch(allArgs)) {
+    exceptions.main(enableLogger: enableLogger);
   }
 
-  if (runAll || (new RegExp("amqp-decoder")).hasMatch(allArgs)) {
-    amqp_decoder.main(enableLogger : enableLogger);
+  if (runAll || (RegExp("amqp-decoder")).hasMatch(allArgs)) {
+    amqp_decoder.main(enableLogger: enableLogger);
   }
 
-  if (runAll || (new RegExp("authentication")).hasMatch(allArgs)) {
-    auth.main(enableLogger : enableLogger);
+  if (runAll || (RegExp("authentication")).hasMatch(allArgs)) {
+    auth.main(enableLogger: enableLogger);
   }
 
-  if (runAll || (new RegExp("channels")).hasMatch(allArgs)) {
-    channels.main(enableLogger : enableLogger);
+  if (runAll || (RegExp("channels")).hasMatch(allArgs)) {
+    channels.main(enableLogger: enableLogger);
   }
 
-  if (runAll || (new RegExp("queues")).hasMatch(allArgs)) {
-    queues.main(enableLogger : enableLogger);
+  if (runAll || (RegExp("queues")).hasMatch(allArgs)) {
+    queues.main(enableLogger: enableLogger);
   }
 
-  if (runAll || (new RegExp("exchanges")).hasMatch(allArgs)) {
-    exchanges.main(enableLogger : enableLogger);
+  if (runAll || (RegExp("exchanges")).hasMatch(allArgs)) {
+    exchanges.main(enableLogger: enableLogger);
   }
 
-  if (runAll || (new RegExp("client")).hasMatch(allArgs)) {
-    client.main(enableLogger : enableLogger);
+  if (runAll || (RegExp("client")).hasMatch(allArgs)) {
+    client.main(enableLogger: enableLogger);
   }
 }

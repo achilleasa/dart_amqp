@@ -4,11 +4,12 @@ services:
 jobs:
   include:
     - stage: run tests
-      dart: dev
+      dart: stable
       script:
         - export PATH=$PATH:"~/.pub-cache/bin"
         - pub get
         - pub global activate coverage
+        - dartfmt -n --set-exit-if-changed .
         - dartanalyzer --fatal-warnings --fatal-hints --fatal-lints ./
         - cd test
         - bash run.sh
