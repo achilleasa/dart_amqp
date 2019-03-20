@@ -11,27 +11,23 @@ int fib(int n) {
   return fib(n - 1) + fib(n - 2);
 }
 
-void main(List<String> args) {
+void main(List<String> args) async {
   Client client = Client();
 
   // Setup a signal handler to cleanly exit if CTRL+C is pressed
-  ProcessSignal.sigint.watch().listen((_) {
-    client.close().then((_) {
-      exit(0);
-    });
+  ProcessSignal.sigint.watch().listen((_) async {
+    await client.close();
+    exit(0);
   });
 
-  client
-      .channel()
-      .then((Channel channel) => channel.qos(0, 1))
-      .then((Channel channel) => channel.queue("rpc_queue"))
-      .then((Queue queue) => queue.consume())
-      .then((Consumer consumer) {
-    print(" [x] Awaiting RPC request");
-    consumer.listen((AmqpMessage message) {
-      int n = message.payloadAsJson["n"];
-      print(" [.] fib(${n})");
-      message.reply(fib(n).toString());
-    });
+  Channel channel = await client.channel();
+  channel = await channel.qos(0, 1);
+  Queue queue = await channel.queue("rpc_queue");
+  Consumer consumer = await queue.consume();
+  print(" [x] Awaiting RPC request");
+  consumer.listen((message) {
+    int n = message.payloadAsJson["n"];
+    print(" [.] fib(${n})");
+    message.reply(fib(n).toString());
   });
 }

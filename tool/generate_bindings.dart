@@ -118,17 +118,16 @@ part "protocol/io/amqp_message_decoder.dart";
   };
   Map<String, String> _amqpCustomTypeToBasicType = {};
 
-  Future<xml.XmlDocument> _retrieveSchema(String schemaUrl) {
+  Future<xml.XmlDocument> _retrieveSchema(String schemaUrl) async {
     logger.info("- Retrieving schema from ${schemaUrl}");
 
     // Check for cached copy
     File cachedCopy = File(schemaUrl.split('/').last);
-    return cachedCopy.exists().then((bool exists) {
-      return exists ? cachedCopy.readAsString() : http.read(schemaUrl);
-    }).then((String data) {
-      logger.info("- Parsing schema");
-      return xml.parse(data);
-    });
+    bool exists = await cachedCopy.exists();
+    String data =
+        exists ? await cachedCopy.readAsString() : await http.read(schemaUrl);
+    logger.info("- Parsing schema");
+    return xml.parse(data);
   }
 
   String _parseMethod(
@@ -475,8 +474,8 @@ part of dart_amqp.protocol;
     messageFile.writeAsStringSync(generatedMessageFactoryFile.toString());
   }
 
-  void build(String schemaUrl) {
-    _retrieveSchema(schemaUrl).then(_parseSchema);
+  void build(String schemaUrl) async {
+    _parseSchema(await _retrieveSchema(schemaUrl));
   }
 }
 

@@ -1,7 +1,7 @@
 import "dart:io";
 import "package:dart_amqp/dart_amqp.dart";
 
-void main(List<String> args) {
+void main(List<String> args) async {
   if (args.length < 2) {
     print("""
     Error: invalid arguments. Please invoke as:
@@ -18,15 +18,11 @@ void main(List<String> args) {
   String routingKey = args.first;
 
   Client client = Client();
-  client
-      .channel()
-      .then((Channel channel) =>
-          channel.exchange("topic_logs", ExchangeType.TOPIC))
-      .then((Exchange exchange) {
-    String message = args.sublist(1).join(' ');
-    // Use 'severity' as our routing key
-    exchange.publish(message, routingKey);
-    print(" [x] Sent [${routingKey}] ${message}");
-    return client.close();
-  });
+  Channel channel = await client.channel();
+  Exchange exchange = await channel.exchange("topic_logs", ExchangeType.TOPIC);
+  String message = args.sublist(1).join(' ');
+  // Use 'severity' as our routing key
+  exchange.publish(message, routingKey);
+  print(" [x] Sent [${routingKey}] ${message}");
+  await client.close();
 }

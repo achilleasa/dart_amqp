@@ -63,18 +63,13 @@ class MockServer {
     }
   }
 
-  Future listen(String host, int port) {
-    Completer completer = Completer();
+  Future listen(String host, int port) async {
     mockLogger.info("Binding MockServer to $host:$port");
 
-    ServerSocket.bind(host, port).then((ServerSocket server) {
-      _server = server;
-      mockLogger.info("[$host:$port] Listening for incoming connections");
-      _server.listen(_handleConnection);
-      completer.complete();
-    });
-
-    return completer.future;
+    _server = await ServerSocket.bind(host, port);
+    mockLogger.info("[$host:$port] Listening for incoming connections");
+    _server.listen(_handleConnection);
+    ;
   }
 
   void _handleConnection(Socket client) {

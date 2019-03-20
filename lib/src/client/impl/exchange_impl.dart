@@ -45,7 +45,7 @@ class _ExchangeImpl implements Exchange {
   }
 
   Future<Consumer> bindPrivateQueueConsumer(List<String> routingKeys,
-      {String consumerTag, bool noAck = true}) {
+      {String consumerTag, bool noAck = true}) async {
     // Fanout and headers exchanges do not need to specify any keys. Use the default one if none is specified
     if ((type == ExchangeType.FANOUT || type == ExchangeType.HEADERS) &&
         (routingKeys == null || routingKeys.isEmpty)) {
@@ -57,10 +57,10 @@ class _ExchangeImpl implements Exchange {
           "One or more routing keys needs to be specified for this exchange type");
     }
 
-    return channel.privateQueue().then((Queue queue) {
-      return Future.forEach(
-              routingKeys, (String routingKey) => queue.bind(this, routingKey))
-          .then((_) => queue.consume(consumerTag: consumerTag, noAck: noAck));
-    });
+    Queue queue = await channel.privateQueue();
+    for (String routingKey in routingKeys) {
+      await queue.bind(this, routingKey);
+    }
+    return queue.consume(consumerTag: consumerTag, noAck: noAck);
   }
 }

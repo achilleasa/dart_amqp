@@ -1,7 +1,7 @@
 import "dart:io";
 import "package:dart_amqp/dart_amqp.dart";
 
-void main(List<String> args) {
+void main(List<String> args) async {
   if (args.isEmpty) {
     print("""
     Error: invalid arguments. Please invoke as:
@@ -21,23 +21,18 @@ void main(List<String> args) {
   Client client = Client();
 
   // Setup a signal handler to cleanly exit if CTRL+C is pressed
-  ProcessSignal.sigint.watch().listen((_) {
-    client.close().then((_) {
-      exit(0);
-    });
+  ProcessSignal.sigint.watch().listen((_) async {
+    await client.close();
+    exit(0);
   });
 
-  client
-      .channel()
-      .then((Channel channel) =>
-          channel.exchange("topic_logs", ExchangeType.TOPIC))
-      .then((Exchange exchange) => exchange.bindPrivateQueueConsumer(args))
-      .then((Consumer consumer) {
+  Channel channel = await client.channel();
+  Exchange exchange = await channel.exchange("topic_logs", ExchangeType.TOPIC);
+  Consumer consumer = await exchange.bindPrivateQueueConsumer(args);
+  print(
+      " [*] Waiting for [${args.join(', ')}] logs on private queue ${consumer.queue.name}. To exit, press CTRL+C");
+  consumer.listen((message) {
     print(
-        " [*] Waiting for [${args.join(', ')}] logs on private queue ${consumer.queue.name}. To exit, press CTRL+C");
-    consumer.listen((AmqpMessage message) {
-      print(
-          " [x] [Exchange: ${message.exchangeName}] [${message.routingKey}] ${message.payloadAsString}");
-    });
+        " [x] [Exchange: ${message.exchangeName}] [${message.routingKey}] ${message.payloadAsString}");
   });
 }

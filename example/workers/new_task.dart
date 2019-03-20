@@ -1,14 +1,11 @@
 import "package:dart_amqp/dart_amqp.dart";
 
-void main(List<String> args) {
+void main(List<String> args) async {
   Client client = Client();
-  client
-      .channel()
-      .then((Channel channel) => channel.queue("task_queue", durable: true))
-      .then((Queue queue) {
-    String message = args.isEmpty ? "Hello World!" : args.join(" ");
-    queue.publish(message, properties: MessageProperties.persistentMessage());
-    print(" [x] Sent ${message}");
-    return client.close();
-  });
+  Channel channel = await client.channel();
+  Queue queue = await channel.queue("task_queue", durable: true);
+  String message = args.isEmpty ? "Hello World!" : args.join(" ");
+  queue.publish(message, properties: MessageProperties.persistentMessage());
+  print(" [x] Sent ${message}");
+  await client.close();
 }
