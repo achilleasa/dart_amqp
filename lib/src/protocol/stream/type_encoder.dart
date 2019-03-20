@@ -5,7 +5,7 @@ class TypeEncoder {
 
   final Endian endianess = Endian.big;
 
-  TypeEncoder({ChunkedOutputWriter withWriter = null}) {
+  TypeEncoder({ChunkedOutputWriter withWriter}) {
     _writer = withWriter == null ? ChunkedOutputWriter() : withWriter;
   }
 

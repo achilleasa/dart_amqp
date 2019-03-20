@@ -219,10 +219,8 @@ ${String.fromCharCodes(List<int>.filled(className.length + methodName.length + 1
       }).replaceAll("-", "_");
 
       // Retrieve Dart type for field domain
-      String fieldDomain = amqpMethodField.getAttribute("domain");
-      if (fieldDomain == null) {
-        fieldDomain = amqpMethodField.getAttribute("type");
-      }
+      String fieldDomain = amqpMethodField.getAttribute("domain") ??
+          amqpMethodField.getAttribute("type");
       String amqpType = _amqpCustomTypeToBasicType.containsKey(fieldDomain)
           ? _amqpCustomTypeToBasicType[fieldDomain]
           : fieldDomain;

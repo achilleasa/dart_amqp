@@ -12,7 +12,7 @@ import "lib/client_test.dart" as client;
 
 void main(List<String> args) {
   // Check if we need to disable our loggers
-  bool enableLogger = args.indexOf('--enable-logger') != -1;
+  bool enableLogger = args.contains('--enable-logger');
 
   String allArgs = args.join(".");
   bool runAll = args.isEmpty || allArgs == '--enable-logger';

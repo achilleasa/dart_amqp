@@ -35,7 +35,7 @@ class BasicQosOk implements Message {
 
   // Message arguments
 
-  BasicQosOk.fromStream(TypeDecoder decoder) {}
+  BasicQosOk.fromStream(TypeDecoder decoder);
 
   void serialize(TypeEncoder encoder) {}
 }
@@ -255,7 +255,7 @@ class BasicRecoverOk implements Message {
 
   // Message arguments
 
-  BasicRecoverOk.fromStream(TypeDecoder decoder) {}
+  BasicRecoverOk.fromStream(TypeDecoder decoder);
 
   void serialize(TypeEncoder encoder) {}
 }

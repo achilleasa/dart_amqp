@@ -366,6 +366,7 @@ main({bool enableLogger = true}) {
           expect(ex, const TypeMatcher<FatalException>());
         }
 
+        // ignore: unawaited_futures
         server
             .shutdown()
             .then((_) =>
@@ -376,8 +377,8 @@ main({bool enableLogger = true}) {
             client.errorListener((ex) => handleError(ex));
             return server
                 .shutdown()
-                .then((_) =>
-                    Future.delayed(Duration(seconds: 5) + server.responseDelay))
+                .then((_) => Future.delayed(
+                    const Duration(seconds: 5) + server.responseDelay))
                 .then((_) => fail("Expected an exception to be thrown"));
           });
         });

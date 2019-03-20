@@ -155,7 +155,7 @@ main({bool enableLogger = true}) {
 
     test("PLAIN authenticaion", () {
       ConnectionSettings settings = ConnectionSettings(
-          authProvider: PlainAuthenticator("guest", "guest"));
+          authProvider: const PlainAuthenticator("guest", "guest"));
       client = Client(settings: settings);
 
       client.connect().then(expectAsync1((_) {}));
@@ -163,7 +163,7 @@ main({bool enableLogger = true}) {
 
     test("AMQPLAIN authenticaion", () {
       ConnectionSettings settings = ConnectionSettings(
-          authProvider: AmqPlainAuthenticator("guest", "guest"));
+          authProvider: const AmqPlainAuthenticator("guest", "guest"));
       client = Client(settings: settings);
 
       client.connect().then(expectAsync1((_) {}));
@@ -223,8 +223,8 @@ main({bool enableLogger = true}) {
     });
 
     test("invalid auth credentials", () {
-      ConnectionSettings settings =
-          ConnectionSettings(authProvider: PlainAuthenticator("foo", "foo"));
+      ConnectionSettings settings = ConnectionSettings(
+          authProvider: const PlainAuthenticator("foo", "foo"));
 
       client = Client(settings: settings);
 

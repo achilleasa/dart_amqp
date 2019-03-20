@@ -42,8 +42,8 @@ class MockServer {
           client.destroy();
           return Future.value(true);
         }))
-        ..add(_server.close().then(
-            (_) => Future.delayed(Duration(milliseconds: 20), () => true)));
+        ..add(_server.close().then((_) =>
+            Future.delayed(const Duration(milliseconds: 20), () => true)));
 
       clients.clear();
       _server = null;
@@ -87,7 +87,7 @@ class MockServer {
   }
 
   void _handleClientData(Socket client, dynamic data) {
-    if (replayList != null && !replayList.isEmpty) {
+    if (replayList != null && replayList.isNotEmpty) {
       // Respond with the next payload in replay list
       Future.delayed(responseDelay).then((_) {
         client

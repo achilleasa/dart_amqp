@@ -120,7 +120,7 @@ class ChannelCloseOk implements Message {
   // Message arguments
 
   ChannelCloseOk();
-  ChannelCloseOk.fromStream(TypeDecoder decoder) {}
+  ChannelCloseOk.fromStream(TypeDecoder decoder);
   void serialize(TypeEncoder encoder) {
     encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
   }

@@ -2,7 +2,7 @@ import "dart:io";
 import "package:dart_amqp/dart_amqp.dart";
 
 void main(List<String> args) {
-  if (args.length < 2 || ["info", "warning", "error"].indexOf(args[0]) == -1) {
+  if (args.length < 2 || !["info", "warning", "error"].contains(args[0])) {
     print("""
     Error: invalid arguments. Please invoke as:
 

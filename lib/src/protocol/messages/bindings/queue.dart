@@ -88,7 +88,7 @@ class QueueBindOk implements Message {
 
   // Message arguments
 
-  QueueBindOk.fromStream(TypeDecoder decoder) {}
+  QueueBindOk.fromStream(TypeDecoder decoder);
 
   void serialize(TypeEncoder encoder) {}
 }
@@ -126,7 +126,7 @@ class QueueUnbindOk implements Message {
 
   // Message arguments
 
-  QueueUnbindOk.fromStream(TypeDecoder decoder) {}
+  QueueUnbindOk.fromStream(TypeDecoder decoder);
 
   void serialize(TypeEncoder encoder) {}
 }

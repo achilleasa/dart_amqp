@@ -25,9 +25,9 @@ main({bool enableLogger = true}) {
   for (Type enumClass in enumClasses) {
     ClassMirror cm = reflectClass(enumClass);
 
-    MethodMirror valueOfMirror = null;
-    MethodMirror nameOfMirror = null;
-    MethodMirror toStringMirror = null;
+    MethodMirror valueOfMirror;
+    MethodMirror nameOfMirror;
+    MethodMirror toStringMirror;
 
     // Run a first pass to detect which methods we can use
     cm.declarations.forEach((Symbol enumSymbol, declarationMirror) {

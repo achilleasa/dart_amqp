@@ -201,7 +201,7 @@ class ConnectionCloseOk implements Message {
   // Message arguments
 
   ConnectionCloseOk();
-  ConnectionCloseOk.fromStream(TypeDecoder decoder) {}
+  ConnectionCloseOk.fromStream(TypeDecoder decoder);
   void serialize(TypeEncoder encoder) {
     encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
   }

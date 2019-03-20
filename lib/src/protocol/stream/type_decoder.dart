@@ -112,7 +112,7 @@ class TypeDecoder {
 
   Object _readField(String fieldName) {
     int typeValue = readUInt8();
-    FieldType type = null;
+    FieldType type;
     try {
       type = FieldType.valueOf(typeValue);
     } catch (e) {}

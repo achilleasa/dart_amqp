@@ -31,9 +31,7 @@ class _ClientImpl implements Client {
   /// fail, then the [_connected] [Future] returned by a call to [open[ will also fail
 
   Future _reconnect() {
-    if (_connected == null) {
-      _connected = Completer();
-    }
+    _connected ??= Completer();
 
     connectionLogger.info(
         "Trying to connect to ${settings.host}:${settings.port} [attempt ${_connectionAttempt + 1}/${settings.maxConnectionAttempts}]");
@@ -46,7 +44,8 @@ class _ClientImpl implements Client {
           .transform(AmqpMessageDecoder().transformer)
           .listen(_handleMessage,
               onError: _handleException,
-              onDone: () => _handleException(SocketException("Socket closed")));
+              onDone: () =>
+                  _handleException(const SocketException("Socket closed")));
 
       // Allocate channel 0 for handshaking and transmit the AMQP header to bootstrap the handshake
       _channels.clear();
@@ -255,7 +254,7 @@ class _ClientImpl implements Client {
       }
 
       // Find next available channel
-      _ChannelImpl userChannel = null;
+      _ChannelImpl userChannel;
       int nextChannelId = 0;
       while (nextChannelId < 65536) {
         if (!_channels.containsKey(++nextChannelId)) {

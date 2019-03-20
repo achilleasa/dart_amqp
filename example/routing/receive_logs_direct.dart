@@ -3,8 +3,7 @@ import "package:dart_amqp/dart_amqp.dart";
 
 void main(List<String> args) {
   if (args.isEmpty ||
-      !args.every(
-          (String arg) => ["info", "warning", "error"].indexOf(arg) != -1)) {
+      !args.every((String arg) => ["info", "warning", "error"].contains(arg))) {
     print("""
     Error: invalid arguments. Please invoke as:
 

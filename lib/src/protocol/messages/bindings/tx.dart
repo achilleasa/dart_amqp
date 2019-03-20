@@ -27,7 +27,7 @@ class TxSelectOk implements Message {
 
   // Message arguments
 
-  TxSelectOk.fromStream(TypeDecoder decoder) {}
+  TxSelectOk.fromStream(TypeDecoder decoder);
 
   void serialize(TypeEncoder encoder) {}
 }
@@ -53,7 +53,7 @@ class TxCommitOk implements Message {
 
   // Message arguments
 
-  TxCommitOk.fromStream(TypeDecoder decoder) {}
+  TxCommitOk.fromStream(TypeDecoder decoder);
 
   void serialize(TypeEncoder encoder) {}
 }
@@ -79,7 +79,7 @@ class TxRollbackOk implements Message {
 
   // Message arguments
 
-  TxRollbackOk.fromStream(TypeDecoder decoder) {}
+  TxRollbackOk.fromStream(TypeDecoder decoder);
 
   void serialize(TypeEncoder encoder) {}
 }

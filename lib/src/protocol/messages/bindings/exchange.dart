@@ -43,7 +43,7 @@ class ExchangeDeclareOk implements Message {
 
   // Message arguments
 
-  ExchangeDeclareOk.fromStream(TypeDecoder decoder) {}
+  ExchangeDeclareOk.fromStream(TypeDecoder decoder);
 
   void serialize(TypeEncoder encoder) {}
 }
@@ -78,7 +78,7 @@ class ExchangeDeleteOk implements Message {
 
   // Message arguments
 
-  ExchangeDeleteOk.fromStream(TypeDecoder decoder) {}
+  ExchangeDeleteOk.fromStream(TypeDecoder decoder);
 
   void serialize(TypeEncoder encoder) {}
 }

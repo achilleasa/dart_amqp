@@ -93,9 +93,8 @@ class _ChannelImpl implements Channel {
             (serverMessage.message as ConnectionStart);
 
         // Check if the currently supplied authentication provider is supported by the server.
-        if (serverResponse.mechanisms
-                .indexOf(_client.settings.authProvider.saslType) ==
-            -1) {
+        if (!serverResponse.mechanisms
+            .contains(_client.settings.authProvider.saslType)) {
           _client._handleException(FatalException(
               "Selected authentication provider '${_client.settings.authProvider.saslType}' is unsupported by the server (server supports: ${serverResponse.mechanisms})"));
           return;
@@ -136,7 +135,7 @@ class _ChannelImpl implements Channel {
           ..maxChannels = _client.tuningSettings.maxChannels > 0
               ? _client.tuningSettings.maxChannels
               : serverResponse.channelMax
-          ..heartbeatPeriod = Duration(seconds: 0);
+          ..heartbeatPeriod = Duration.zero;
 
         // Respond with the mirrored tuning settings
         ConnectionTuneOk clientResponse = ConnectionTuneOk()
@@ -183,12 +182,8 @@ class _ChannelImpl implements Channel {
 
     _channelClosed = Completer<Channel>();
 
-    if (classId == null) {
-      classId = 0;
-    }
-    if (methodId == null) {
-      methodId = 0;
-    }
+    classId ??= 0;
+    methodId ??= 0;
 
     // Channel #0 should close the connection instead of closing the channel
     Message closeRequest;
@@ -359,9 +354,7 @@ class _ChannelImpl implements Channel {
         }
 
         // Mark the channel as closed
-        if (_channelClosed == null) {
-          _channelClosed = Completer();
-        }
+        _channelClosed ??= Completer();
         if (!_channelClosed.isCompleted) {
           _channelClosed.complete();
         }
@@ -406,10 +399,7 @@ class _ChannelImpl implements Channel {
 
     // Mark the channel as closed if we need to
     if (flagChannelAsClosed) {
-      if (_channelClosed == null) {
-        _channelClosed = Completer();
-      }
-
+      _channelClosed ??= Completer();
       if (!_channelClosed.isCompleted) {
         _channelClosed.complete();
       }
@@ -514,12 +504,8 @@ class _ChannelImpl implements Channel {
 
   Future<Channel> qos(int prefetchSize, int prefetchCount,
       {bool global = true}) {
-    if (prefetchSize == null) {
-      prefetchSize = 0;
-    }
-    if (prefetchCount == null) {
-      prefetchCount = 0;
-    }
+    prefetchSize ??= 0;
+    prefetchCount ??= 0;
     BasicQos qosRequest = BasicQos()
       ..prefetchSize = prefetchSize
       ..prefetchCount = prefetchCount
