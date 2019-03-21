@@ -448,8 +448,8 @@ part of dart_amqp.protocol;
   void _parseSchema(xml.XmlDocument schema) {
     logger.info("- Processing custom domains");
     schema.descendants
-        .where((xml.XmlNode node) =>
-            node is xml.XmlElement && node.name.local == "domain")
+        .whereType<xml.XmlElement>()
+        .where((xml.XmlElement node) => node.name.local == "domain")
         .forEach(_parseDomain);
 
     logger.info("- Processing amqp classes");
