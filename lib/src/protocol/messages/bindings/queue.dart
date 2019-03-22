@@ -23,15 +23,14 @@ class QueueDeclare implements Message {
 
   QueueDeclare();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
       ..writeUInt16(reserved_1)
       ..writeShortString(queue)
       ..writeBits([passive, durable, exclusive, autoDelete, noWait])
-      ..writeFieldTable(arguments)
-    ;
+      ..writeFieldTable(arguments);
   }
 }
 
@@ -45,14 +44,13 @@ class QueueDeclareOk implements Message {
   int messageCount;
   int consumerCount;
 
-  QueueDeclareOk.fromStream( TypeDecoder decoder ){
+  QueueDeclareOk.fromStream(TypeDecoder decoder) {
     queue = decoder.readShortString();
     messageCount = decoder.readUInt32();
     consumerCount = decoder.readUInt32();
   }
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class QueueBind implements Message {
@@ -70,7 +68,7 @@ class QueueBind implements Message {
 
   QueueBind();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
@@ -79,8 +77,7 @@ class QueueBind implements Message {
       ..writeShortString(exchange)
       ..writeShortString(routingKey)
       ..writeBits([noWait])
-      ..writeFieldTable(arguments)
-    ;
+      ..writeFieldTable(arguments);
   }
 }
 
@@ -91,11 +88,9 @@ class QueueBindOk implements Message {
 
   // Message arguments
 
-  QueueBindOk.fromStream( TypeDecoder decoder ){
-  }
+  QueueBindOk.fromStream(TypeDecoder decoder) {}
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class QueueUnbind implements Message {
@@ -112,7 +107,7 @@ class QueueUnbind implements Message {
 
   QueueUnbind();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
@@ -120,8 +115,7 @@ class QueueUnbind implements Message {
       ..writeShortString(queue)
       ..writeShortString(exchange)
       ..writeShortString(routingKey)
-      ..writeFieldTable(arguments)
-    ;
+      ..writeFieldTable(arguments);
   }
 }
 
@@ -132,11 +126,9 @@ class QueueUnbindOk implements Message {
 
   // Message arguments
 
-  QueueUnbindOk.fromStream( TypeDecoder decoder ){
-  }
+  QueueUnbindOk.fromStream(TypeDecoder decoder) {}
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class QueuePurge implements Message {
@@ -151,14 +143,13 @@ class QueuePurge implements Message {
 
   QueuePurge();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
       ..writeUInt16(reserved_1)
       ..writeShortString(queue)
-      ..writeBits([noWait])
-    ;
+      ..writeBits([noWait]);
   }
 }
 
@@ -170,12 +161,11 @@ class QueuePurgeOk implements Message {
   // Message arguments
   int messageCount;
 
-  QueuePurgeOk.fromStream( TypeDecoder decoder ){
+  QueuePurgeOk.fromStream(TypeDecoder decoder) {
     messageCount = decoder.readUInt32();
   }
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class QueueDelete implements Message {
@@ -192,14 +182,13 @@ class QueueDelete implements Message {
 
   QueueDelete();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
       ..writeUInt16(reserved_1)
       ..writeShortString(queue)
-      ..writeBits([ifUnused, ifEmpty, noWait])
-    ;
+      ..writeBits([ifUnused, ifEmpty, noWait]);
   }
 }
 
@@ -211,10 +200,9 @@ class QueueDeleteOk implements Message {
   // Message arguments
   int messageCount;
 
-  QueueDeleteOk.fromStream( TypeDecoder decoder ){
+  QueueDeleteOk.fromStream(TypeDecoder decoder) {
     messageCount = decoder.readUInt32();
   }
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }

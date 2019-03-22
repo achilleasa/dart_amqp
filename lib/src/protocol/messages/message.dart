@@ -9,7 +9,6 @@
 part of dart_amqp.protocol;
 
 abstract class Message {
-
   int get msgClassId;
 
   int get msgMethodId;
@@ -18,92 +17,93 @@ abstract class Message {
 
   void serialize(TypeEncoder encoder);
 
-  factory Message.fromStream(TypeDecoder decoder){
+  factory Message.fromStream(TypeDecoder decoder) {
     int msgClassId = decoder.readUInt16();
     int msgMethodId = decoder.readUInt16();
 
-    switch( msgClassId ){
-      case 10:  // Class: Connection
-        switch( msgMethodId ){
+    switch (msgClassId) {
+      case 10: // Class: Connection
+        switch (msgMethodId) {
           case 10:
-            return new ConnectionStart.fromStream( decoder );
+            return ConnectionStart.fromStream(decoder);
           case 20:
-            return new ConnectionSecure.fromStream( decoder );
+            return ConnectionSecure.fromStream(decoder);
           case 30:
-            return new ConnectionTune.fromStream( decoder );
+            return ConnectionTune.fromStream(decoder);
           case 41:
-            return new ConnectionOpenOk.fromStream( decoder );
+            return ConnectionOpenOk.fromStream(decoder);
           case 50:
-            return new ConnectionClose.fromStream( decoder );
+            return ConnectionClose.fromStream(decoder);
           case 51:
-            return new ConnectionCloseOk.fromStream( decoder );
+            return ConnectionCloseOk.fromStream(decoder);
         }
-      break;
-      case 20:  // Class: Channel
-        switch( msgMethodId ){
+        break;
+      case 20: // Class: Channel
+        switch (msgMethodId) {
           case 11:
-            return new ChannelOpenOk.fromStream( decoder );
+            return ChannelOpenOk.fromStream(decoder);
           case 20:
-            return new ChannelFlow.fromStream( decoder );
+            return ChannelFlow.fromStream(decoder);
           case 21:
-            return new ChannelFlowOk.fromStream( decoder );
+            return ChannelFlowOk.fromStream(decoder);
           case 40:
-            return new ChannelClose.fromStream( decoder );
+            return ChannelClose.fromStream(decoder);
           case 41:
-            return new ChannelCloseOk.fromStream( decoder );
+            return ChannelCloseOk.fromStream(decoder);
         }
-      break;
-      case 40:  // Class: Exchange
-        switch( msgMethodId ){
+        break;
+      case 40: // Class: Exchange
+        switch (msgMethodId) {
           case 11:
-            return new ExchangeDeclareOk.fromStream( decoder );
+            return ExchangeDeclareOk.fromStream(decoder);
           case 21:
-            return new ExchangeDeleteOk.fromStream( decoder );
+            return ExchangeDeleteOk.fromStream(decoder);
         }
-      break;
-      case 50:  // Class: Queue
-        switch( msgMethodId ){
+        break;
+      case 50: // Class: Queue
+        switch (msgMethodId) {
           case 11:
-            return new QueueDeclareOk.fromStream( decoder );
+            return QueueDeclareOk.fromStream(decoder);
           case 21:
-            return new QueueBindOk.fromStream( decoder );
+            return QueueBindOk.fromStream(decoder);
           case 51:
-            return new QueueUnbindOk.fromStream( decoder );
+            return QueueUnbindOk.fromStream(decoder);
           case 31:
-            return new QueuePurgeOk.fromStream( decoder );
+            return QueuePurgeOk.fromStream(decoder);
           case 41:
-            return new QueueDeleteOk.fromStream( decoder );
+            return QueueDeleteOk.fromStream(decoder);
         }
-      break;
-      case 60:  // Class: Basic
-        switch( msgMethodId ){
+        break;
+      case 60: // Class: Basic
+        switch (msgMethodId) {
           case 11:
-            return new BasicQosOk.fromStream( decoder );
+            return BasicQosOk.fromStream(decoder);
           case 21:
-            return new BasicConsumeOk.fromStream( decoder );
+            return BasicConsumeOk.fromStream(decoder);
           case 31:
-            return new BasicCancelOk.fromStream( decoder );
+            return BasicCancelOk.fromStream(decoder);
           case 50:
-            return new BasicReturn.fromStream( decoder );
+            return BasicReturn.fromStream(decoder);
           case 60:
-            return new BasicDeliver.fromStream( decoder );
+            return BasicDeliver.fromStream(decoder);
           case 111:
-            return new BasicRecoverOk.fromStream( decoder );
+            return BasicRecoverOk.fromStream(decoder);
         }
-      break;
-      case 90:  // Class: Tx
-        switch( msgMethodId ){
+        break;
+      case 90: // Class: Tx
+        switch (msgMethodId) {
           case 11:
-            return new TxSelectOk.fromStream( decoder );
+            return TxSelectOk.fromStream(decoder);
           case 21:
-            return new TxCommitOk.fromStream( decoder );
+            return TxCommitOk.fromStream(decoder);
           case 31:
-            return new TxRollbackOk.fromStream( decoder );
+            return TxRollbackOk.fromStream(decoder);
         }
-      break;
+        break;
     }
 
     // Message decoding failed; unknown message
-    throw new ArgumentError("Unknown message type (class: ${msgClassId}, method: ${msgMethodId})");
+    throw ArgumentError(
+        "Unknown message type (class: ${msgClassId}, method: ${msgMethodId})");
   }
 }

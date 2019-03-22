@@ -1,8 +1,6 @@
 part of dart_amqp.client;
 
-
 class _BasicReturnMessageImpl implements BasicReturnMessage {
-
   final DecodedMessage message;
   final BasicReturn basicReturn;
 
@@ -23,5 +21,4 @@ class _BasicReturnMessageImpl implements BasicReturnMessage {
   String get replyText => basicReturn.replyText;
 
   MessageProperties get properties => message.properties;
-
 }

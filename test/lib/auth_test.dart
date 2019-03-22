@@ -30,8 +30,7 @@ class ConnectionStartMock extends Mock implements ConnectionStart {
       ..writeUInt8(versionMinor)
       ..writeFieldTable(serverProperties)
       ..writeLongString(mechanisms)
-      ..writeLongString(locales)
-    ;
+      ..writeLongString(locales);
   }
 }
 
@@ -47,8 +46,7 @@ class ConnectionSecureMock extends Mock implements ConnectionSecure {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
-      ..writeLongString(challenge)
-    ;
+      ..writeLongString(challenge);
   }
 }
 
@@ -68,8 +66,7 @@ class ConnectionTuneMock extends Mock implements ConnectionTune {
       ..writeUInt16(msgMethodId)
       ..writeUInt16(channelMax)
       ..writeUInt32(frameMax)
-      ..writeUInt16(heartbeat)
-    ;
+      ..writeUInt16(heartbeat);
   }
 }
 
@@ -83,8 +80,7 @@ class ConnectionOpenOkMock extends Mock implements ConnectionOpenOk {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
-      ..writeShortString(reserved_1)
-    ;
+      ..writeShortString(reserved_1);
   }
 }
 
@@ -94,10 +90,7 @@ class ConnectionCloseOkMock extends Mock implements ConnectionCloseOk {
   final int msgMethodId = 51;
 
   void serialize(TypeEncoder encoder) {
-    encoder
-      ..writeUInt16(msgClassId)
-      ..writeUInt16(msgMethodId)
-    ;
+    encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
   }
 }
 
@@ -107,19 +100,19 @@ class FooAuthProvider implements Authenticator {
   String answerChallenge(String challenge) {
     return null;
   }
-
 }
 
-void generateHandshakeMessages(FrameWriter frameWriter, mock.MockServer server, int numChapRounds) {
+void generateHandshakeMessages(
+    FrameWriter frameWriter, mock.MockServer server, int numChapRounds) {
   // Connection start
-  frameWriter.writeMessage(0, new ConnectionStartMock()
-    ..versionMajor = 0
-    ..versionMinor = 9
-    ..serverProperties = {
-      "product" : "foo"
-  }
-    ..mechanisms = "PLAIN"
-    ..locales = "en");
+  frameWriter.writeMessage(
+      0,
+      ConnectionStartMock()
+        ..versionMajor = 0
+        ..versionMinor = 9
+        ..serverProperties = {"product": "foo"}
+        ..mechanisms = "PLAIN"
+        ..locales = "en");
   server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
   frameWriter.outputEncoder.writer.clear();
 
@@ -127,29 +120,28 @@ void generateHandshakeMessages(FrameWriter frameWriter, mock.MockServer server, 
   for (int round = 0; round < numChapRounds; round++) {
     // Connection secure
     frameWriter.writeMessage(
-        0,
-        new ConnectionSecureMock()
-          ..challenge = "round${round}"
-        );
+        0, ConnectionSecureMock()..challenge = "round${round}");
     server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
     frameWriter.outputEncoder.writer.clear();
   }
 
   // Connection tune
-  frameWriter.writeMessage(0, new ConnectionTuneMock()
-    ..channelMax = 0
-    ..frameMax = (new TuningSettings()).maxFrameSize
-    ..heartbeat = 0);
+  frameWriter.writeMessage(
+      0,
+      ConnectionTuneMock()
+        ..channelMax = 0
+        ..frameMax = (TuningSettings()).maxFrameSize
+        ..heartbeat = 0);
   server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
   frameWriter.outputEncoder.writer.clear();
 
   // Connection open ok
-  frameWriter.writeMessage(0, new ConnectionOpenOkMock());
+  frameWriter.writeMessage(0, ConnectionOpenOkMock());
   server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
   frameWriter.outputEncoder.writer.clear();
 }
 
-main({bool enableLogger : true}) {
+main({bool enableLogger = true}) {
   if (enableLogger) {
     mock.initLogger();
   }
@@ -162,27 +154,19 @@ main({bool enableLogger : true}) {
     });
 
     test("PLAIN authenticaion", () {
-      ConnectionSettings settings = new ConnectionSettings(
-          authProvider : new PlainAuthenticator("guest", "guest")
-          );
-      client = new Client(settings : settings);
+      ConnectionSettings settings = ConnectionSettings(
+          authProvider: PlainAuthenticator("guest", "guest"));
+      client = Client(settings: settings);
 
-      client
-      .connect()
-      .then(expectAsync1((_) {
-      }));
+      client.connect().then(expectAsync1((_) {}));
     });
 
     test("AMQPLAIN authenticaion", () {
-      ConnectionSettings settings = new ConnectionSettings(
-          authProvider : new AmqPlainAuthenticator("guest", "guest")
-          );
-      client = new Client(settings : settings);
+      ConnectionSettings settings = ConnectionSettings(
+          authProvider: AmqPlainAuthenticator("guest", "guest"));
+      client = Client(settings: settings);
 
-      client
-      .connect()
-      .then(expectAsync1((_) {
-      }));
+      client.connect().then(expectAsync1((_) {}));
     });
   });
 
@@ -193,30 +177,26 @@ main({bool enableLogger : true}) {
     TuningSettings tuningSettings;
 
     setUp(() {
-      tuningSettings = new TuningSettings();
-      frameWriter = new FrameWriter(tuningSettings);
-      server = new mock.MockServer();
-      client = new Client(settings : new ConnectionSettings(port : 9000));
+      tuningSettings = TuningSettings();
+      frameWriter = FrameWriter(tuningSettings);
+      server = mock.MockServer();
+      client = Client(settings: ConnectionSettings(port: 9000));
       return server.listen('127.0.0.1', 9000);
     });
 
     tearDown(() {
-      return client.close()
-        .then( (_) => server.shutdown() );
+      return client.close().then((_) => server.shutdown());
     });
 
     test("multiple challenge-response rounds", () {
       generateHandshakeMessages(frameWriter, server, 10);
 
       // Encode final connection close
-      frameWriter.writeMessage(0, new ConnectionCloseOkMock());
+      frameWriter.writeMessage(0, ConnectionCloseOkMock());
       server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
       frameWriter.outputEncoder.writer.clear();
 
-      client
-      .connect()
-      .then(expectAsync1((_) {
-      }));
+      client.connect().then(expectAsync1((_) {}));
     });
   });
 
@@ -228,26 +208,27 @@ main({bool enableLogger : true}) {
     });
 
     test("unsupported SASL provider", () {
-      ConnectionSettings settings = new ConnectionSettings(authProvider : new FooAuthProvider());
+      ConnectionSettings settings =
+          ConnectionSettings(authProvider: FooAuthProvider());
 
-      client = new Client(settings : settings);
+      client = Client(settings: settings);
 
-      client
-      .connect()
-      .catchError(expectAsync1((e) {
+      client.connect().catchError(expectAsync1((e) {
         expect(e, const TypeMatcher<FatalException>());
-        expect(e.message, startsWith("Selected authentication provider 'foo' is unsupported by the server"));
+        expect(
+            e.message,
+            startsWith(
+                "Selected authentication provider 'foo' is unsupported by the server"));
       }));
     });
 
     test("invalid auth credentials", () {
-      ConnectionSettings settings = new ConnectionSettings(authProvider : new PlainAuthenticator("foo", "foo"));
+      ConnectionSettings settings =
+          ConnectionSettings(authProvider: PlainAuthenticator("foo", "foo"));
 
-      client = new Client(settings : settings);
+      client = Client(settings: settings);
 
-      client
-      .connect()
-      .catchError(expectAsync1((e) {
+      client.connect().catchError(expectAsync1((e) {
         expect(e, const TypeMatcher<FatalException>());
         expect(e.message, equals("Authentication failed"));
       }));

@@ -1,7 +1,6 @@
 part of dart_amqp.protocol;
 
 class HeartbeatFrameImpl implements DecodedMessage {
-
   final int channel;
 
   HeartbeatFrameImpl(int this.channel);

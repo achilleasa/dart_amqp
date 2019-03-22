@@ -1,7 +1,6 @@
 part of dart_amqp.protocol;
 
 class FrameHeader implements Header {
-
   static const int LENGTH_IN_BYTES = 7;
 
   FrameType type;
@@ -10,12 +9,13 @@ class FrameHeader implements Header {
 
   FrameHeader();
 
-  FrameHeader.fromByteData(TypeDecoder decoder){
+  FrameHeader.fromByteData(TypeDecoder decoder) {
     int typeValue = decoder.readUInt8();
     try {
       type = FrameType.valueOf(typeValue);
     } catch (e) {
-      throw new FatalException("Received unknown frame type 0x${typeValue.toRadixString(16)}");
+      throw FatalException(
+          "Received unknown frame type 0x${typeValue.toRadixString(16)}");
     }
     channel = decoder.readUInt16();
     size = decoder.readUInt32();

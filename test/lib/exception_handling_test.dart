@@ -34,8 +34,7 @@ class ConnectionStartMock extends Mock implements ConnectionStart {
       ..writeUInt8(versionMinor)
       ..writeFieldTable(serverProperties)
       ..writeLongString(mechanisms)
-      ..writeLongString(locales)
-    ;
+      ..writeLongString(locales);
   }
 }
 
@@ -55,8 +54,7 @@ class ConnectionTuneMock extends Mock implements ConnectionTune {
       ..writeUInt16(msgMethodId)
       ..writeUInt16(channelMax)
       ..writeUInt32(frameMax)
-      ..writeUInt16(heartbeat)
-    ;
+      ..writeUInt16(heartbeat);
   }
 }
 
@@ -70,8 +68,7 @@ class ConnectionOpenOkMock extends Mock implements ConnectionOpenOk {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
-      ..writeShortString(reserved_1)
-    ;
+      ..writeShortString(reserved_1);
   }
 }
 
@@ -81,42 +78,42 @@ class TxSelectOkMock extends Mock implements TxSelectOk {
   final int msgMethodId = 11;
 
   void serialize(TypeEncoder encoder) {
-    encoder
-      ..writeUInt16(msgClassId)
-      ..writeUInt16(msgMethodId)
-    ;
+    encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
   }
 }
 
-void generateHandshakeMessages(FrameWriter frameWriter, mock.MockServer server) {
+void generateHandshakeMessages(
+    FrameWriter frameWriter, mock.MockServer server) {
   // Connection start
-  frameWriter.writeMessage(0, new ConnectionStartMock()
-    ..versionMajor = 0
-    ..versionMinor = 9
-    ..serverProperties = {
-    "product" : "foo"
-  }
-    ..mechanisms = "PLAIN"
-    ..locales = "en");
+  frameWriter.writeMessage(
+      0,
+      ConnectionStartMock()
+        ..versionMajor = 0
+        ..versionMinor = 9
+        ..serverProperties = {"product": "foo"}
+        ..mechanisms = "PLAIN"
+        ..locales = "en");
   server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
   frameWriter.outputEncoder.writer.clear();
 
   // Connection tune
-  frameWriter.writeMessage(0, new ConnectionTuneMock()
-    ..channelMax = 0
-    ..frameMax = (new TuningSettings()).maxFrameSize
-    ..heartbeat = 0);
+  frameWriter.writeMessage(
+      0,
+      ConnectionTuneMock()
+        ..channelMax = 0
+        ..frameMax = (TuningSettings()).maxFrameSize
+        ..heartbeat = 0);
   server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
   frameWriter.outputEncoder.writer.clear();
 
   // Connection open ok
-  frameWriter.writeMessage(0, new ConnectionOpenOkMock());
+  frameWriter.writeMessage(0, ConnectionOpenOkMock());
   server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
   frameWriter.outputEncoder.writer.clear();
 }
 
-main({bool enableLogger : true}) {
-  Random rnd = new Random();
+main({bool enableLogger = true}) {
+  Random rnd = Random();
   if (enableLogger) {
     mock.initLogger();
   }
@@ -129,23 +126,22 @@ main({bool enableLogger : true}) {
     int port;
 
     setUp(() {
-      tuningSettings = new TuningSettings();
-      frameWriter = new FrameWriter(tuningSettings);
-      server = new mock.MockServer();
+      tuningSettings = TuningSettings();
+      frameWriter = FrameWriter(tuningSettings);
+      server = mock.MockServer();
       port = 9000 + rnd.nextInt(100);
-      client = new Client(settings : new ConnectionSettings(port : port));
+      client = Client(settings: ConnectionSettings(port: port));
       return server.listen('127.0.0.1', port);
     });
 
     tearDown(() {
-      return client.close()
-      .then((_) => server.shutdown());
+      return client.close().then((_) => server.shutdown());
     });
 
     group("fatal exceptions:", () {
       test("protocol mismatch", () {
-        TypeEncoder encoder = new TypeEncoder();
-        new ProtocolHeader()
+        TypeEncoder encoder = TypeEncoder();
+        ProtocolHeader()
           ..protocolVersion = 0
           ..majorVersion = 0
           ..minorVersion = 8
@@ -156,132 +152,138 @@ main({bool enableLogger : true}) {
 
         void handleError(ex, s) {
           expect(ex, const TypeMatcher<FatalException>());
-          expect(ex.message, equalsIgnoringCase("Could not negotiate a valid AMQP protocol version. Server supports AMQP 0.8.0"));
+          expect(
+              ex.message,
+              equalsIgnoringCase(
+                  "Could not negotiate a valid AMQP protocol version. Server supports AMQP 0.8.0"));
         }
 
-        client
-        .connect()
-        .then((_) {
+        client.connect().then((_) {
           fail("Expected a FatalException to be thrown");
         }).catchError(expectAsync2(handleError));
       });
 
       test("frame without terminator", () {
-        frameWriter.writeMessage(0, new ConnectionStartMock()
-          ..versionMajor = 0
-          ..versionMinor = 9
-          ..serverProperties = {
-          "product" : "foo"
-        }
-          ..mechanisms = "PLAIN"
-          ..locales = "en");
+        frameWriter.writeMessage(
+            0,
+            ConnectionStartMock()
+              ..versionMajor = 0
+              ..versionMinor = 9
+              ..serverProperties = {"product": "foo"}
+              ..mechanisms = "PLAIN"
+              ..locales = "en");
         Uint8List frameData = frameWriter.outputEncoder.writer.joinChunks();
         // Set an invalid frame terminator to the mock server response
-        frameData[ frameData.length - 1 ] = 0xF0;
+        frameData[frameData.length - 1] = 0xF0;
         server.replayList.add(frameData);
 
         void handleError(ex, s) {
           expect(ex, const TypeMatcher<FatalException>());
-          expect(ex.message, equalsIgnoringCase("Frame did not end with the expected frame terminator (0xCE)"));
+          expect(
+              ex.message,
+              equalsIgnoringCase(
+                  "Frame did not end with the expected frame terminator (0xCE)"));
         }
 
-        client
-        .connect()
-        .then((_) {
+        client.connect().then((_) {
           fail("Expected an exception to be thrown");
         }).catchError(expectAsync2(handleError));
       });
 
       test("frame on channel > 0 while handshake in progress", () {
-        frameWriter.writeMessage(1, new ConnectionStartMock()
-          ..versionMajor = 0
-          ..versionMinor = 9
-          ..serverProperties = {
-          "product" : "foo"
-        }
-          ..mechanisms = "PLAIN"
-          ..locales = "en");
+        frameWriter.writeMessage(
+            1,
+            ConnectionStartMock()
+              ..versionMajor = 0
+              ..versionMinor = 9
+              ..serverProperties = {"product": "foo"}
+              ..mechanisms = "PLAIN"
+              ..locales = "en");
         server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
 
         void handleError(ex, s) {
           expect(ex, const TypeMatcher<FatalException>());
-          expect(ex.message, equalsIgnoringCase("Received message for channel 1 while still handshaking"));
+          expect(
+              ex.message,
+              equalsIgnoringCase(
+                  "Received message for channel 1 while still handshaking"));
         }
 
-        client
-        .connect()
-        .then((_) {
+        client.connect().then((_) {
           fail("Expected an exception to be thrown");
         }).catchError(expectAsync2(handleError));
       });
 
       test("unexpected frame during handshake", () {
         // Connection start
-        frameWriter.writeMessage(0, new ConnectionStartMock()
-          ..versionMajor = 0
-          ..versionMinor = 9
-          ..serverProperties = {
-          "product" : "foo"
-        }
-          ..mechanisms = "PLAIN"
-          ..locales = "en");
+        frameWriter.writeMessage(
+            0,
+            ConnectionStartMock()
+              ..versionMajor = 0
+              ..versionMinor = 9
+              ..serverProperties = {"product": "foo"}
+              ..mechanisms = "PLAIN"
+              ..locales = "en");
         server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
         frameWriter.outputEncoder.writer.clear();
 
         // Connection tune
-        frameWriter.writeMessage(0, new ConnectionTuneMock()
-          ..channelMax = 0
-          ..frameMax = (new TuningSettings()).maxFrameSize
-          ..heartbeat = 0);
+        frameWriter.writeMessage(
+            0,
+            ConnectionTuneMock()
+              ..channelMax = 0
+              ..frameMax = (TuningSettings()).maxFrameSize
+              ..heartbeat = 0);
         server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
         frameWriter.outputEncoder.writer.clear();
 
         // Unexpected frame
-        frameWriter.writeMessage(0, new TxSelectOkMock());
+        frameWriter.writeMessage(0, TxSelectOkMock());
         server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
         frameWriter.outputEncoder.writer.clear();
 
         void handleError(ex, s) {
           expect(ex, const TypeMatcher<FatalException>());
-          expect(ex.message, equalsIgnoringCase("Received unexpected message TxSelectOk during handshake"));
+          expect(
+              ex.message,
+              equalsIgnoringCase(
+                  "Received unexpected message TxSelectOk during handshake"));
         }
 
-        client
-        .connect()
-        .then((_) {
+        client.connect().then((_) {
           fail("Expected an exception to be thrown");
         }).catchError(expectAsync2(handleError));
       });
-
     });
 
     group("connection exceptions:", () {
       test("illegal frame size", () {
-        frameWriter.writeMessage(0, new ConnectionStartMock()
-          ..versionMajor = 0
-          ..versionMinor = 9
-          ..serverProperties = {
-          "product" : "foo"
-        }
-          ..mechanisms = "PLAIN"
-          ..locales = "en");
+        frameWriter.writeMessage(
+            0,
+            ConnectionStartMock()
+              ..versionMajor = 0
+              ..versionMinor = 9
+              ..serverProperties = {"product": "foo"}
+              ..mechanisms = "PLAIN"
+              ..locales = "en");
         Uint8List frameData = frameWriter.outputEncoder.writer.joinChunks();
         // Manipulate the frame header to indicate a too long message
         int len = tuningSettings.maxFrameSize + 1;
-        frameData[ 3 ] = (len >> 24) & 0xFF;
-        frameData[ 4 ] = (len >> 16) & 0xFF;
-        frameData[ 5 ] = (len >> 8) & 0xFF;
-        frameData[ 6 ] = (len) & 0xFF;
+        frameData[3] = (len >> 24) & 0xFF;
+        frameData[4] = (len >> 16) & 0xFF;
+        frameData[5] = (len >> 8) & 0xFF;
+        frameData[6] = (len) & 0xFF;
         server.replayList.add(frameData);
 
         void handleError(ex, s) {
           expect(ex, const TypeMatcher<ConnectionException>());
-          expect(ex.message, equalsIgnoringCase("Frame size cannot be larger than ${tuningSettings.maxFrameSize} bytes. Server sent ${tuningSettings.maxFrameSize + 1} bytes"));
+          expect(
+              ex.message,
+              equalsIgnoringCase(
+                  "Frame size cannot be larger than ${tuningSettings.maxFrameSize} bytes. Server sent ${tuningSettings.maxFrameSize + 1} bytes"));
         }
 
-        client
-        .connect()
-        .then((_) {
+        client.connect().then((_) {
           fail("Expected an exception to be thrown");
         }).catchError(expectAsync2(handleError));
       });
@@ -290,24 +292,25 @@ main({bool enableLogger : true}) {
         generateHandshakeMessages(frameWriter, server);
 
         // Add a fake connection start message at channel 1
-        frameWriter.writeMessage(1, new ConnectionStartMock()
-          ..versionMajor = 0
-          ..versionMinor = 9
-          ..serverProperties = {
-          "product" : "foo"
-        }
-          ..mechanisms = "PLAIN"
-          ..locales = "en");
+        frameWriter.writeMessage(
+            1,
+            ConnectionStartMock()
+              ..versionMajor = 0
+              ..versionMinor = 9
+              ..serverProperties = {"product": "foo"}
+              ..mechanisms = "PLAIN"
+              ..locales = "en");
         server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
 
         void handleError(ex, s) {
           expect(ex, const TypeMatcher<ConnectionException>());
-          expect(ex.message, equalsIgnoringCase("Received CONNECTION class message on a channel > 0"));
+          expect(
+              ex.message,
+              equalsIgnoringCase(
+                  "Received CONNECTION class message on a channel > 0"));
         }
 
-        client
-        .channel()
-        .then((_) {
+        client.channel().then((_) {
           fail("Expected an exception to be thrown");
         }).catchError(expectAsync2(handleError));
       });
@@ -316,17 +319,19 @@ main({bool enableLogger : true}) {
         generateHandshakeMessages(frameWriter, server);
 
         // Add a heartbeat start message at channel 1
-        frameWriter.outputEncoder.writer.addLast(new Uint8List.fromList([8, 0, 1, 0, 0, 0, 0, RawFrameParser.FRAME_TERMINATOR]));
+        frameWriter.outputEncoder.writer.addLast(Uint8List.fromList(
+            [8, 0, 1, 0, 0, 0, 0, RawFrameParser.FRAME_TERMINATOR]));
         server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
 
         void handleError(ex, s) {
           expect(ex, const TypeMatcher<ConnectionException>());
-          expect(ex.message, equalsIgnoringCase("Received HEARTBEAT message on a channel > 0"));
+          expect(
+              ex.message,
+              equalsIgnoringCase(
+                  "Received HEARTBEAT message on a channel > 0"));
         }
 
-        client
-        .channel()
-        .then((_) {
+        client.channel().then((_) {
           fail("Expected an exception to be thrown");
         }).catchError(expectAsync2(handleError));
       });
@@ -335,22 +340,22 @@ main({bool enableLogger : true}) {
         generateHandshakeMessages(frameWriter, server);
 
         // Add a fake connection start message at channel 1
-        frameWriter.writeMessage(0, new ConnectionClose()
-          ..classId = 10
-          ..methodId = 40
-          ..replyCode = ErrorType.ACCESS_REFUSED.value
-          ..replyText = "No access"
-        );
+        frameWriter.writeMessage(
+            0,
+            ConnectionClose()
+              ..classId = 10
+              ..methodId = 40
+              ..replyCode = ErrorType.ACCESS_REFUSED.value
+              ..replyText = "No access");
         server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
 
         void handleError(ex, s) {
           expect(ex, const TypeMatcher<ConnectionException>());
-          expect(ex.toString(), equals("ConnectionException(ACCESS_REFUSED): No access"));
+          expect(ex.toString(),
+              equals("ConnectionException(ACCESS_REFUSED): No access"));
         }
 
-        client
-        .channel()
-        .then((_) {
+        client.channel().then((_) {
           fail("Expected an exception to be thrown");
         }).catchError(expectAsync2(handleError));
       });
@@ -360,18 +365,20 @@ main({bool enableLogger : true}) {
         void handleError(ex) {
           expect(ex, const TypeMatcher<FatalException>());
         }
-        server.shutdown()
-            .then((_) => server.listen(client.settings.host, client.settings.port))
+
+        server
+            .shutdown()
+            .then((_) =>
+                server.listen(client.settings.host, client.settings.port))
             .then((_) {
-              generateHandshakeMessages(frameWriter, server);
-              return client
-                  .connect()
-                  .then((_) {
-                    client.errorListener((ex) => handleError(ex));
-                    return server.shutdown()
-                        .then((_) => new Future.delayed(
-                        new Duration(seconds: 5) + server.responseDelay))
-                        .then((_) => fail("Expected an exception to be thrown"));
+          generateHandshakeMessages(frameWriter, server);
+          return client.connect().then((_) {
+            client.errorListener((ex) => handleError(ex));
+            return server
+                .shutdown()
+                .then((_) =>
+                    Future.delayed(Duration(seconds: 5) + server.responseDelay))
+                .then((_) => fail("Expected an exception to be thrown"));
           });
         });
       });

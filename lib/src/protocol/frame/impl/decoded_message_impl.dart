@@ -1,7 +1,6 @@
 part of dart_amqp.protocol;
 
 class DecodedMessageImpl implements DecodedMessage {
-
   final int channel;
   final Message message;
   ContentHeader contentHeader;
@@ -10,7 +9,8 @@ class DecodedMessageImpl implements DecodedMessage {
 
   DecodedMessageImpl(this.channel, Message this.message);
 
-  MessageProperties get properties => contentHeader != null ? contentHeader.properties : null;
+  MessageProperties get properties =>
+      contentHeader != null ? contentHeader.properties : null;
 
   set properties(MessageProperties properties) {
     if (contentHeader != null) {
@@ -51,5 +51,4 @@ class DecodedMessageImpl implements DecodedMessage {
   Map get payloadAsJson {
     return json.decode(utf8.decode(payload));
   }
-
 }

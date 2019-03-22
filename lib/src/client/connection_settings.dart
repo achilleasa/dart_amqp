@@ -1,7 +1,6 @@
 part of dart_amqp.client;
 
 class ConnectionSettings {
-
   // The host to connect to
   String host;
 
@@ -30,19 +29,16 @@ class ConnectionSettings {
   TuningSettings tuningSettings;
 
   ConnectionSettings(
-    {
-      String this.host : "127.0.0.1"
-      , int this.port : 5672
-      , String this.virtualHost : "/"
-      , Authenticator this.authProvider : const PlainAuthenticator("guest", "guest")
-      , int this.maxConnectionAttempts : 1
-      , Duration this.reconnectWaitTime : const Duration(milliseconds : 1500)
-      , TuningSettings this.tuningSettings
-     }
-  ){
-    if( this.tuningSettings == null){
-      tuningSettings = new TuningSettings();
+      {String this.host = "127.0.0.1",
+      int this.port = 5672,
+      String this.virtualHost = "/",
+      Authenticator this.authProvider =
+          const PlainAuthenticator("guest", "guest"),
+      int this.maxConnectionAttempts = 1,
+      Duration this.reconnectWaitTime = const Duration(milliseconds: 1500),
+      TuningSettings this.tuningSettings}) {
+    if (this.tuningSettings == null) {
+      tuningSettings = TuningSettings();
     }
   }
-
 }

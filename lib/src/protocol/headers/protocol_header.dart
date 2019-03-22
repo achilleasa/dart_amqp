@@ -10,7 +10,7 @@ class ProtocolHeader implements Header {
 
   ProtocolHeader();
 
-  ProtocolHeader.fromByteData(TypeDecoder decoder){
+  ProtocolHeader.fromByteData(TypeDecoder decoder) {
     // Skip AMQP string
     decoder.skipBytes(4);
     protocolVersion = decoder.readUInt8();
@@ -21,7 +21,7 @@ class ProtocolHeader implements Header {
 
   void serialize(TypeEncoder encoder) {
     encoder
-      ..writer.addLast(new Uint8List.fromList(ascii.encode("AMQP")))
+      ..writer.addLast(Uint8List.fromList(ascii.encode("AMQP")))
       ..writeUInt8(protocolVersion)
       ..writeUInt8(majorVersion)
       ..writeUInt8(minorVersion)

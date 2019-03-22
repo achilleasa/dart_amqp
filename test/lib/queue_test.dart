@@ -12,7 +12,7 @@ import "package:dart_amqp/src/exceptions.dart";
 import "mocks/mocks.dart" as mock;
 
 // This test expects a local running rabbitmq instance at the default port
-main({bool enableLogger : true}) {
+main({bool enableLogger = true}) {
   if (enableLogger) {
     mock.initLogger();
   }
@@ -21,7 +21,7 @@ main({bool enableLogger : true}) {
     Client client;
 
     setUp(() {
-      client = new Client();
+      client = Client();
     });
 
     tearDown(() {
@@ -30,21 +30,22 @@ main({bool enableLogger : true}) {
 
     test("check if unknown queue exists", () {
       client
-      .channel()
-      .then((Channel channel) => channel.queue("foo", passive : true))
-      .then((_) => fail("Expected an exception to be thrown"))
-      .catchError(expectAsync1((e) {
+          .channel()
+          .then((Channel channel) => channel.queue("foo", passive: true))
+          .then((_) => fail("Expected an exception to be thrown"))
+          .catchError(expectAsync1((e) {
         expect(e, const TypeMatcher<QueueNotFoundException>());
-        expect((e as QueueNotFoundException).errorType, equals(ErrorType.NOT_FOUND));
+        expect((e as QueueNotFoundException).errorType,
+            equals(ErrorType.NOT_FOUND));
         expect(e.toString(), startsWith("QueueNotFoundException: NOT_FOUND"));
       }));
     });
 
     test("create private queue", () {
       client
-      .channel()
-      .then((Channel channel) => channel.privateQueue())
-      .then(expectAsync1((Queue queue) {
+          .channel()
+          .then((Channel channel) => channel.privateQueue())
+          .then(expectAsync1((Queue queue) {
         expect(queue.channel, const TypeMatcher<Channel>());
         expect(queue.name, isNotEmpty);
         expect(queue.consumerCount, equals(0));
@@ -54,9 +55,9 @@ main({bool enableLogger : true}) {
 
     test("create public queue", () {
       client
-      .channel()
-      .then((Channel channel) => channel.queue("test_1"))
-      .then(expectAsync1((Queue queue) {
+          .channel()
+          .then((Channel channel) => channel.queue("test_1"))
+          .then(expectAsync1((Queue queue) {
         expect(queue.channel, const TypeMatcher<Channel>());
         expect(queue.name, isNotEmpty);
         expect(queue.consumerCount, equals(0));
@@ -66,12 +67,13 @@ main({bool enableLogger : true}) {
 
     test("Check the existance of a created queue", () {
       client
-      .channel()
-      .then((Channel channel) => channel.privateQueue())
-      .then(expectAsync1((Queue privateQueue) {
+          .channel()
+          .then((Channel channel) => channel.privateQueue())
+          .then(expectAsync1((Queue privateQueue) {
         // Check existance
-        privateQueue.channel.queue(privateQueue.name, passive : true)
-        .then(expectAsync1((Queue queue) {
+        privateQueue.channel
+            .queue(privateQueue.name, passive: true)
+            .then(expectAsync1((Queue queue) {
           expect(queue.name, equals(privateQueue.name));
         }));
       }));
@@ -83,26 +85,22 @@ main({bool enableLogger : true}) {
     Client client2;
 
     setUp(() {
-      client = new Client();
-      client2 = new Client();
+      client = Client();
+      client2 = Client();
     });
 
     tearDown(() {
-      return Future.wait(
-          [
-            client.close(),
-            client2.close()
-          ]);
+      return Future.wait([client.close(), client2.close()]);
     });
 
     test("queue message delivery", () {
-      Completer testCompleter = new Completer();
+      Completer testCompleter = Completer();
 
       client
-      .channel()
-      .then((Channel channel) => channel.queue("test_2"))
-      .then((Queue testQueue) => testQueue.consume())
-      .then((Consumer consumer) {
+          .channel()
+          .then((Channel channel) => channel.queue("test_2"))
+          .then((Queue testQueue) => testQueue.consume())
+          .then((Consumer consumer) {
         expect(consumer.channel, const TypeMatcher<Channel>());
         expect(consumer.queue, const TypeMatcher<Queue>());
         expect(consumer.tag, isNotEmpty);
@@ -114,64 +112,66 @@ main({bool enableLogger : true}) {
 
         // Using second client publish a message to the queue
         client2
-        .channel()
-        .then((Channel channel) => channel.queue(consumer.queue.name))
-        .then((Queue target) => target.publish("Test payload"));
+            .channel()
+            .then((Channel channel) => channel.queue(consumer.queue.name))
+            .then((Queue target) => target.publish("Test payload"));
       });
 
       return testCompleter.future;
     });
 
     test("queue JSON message delivery (auto-filled content type)", () {
-      Completer testCompleter = new Completer();
+      Completer testCompleter = Completer();
 
       client
-      .channel()
-      .then((Channel channel) => channel.queue("test_2"))
-      .then((Queue testQueue) => testQueue.consume())
-      .then((Consumer consumer) {
+          .channel()
+          .then((Channel channel) => channel.queue("test_2"))
+          .then((Queue testQueue) => testQueue.consume())
+          .then((Consumer consumer) {
         expect(consumer.channel, const TypeMatcher<Channel>());
         expect(consumer.queue, const TypeMatcher<Queue>());
         expect(consumer.tag, isNotEmpty);
 
         consumer.listen(expectAsync1((AmqpMessage message) {
-          expect(message.payloadAsJson, equals({"message" : "Test payload"}));
+          expect(message.payloadAsJson, equals({"message": "Test payload"}));
           expect(message.properties.contentType, equals("application/json"));
           testCompleter.complete();
         }));
 
         // Using second client publish a message to the queue
         client2
-        .channel()
-        .then((Channel channel) => channel.queue(consumer.queue.name))
-        .then((Queue target) => target.publish({"message" : "Test payload"}));
+            .channel()
+            .then((Channel channel) => channel.queue(consumer.queue.name))
+            .then(
+                (Queue target) => target.publish({"message": "Test payload"}));
       });
 
       return testCompleter.future;
     });
 
-    test("queue JSON message delivery (auto-filled content type in existing persistent message property set)", () {
-      Completer testCompleter = new Completer();
+    test(
+        "queue JSON message delivery (auto-filled content type in existing persistent message property set)",
+        () {
+      Completer testCompleter = Completer();
 
       client
-      .channel()
-      .then((Channel channel) => channel.queue("test_2"))
-      .then((Queue testQueue) => testQueue.consume())
-      .then((Consumer consumer) {
+          .channel()
+          .then((Channel channel) => channel.queue("test_2"))
+          .then((Queue testQueue) => testQueue.consume())
+          .then((Consumer consumer) {
         expect(consumer.channel, const TypeMatcher<Channel>());
         expect(consumer.queue, const TypeMatcher<Queue>());
         expect(consumer.tag, isNotEmpty);
 
         // Use second accuracy
-        DateTime now = new DateTime.now();
-        now = now.subtract(new Duration(milliseconds : now.millisecond, microseconds: now.microsecond));
+        DateTime now = DateTime.now();
+        now = now.subtract(Duration(
+            milliseconds: now.millisecond, microseconds: now.microsecond));
 
         consumer.listen(expectAsync1((AmqpMessage message) {
-          expect(message.payloadAsJson, equals({"message" : "Test payload"}));
+          expect(message.payloadAsJson, equals({"message": "Test payload"}));
           expect(message.properties.contentType, equals("application/json"));
-          expect(message.properties.headers, equals({
-            'X-HEADER' : 'ok'
-          }));
+          expect(message.properties.headers, equals({'X-HEADER': 'ok'}));
           expect(message.properties.priority, equals(1));
           expect(message.properties.corellationId, equals("123"));
           expect(message.properties.replyTo, equals("/dev/null"));
@@ -186,37 +186,33 @@ main({bool enableLogger : true}) {
 
         // Using second client publish a message with full properties to the queue
         client2
-        .channel()
-        .then((Channel channel) => channel.queue(consumer.queue.name))
-        .then((Queue target) => target.publish(
-            {"message" : "Test payload"},
-            properties : new MessageProperties.persistentMessage()
-              ..headers = {
-              'X-HEADER' : 'ok'
-            }
-              ..priority = 1
-              ..corellationId = "123"
-              ..replyTo = "/dev/null"
-              ..expiration = "60000" // 60 sec
-              ..messageId = "0xf00"
-              ..timestamp = now
-              ..type = "test"
-              ..userId = "guest"
-              ..appId = "unit-test"
-        ));
+            .channel()
+            .then((Channel channel) => channel.queue(consumer.queue.name))
+            .then((Queue target) => target.publish({"message": "Test payload"},
+                properties: MessageProperties.persistentMessage()
+                  ..headers = {'X-HEADER': 'ok'}
+                  ..priority = 1
+                  ..corellationId = "123"
+                  ..replyTo = "/dev/null"
+                  ..expiration = "60000" // 60 sec
+                  ..messageId = "0xf00"
+                  ..timestamp = now
+                  ..type = "test"
+                  ..userId = "guest"
+                  ..appId = "unit-test"));
       });
 
       return testCompleter.future;
     });
 
     test("queue message delivery with ack", () {
-      Completer testCompleter = new Completer();
+      Completer testCompleter = Completer();
 
       client
-      .channel()
-      .then((Channel channel) => channel.queue("test_3"))
-      .then((Queue testQueue) => testQueue.consume(noAck : false))
-      .then((Consumer consumer) {
+          .channel()
+          .then((Channel channel) => channel.queue("test_3"))
+          .then((Queue testQueue) => testQueue.consume(noAck: false))
+          .then((Consumer consumer) {
         expect(consumer.channel, const TypeMatcher<Channel>());
         expect(consumer.queue, const TypeMatcher<Queue>());
         expect(consumer.tag, isNotEmpty);
@@ -229,22 +225,23 @@ main({bool enableLogger : true}) {
 
         // Using second client publish a message to the queue (request ack)
         client2
-        .channel()
-        .then((Channel channel) => channel.queue(consumer.queue.name))
-        .then((Queue target) => target.publish("Test payload", mandatory : true));
+            .channel()
+            .then((Channel channel) => channel.queue(consumer.queue.name))
+            .then((Queue target) =>
+                target.publish("Test payload", mandatory: true));
       });
 
       return testCompleter.future;
     });
 
     test("reject delivered message", () {
-      Completer testCompleter = new Completer();
+      Completer testCompleter = Completer();
 
       client
-      .channel()
-      .then((Channel channel) => channel.queue("test_3"))
-      .then((Queue testQueue) => testQueue.consume(noAck : false))
-      .then((Consumer consumer) {
+          .channel()
+          .then((Channel channel) => channel.queue("test_3"))
+          .then((Queue testQueue) => testQueue.consume(noAck: false))
+          .then((Consumer consumer) {
         expect(consumer.channel, const TypeMatcher<Channel>());
         expect(consumer.queue, const TypeMatcher<Queue>());
         expect(consumer.tag, isNotEmpty);
@@ -257,25 +254,25 @@ main({bool enableLogger : true}) {
 
         // Using second client publish a message to the queue (request ack)
         client2
-        .channel()
-        .then((Channel channel) => channel.queue(consumer.queue.name))
-        .then((Queue target) => target.publish("Test payload", mandatory : true));
+            .channel()
+            .then((Channel channel) => channel.queue(consumer.queue.name))
+            .then((Queue target) =>
+                target.publish("Test payload", mandatory: true));
       });
 
       return testCompleter.future;
     });
 
     test("queue cancel consumer", () {
-      Completer testCompleter = new Completer();
+      Completer testCompleter = Completer();
       client
-      .channel()
-      .then((Channel channel) => channel.queue("test_3"))
-      .then((Queue testQueue) => testQueue.consume(noAck : false))
-      .then((Consumer consumer) {
-
+          .channel()
+          .then((Channel channel) => channel.queue("test_3"))
+          .then((Queue testQueue) => testQueue.consume(noAck: false))
+          .then((Consumer consumer) {
         consumer.listen((AmqpMessage message) {
           fail("Received unexpected AMQP message");
-        }, onDone : () {
+        }, onDone: () {
           testCompleter.complete();
         });
 
@@ -288,25 +285,26 @@ main({bool enableLogger : true}) {
 
     test("delete queue", () {
       client
-      .channel()
-      .then((Channel channel) => channel.queue("test_3"))
-      .then((Queue testQueue) => testQueue.delete())
-      .then(expectAsync1((Queue queue) {
-
-      }));
+          .channel()
+          .then((Channel channel) => channel.queue("test_3"))
+          .then((Queue testQueue) => testQueue.delete())
+          .then(expectAsync1((Queue queue) {}));
     });
 
-    test("consuming with same consumer tag on same channel should return identical consumer", () {
-      Completer testCompleter = new Completer();
+    test(
+        "consuming with same consumer tag on same channel should return identical consumer",
+        () {
+      Completer testCompleter = Completer();
 
       client
-      .channel()
-      .then((Channel channel) => channel.queue("test_3"))
-      .then((Queue testQueue) => testQueue.consume(consumerTag : "test_tag_1"))
-      .then((Consumer consumer1) {
+          .channel()
+          .then((Channel channel) => channel.queue("test_3"))
+          .then(
+              (Queue testQueue) => testQueue.consume(consumerTag: "test_tag_1"))
+          .then((Consumer consumer1) {
         consumer1.queue
-        .consume(consumerTag : "test_tag_1")
-        .then((Consumer consumer2) {
+            .consume(consumerTag: "test_tag_1")
+            .then((Consumer consumer2) {
           expect(true, identical(consumer1, consumer2));
           testCompleter.complete();
         });
@@ -317,64 +315,66 @@ main({bool enableLogger : true}) {
 
     test("purge a queue", () {
       return client
-      .channel()
-      .then((Channel channel) => channel.queue("test_4"))
-      .then((Queue queue) => queue.purge());
+          .channel()
+          .then((Channel channel) => channel.queue("test_4"))
+          .then((Queue queue) => queue.purge());
     });
 
     group("exceptions:", () {
       test("unsupported message payload", () {
-
         client
-        .channel()
-        .then((Channel channel) => channel.queue("test_99"))
-        .then((Queue queue) => queue.publish(new StreamController()))
-        .catchError(expectAsync1((ex) {
+            .channel()
+            .then((Channel channel) => channel.queue("test_99"))
+            .then((Queue queue) => queue.publish(StreamController()))
+            .catchError(expectAsync1((ex) {
           expect(ex, const TypeMatcher<ArgumentError>());
-          expect(ex.message, equals("Message payload should be either a Map, an Iterable, a String or an UInt8List instance"));
+          expect(
+              ex.message,
+              equals(
+                  "Message payload should be either a Map, an Iterable, a String or an UInt8List instance"));
         }));
-
       });
 
-      test("server closes channel after publishing message with invalid properties; next channel operation should fail", () {
-
+      test(
+          "server closes channel after publishing message with invalid properties; next channel operation should fail",
+          () {
         client
-        .channel()
-        .then((Channel channel) => channel.queue("test_100"))
-        .then((Queue queue) {
+            .channel()
+            .then((Channel channel) => channel.queue("test_100"))
+            .then((Queue queue) {
           queue.publish("invalid properties test",
-          properties : new MessageProperties()
-            ..expiration = "undefined"
-          );
+              properties: MessageProperties()..expiration = "undefined");
 
           return queue.channel.queue("other_queue");
-        })
-        .catchError(expectAsync1((ex) {
+        }).catchError(expectAsync1((ex) {
           expect(ex, const TypeMatcher<ChannelException>());
-          expect(ex.toString(), equals("ChannelException(PRECONDITION_FAILED): PRECONDITION_FAILED - invalid expiration 'undefined': no_integer"));
+          expect(
+              ex.toString(),
+              equals(
+                  "ChannelException(PRECONDITION_FAILED): PRECONDITION_FAILED - invalid expiration 'undefined': no_integer"));
         }));
-
       });
 
-      test("trying to publish to a channel closed by a prior invalid published message; next publish should fail", () {
-        Completer testCompleter = new Completer();
+      test(
+          "trying to publish to a channel closed by a prior invalid published message; next publish should fail",
+          () {
+        Completer testCompleter = Completer();
 
         client
-        .channel()
-        .then((Channel channel) => channel.queue("test_100"))
-        .then((Queue queue) {
+            .channel()
+            .then((Channel channel) => channel.queue("test_100"))
+            .then((Queue queue) {
           queue.publish("invalid properties test",
-          properties : new MessageProperties()
-            ..expiration = "undefined"
-          );
+              properties: MessageProperties()..expiration = "undefined");
 
-          new Future.delayed(const Duration(seconds: 1))
-          .then((_) {
+          Future.delayed(const Duration(seconds: 1)).then((_) {
             queue.publish("test");
-          })
-          .catchError(expectAsync1((ex) {
+          }).catchError(expectAsync1((ex) {
             expect(ex, const TypeMatcher<ChannelException>());
-            expect(ex.toString(), equals("ChannelException(PRECONDITION_FAILED): PRECONDITION_FAILED - invalid expiration 'undefined': no_integer"));
+            expect(
+                ex.toString(),
+                equals(
+                    "ChannelException(PRECONDITION_FAILED): PRECONDITION_FAILED - invalid expiration 'undefined': no_integer"));
 
             testCompleter.complete();
           }));
@@ -382,8 +382,6 @@ main({bool enableLogger : true}) {
 
         return testCompleter.future;
       });
-
     });
-
   });
 }

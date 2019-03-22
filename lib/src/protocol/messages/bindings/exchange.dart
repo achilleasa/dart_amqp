@@ -24,7 +24,7 @@ class ExchangeDeclare implements Message {
 
   ExchangeDeclare();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
@@ -32,8 +32,7 @@ class ExchangeDeclare implements Message {
       ..writeShortString(exchange)
       ..writeShortString(type)
       ..writeBits([passive, durable, reserved_2, reserved_3, noWait])
-      ..writeFieldTable(arguments)
-    ;
+      ..writeFieldTable(arguments);
   }
 }
 
@@ -44,11 +43,9 @@ class ExchangeDeclareOk implements Message {
 
   // Message arguments
 
-  ExchangeDeclareOk.fromStream( TypeDecoder decoder ){
-  }
+  ExchangeDeclareOk.fromStream(TypeDecoder decoder) {}
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class ExchangeDelete implements Message {
@@ -64,14 +61,13 @@ class ExchangeDelete implements Message {
 
   ExchangeDelete();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
       ..writeUInt16(reserved_1)
       ..writeShortString(exchange)
-      ..writeBits([ifUnused, noWait])
-    ;
+      ..writeBits([ifUnused, noWait]);
   }
 }
 
@@ -82,9 +78,7 @@ class ExchangeDeleteOk implements Message {
 
   // Message arguments
 
-  ExchangeDeleteOk.fromStream( TypeDecoder decoder ){
-  }
+  ExchangeDeleteOk.fromStream(TypeDecoder decoder) {}
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }

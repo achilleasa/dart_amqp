@@ -4,28 +4,28 @@ import "package:dart_amqp/dart_amqp.dart";
 
 class FibonacciRpcClient {
   int _nextCorrelationId = 1;
-  final Completer connected = new Completer();
+  final Completer connected = Completer();
   final Client client;
-  final Map<String, Completer> _pendingOperations = new Map<String, Completer>();
+  final Map<String, Completer> _pendingOperations = Map<String, Completer>();
   Queue _serverQueue;
   String _replyQueueName;
 
-  FibonacciRpcClient() : client = new Client() {
+  FibonacciRpcClient() : client = Client() {
     client
-    .channel()
-    .then((Channel channel) => channel.queue("rpc_queue"))
-    .then((Queue rpcQueue) {
-      _serverQueue = rpcQueue;
+        .channel()
+        .then((Channel channel) => channel.queue("rpc_queue"))
+        .then((Queue rpcQueue) {
+          _serverQueue = rpcQueue;
 
-      // Allocate a private queue for server responses
-      return rpcQueue.channel.privateQueue();
-    })
-    .then((Queue queue) => queue.consume())
-    .then((Consumer consumer) {
-      _replyQueueName = consumer.queue.name;
-      consumer.listen(handleResponse);
-      connected.complete();
-    });
+          // Allocate a private queue for server responses
+          return rpcQueue.channel.privateQueue();
+        })
+        .then((Queue queue) => queue.consume())
+        .then((Consumer consumer) {
+          _replyQueueName = consumer.queue.name;
+          consumer.listen(handleResponse);
+          connected.complete();
+        });
   }
 
   void handleResponse(AmqpMessage message) {
@@ -35,24 +35,23 @@ class FibonacciRpcClient {
     }
 
     _pendingOperations
-    .remove(message.properties.corellationId)
-    .complete(int.parse(message.payloadAsString));
+        .remove(message.properties.corellationId)
+        .complete(int.parse(message.payloadAsString));
   }
 
   Future<int> call(int n) {
     // Make sure we are connected before sending the request
-    return connected.future
-    .then((_) {
+    return connected.future.then((_) {
       String uuid = "${_nextCorrelationId++}";
-      Completer<int> completer = new Completer<int>();
+      Completer<int> completer = Completer<int>();
 
-      MessageProperties properties = new MessageProperties()
+      MessageProperties properties = MessageProperties()
         ..replyTo = _replyQueueName
         ..corellationId = uuid;
 
-      _pendingOperations[ uuid ] = completer;
+      _pendingOperations[uuid] = completer;
 
-      _serverQueue.publish({"n" : n}, properties : properties);
+      _serverQueue.publish({"n": n}, properties: properties);
 
       return completer.future;
     });
@@ -60,7 +59,8 @@ class FibonacciRpcClient {
 
   Future close() {
     // Kill any pending responses
-    _pendingOperations.forEach((_, Completer completer) => completer.completeError("RPC client shutting down"));
+    _pendingOperations.forEach((_, Completer completer) =>
+        completer.completeError("RPC client shutting down"));
     _pendingOperations.clear();
 
     return client.close();
@@ -68,17 +68,16 @@ class FibonacciRpcClient {
 }
 
 main(List<String> args) {
-  FibonacciRpcClient client = new FibonacciRpcClient();
+  FibonacciRpcClient client = FibonacciRpcClient();
 
-  int n = args.isEmpty
-    ? 30
-    : num.parse(args[0]);
+  int n = args.isEmpty ? 30 : num.parse(args[0]);
 
   // Make 10 parallel calls and get fib(1) to fib(10)
-  client.call(n)
-  .then((int res) {
-      print(" [x] fib(${n}) = ${res}");
-  })
-  .then((_) => client.close())
-  .then((_) => exit(0));
+  client
+      .call(n)
+      .then((int res) {
+        print(" [x] fib(${n}) = ${res}");
+      })
+      .then((_) => client.close())
+      .then((_) => exit(0));
 }

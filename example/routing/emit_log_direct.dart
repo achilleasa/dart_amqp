@@ -17,11 +17,12 @@ void main(List<String> args) {
 
   String severity = args.first;
 
-  Client client = new Client();
+  Client client = Client();
   client
-  .channel()
-  .then((Channel channel) => channel.exchange("direct_logs", ExchangeType.DIRECT))
-  .then((Exchange exchange) {
+      .channel()
+      .then((Channel channel) =>
+          channel.exchange("direct_logs", ExchangeType.DIRECT))
+      .then((Exchange exchange) {
     String message = args.sublist(1).join(' ');
     // Use 'severity' as our routing key
     exchange.publish(message, severity);

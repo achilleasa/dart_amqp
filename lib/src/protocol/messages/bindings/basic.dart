@@ -18,14 +18,13 @@ class BasicQos implements Message {
 
   BasicQos();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
       ..writeUInt32(prefetchSize)
       ..writeUInt16(prefetchCount)
-      ..writeBits([global])
-    ;
+      ..writeBits([global]);
   }
 }
 
@@ -36,11 +35,9 @@ class BasicQosOk implements Message {
 
   // Message arguments
 
-  BasicQosOk.fromStream( TypeDecoder decoder ){
-  }
+  BasicQosOk.fromStream(TypeDecoder decoder) {}
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class BasicConsume implements Message {
@@ -60,7 +57,7 @@ class BasicConsume implements Message {
 
   BasicConsume();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
@@ -68,8 +65,7 @@ class BasicConsume implements Message {
       ..writeShortString(queue)
       ..writeShortString(consumerTag)
       ..writeBits([noLocal, noAck, exclusive, noWait])
-      ..writeFieldTable(arguments)
-    ;
+      ..writeFieldTable(arguments);
   }
 }
 
@@ -81,12 +77,11 @@ class BasicConsumeOk implements Message {
   // Message arguments
   String consumerTag;
 
-  BasicConsumeOk.fromStream( TypeDecoder decoder ){
+  BasicConsumeOk.fromStream(TypeDecoder decoder) {
     consumerTag = decoder.readShortString();
   }
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class BasicCancel implements Message {
@@ -100,13 +95,12 @@ class BasicCancel implements Message {
 
   BasicCancel();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
       ..writeShortString(consumerTag)
-      ..writeBits([noWait])
-    ;
+      ..writeBits([noWait]);
   }
 }
 
@@ -118,12 +112,11 @@ class BasicCancelOk implements Message {
   // Message arguments
   String consumerTag;
 
-  BasicCancelOk.fromStream( TypeDecoder decoder ){
+  BasicCancelOk.fromStream(TypeDecoder decoder) {
     consumerTag = decoder.readShortString();
   }
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class BasicPublish implements Message {
@@ -140,15 +133,14 @@ class BasicPublish implements Message {
 
   BasicPublish();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
       ..writeUInt16(reserved_1)
       ..writeShortString(exchange)
       ..writeShortString(routingKey)
-      ..writeBits([mandatory, immediate])
-    ;
+      ..writeBits([mandatory, immediate]);
   }
 }
 
@@ -163,15 +155,14 @@ class BasicReturn implements Message {
   String exchange;
   String routingKey;
 
-  BasicReturn.fromStream( TypeDecoder decoder ){
+  BasicReturn.fromStream(TypeDecoder decoder) {
     replyCode = decoder.readUInt16();
     replyText = decoder.readShortString();
     exchange = decoder.readShortString();
     routingKey = decoder.readShortString();
   }
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class BasicDeliver implements Message {
@@ -186,7 +177,7 @@ class BasicDeliver implements Message {
   String exchange;
   String routingKey;
 
-  BasicDeliver.fromStream( TypeDecoder decoder ){
+  BasicDeliver.fromStream(TypeDecoder decoder) {
     consumerTag = decoder.readShortString();
     deliveryTag = decoder.readUInt64();
     int _bitmask;
@@ -196,8 +187,7 @@ class BasicDeliver implements Message {
     routingKey = decoder.readShortString();
   }
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class BasicAck implements Message {
@@ -211,13 +201,12 @@ class BasicAck implements Message {
 
   BasicAck();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
       ..writeUInt64(deliveryTag)
-      ..writeBits([multiple])
-    ;
+      ..writeBits([multiple]);
   }
 }
 
@@ -232,13 +221,12 @@ class BasicReject implements Message {
 
   BasicReject();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
       ..writeUInt64(deliveryTag)
-      ..writeBits([requeue])
-    ;
+      ..writeBits([requeue]);
   }
 }
 
@@ -252,12 +240,11 @@ class BasicRecover implements Message {
 
   BasicRecover();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
-      ..writeBits([requeue])
-    ;
+      ..writeBits([requeue]);
   }
 }
 
@@ -268,9 +255,7 @@ class BasicRecoverOk implements Message {
 
   // Message arguments
 
-  BasicRecoverOk.fromStream( TypeDecoder decoder ){
-  }
+  BasicRecoverOk.fromStream(TypeDecoder decoder) {}
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }

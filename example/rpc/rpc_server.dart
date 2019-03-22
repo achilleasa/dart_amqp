@@ -12,8 +12,7 @@ int fib(int n) {
 }
 
 void main(List<String> args) {
-
-  Client client = new Client();
+  Client client = Client();
 
   // Setup a signal handler to cleanly exit if CTRL+C is pressed
   ProcessSignal.sigint.watch().listen((_) {
@@ -23,11 +22,11 @@ void main(List<String> args) {
   });
 
   client
-  .channel()
-  .then((Channel channel) => channel.qos(0, 1))
-  .then((Channel channel) => channel.queue("rpc_queue"))
-  .then((Queue queue) => queue.consume())
-  .then((Consumer consumer) {
+      .channel()
+      .then((Channel channel) => channel.qos(0, 1))
+      .then((Channel channel) => channel.queue("rpc_queue"))
+      .then((Queue queue) => queue.consume())
+      .then((Consumer consumer) {
     print(" [x] Awaiting RPC request");
     consumer.listen((AmqpMessage message) {
       int n = message.payloadAsJson["n"];

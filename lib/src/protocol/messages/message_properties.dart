@@ -1,7 +1,6 @@
 part of dart_amqp.protocol;
 
 class MessageProperties {
-
   String contentType;
   String contentEncoding;
   Map<String, Object> headers;
@@ -18,14 +17,12 @@ class MessageProperties {
 
   MessageProperties();
 
-  MessageProperties.persistentMessage(){
+  MessageProperties.persistentMessage() {
     persistent = true;
   }
 
-  /**
-   * Flag the message as persistent or transient based on the value of
-   * [isPersistent]
-   */
+  /// Flag the message as persistent or transient based on the value of
+  /// [isPersistent]
   set persistent(bool isPersistent) => deliveryMode = isPersistent ? 2 : 1;
 
 //  String toString() {

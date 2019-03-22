@@ -18,7 +18,7 @@ void main(List<String> args) {
     exit(1);
   }
 
-  Client client = new Client();
+  Client client = Client();
 
   // Setup a signal handler to cleanly exit if CTRL+C is pressed
   ProcessSignal.sigint.watch().listen((_) {
@@ -28,14 +28,16 @@ void main(List<String> args) {
   });
 
   client
-  .channel()
-  .then((Channel channel) => channel.exchange("topic_logs", ExchangeType.TOPIC))
-  .then((Exchange exchange) => exchange.bindPrivateQueueConsumer(args))
-  .then((Consumer consumer) {
-    print(" [*] Waiting for [${args.join(', ')}] logs on private queue ${consumer.queue.name}. To exit, press CTRL+C");
+      .channel()
+      .then((Channel channel) =>
+          channel.exchange("topic_logs", ExchangeType.TOPIC))
+      .then((Exchange exchange) => exchange.bindPrivateQueueConsumer(args))
+      .then((Consumer consumer) {
+    print(
+        " [*] Waiting for [${args.join(', ')}] logs on private queue ${consumer.queue.name}. To exit, press CTRL+C");
     consumer.listen((AmqpMessage message) {
-      print(" [x] [Exchange: ${message.exchangeName}] [${message.routingKey}] ${message.payloadAsString}");
+      print(
+          " [x] [Exchange: ${message.exchangeName}] [${message.routingKey}] ${message.payloadAsString}");
     });
   });
-
 }

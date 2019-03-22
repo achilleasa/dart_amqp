@@ -1,9 +1,9 @@
 part of dart_amqp.protocol;
 
-final Uint8List FRAME_TERMINATOR_SEQUENCE = new Uint8List.fromList([ RawFrameParser.FRAME_TERMINATOR ]);
+final Uint8List FRAME_TERMINATOR_SEQUENCE =
+    Uint8List.fromList([RawFrameParser.FRAME_TERMINATOR]);
 
 class FrameWriter {
-
   final FrameHeader _frameHeader;
   final ContentHeader _contentHeader;
   final TypeEncoder _bufferEncoder;
@@ -12,12 +12,13 @@ class FrameWriter {
   final TuningSettings _tuningSettings;
 
   FrameWriter(TuningSettings this._tuningSettings)
-  : _frameHeader = new FrameHeader(),
-  _contentHeader = new ContentHeader(),
-  _bufferEncoder = new TypeEncoder(),
-  _outputEncoder = new TypeEncoder();
+      : _frameHeader = FrameHeader(),
+        _contentHeader = ContentHeader(),
+        _bufferEncoder = TypeEncoder(),
+        _outputEncoder = TypeEncoder();
 
-  void writeMessage(int channelId, Message message, { MessageProperties properties, Object payloadContent }) {
+  void writeMessage(int channelId, Message message,
+      {MessageProperties properties, Object payloadContent}) {
     // Make sure our buffer contains no stale data from previous messages
     _outputEncoder.writer.clear();
 
@@ -39,20 +40,21 @@ class FrameWriter {
 
     // if a data payload is specified, encode it and append it before flushing the buffer
     if (payloadContent != null) {
-
       // Serialize content
       Uint8List serializedContent;
       if (payloadContent is Uint8List) {
         serializedContent = payloadContent;
       } else if (payloadContent is Map || payloadContent is Iterable) {
-        serializedContent = new Uint8List.fromList(json.encode(payloadContent).codeUnits);
-        properties = (properties == null ? new MessageProperties() : properties)
+        serializedContent =
+            Uint8List.fromList(json.encode(payloadContent).codeUnits);
+        properties = (properties == null ? MessageProperties() : properties)
           ..contentType = "application/json"
           ..contentEncoding = "UTF-8";
       } else if (payloadContent is String) {
-        serializedContent = new Uint8List.fromList(payloadContent.codeUnits);
+        serializedContent = Uint8List.fromList(payloadContent.codeUnits);
       } else {
-        throw new ArgumentError("Message payload should be either a Map, an Iterable, a String or an UInt8List instance");
+        throw ArgumentError(
+            "Message payload should be either a Map, an Iterable, a String or an UInt8List instance");
       }
 
       // Build the content header
@@ -81,7 +83,9 @@ class FrameWriter {
 
       // Emit the payload data split in ceil( length / maxFrameLength ) chunks
       int contentLen = serializedContent.lengthInBytes;
-      for (int offset = 0; offset < contentLen; offset += _tuningSettings.maxFrameSize) {
+      for (int offset = 0;
+          offset < contentLen;
+          offset += _tuningSettings.maxFrameSize) {
         // Setup  and encode the frame header
         _frameHeader
           ..type = FrameType.BODY
@@ -90,14 +94,16 @@ class FrameWriter {
 
         // Encode the payload for the frame
         _outputEncoder.writer
-          ..addLast(new Uint8List.view(serializedContent.buffer, offset, _frameHeader.size))
+          ..addLast(Uint8List.view(
+              serializedContent.buffer, offset, _frameHeader.size))
           ..addLast(FRAME_TERMINATOR_SEQUENCE);
       }
     }
   }
 
-  void writeProtocolHeader(int protocolVersion, int majorVersion, int minorVersion, int revision) {
-    new ProtocolHeader()
+  void writeProtocolHeader(
+      int protocolVersion, int majorVersion, int minorVersion, int revision) {
+    ProtocolHeader()
       ..protocolVersion = protocolVersion
       ..majorVersion = majorVersion
       ..minorVersion = minorVersion
@@ -106,16 +112,14 @@ class FrameWriter {
   }
 
   void writeHeartbeat() {
-    _outputEncoder.writer.addLast(new Uint8List.fromList([8, 0, 0, 0, 0, 0, 0, RawFrameParser.FRAME_TERMINATOR]));
+    _outputEncoder.writer.addLast(Uint8List.fromList(
+        [8, 0, 0, 0, 0, 0, 0, RawFrameParser.FRAME_TERMINATOR]));
   }
 
-  /**
-   * Pipe encoded frame data to [sink]
-   */
+  /// Pipe encoded frame data to [sink]
   void pipe(Sink sink) {
     _outputEncoder.writer.pipe(sink);
   }
 
   TypeEncoder get outputEncoder => _outputEncoder;
 }
-

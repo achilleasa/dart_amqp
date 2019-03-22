@@ -4,7 +4,7 @@ class RawFrameParser {
   static final int FRAME_TERMINATOR = 0xCE;
   TuningSettings tuningSettings;
 
-  final ChunkedInputReader _inputBuffer = new ChunkedInputReader();
+  final ChunkedInputReader _inputBuffer = ChunkedInputReader();
   FrameHeader _parsedHeader;
   Uint8List _bodyData;
   int _bodyWriteOffset = 0;
@@ -35,26 +35,23 @@ class RawFrameParser {
               return;
             }
 
-            Uint8List headerBytes =
-                new Uint8List(ProtocolHeader.LENGTH_IN_BYTES);
+            Uint8List headerBytes = Uint8List(ProtocolHeader.LENGTH_IN_BYTES);
             _inputBuffer.read(headerBytes, ProtocolHeader.LENGTH_IN_BYTES);
-            ProtocolHeader protocolHeader = new ProtocolHeader.fromByteData(
-                new TypeDecoder.fromBuffer(
-                    new ByteData.view(headerBytes.buffer)));
-            throw new FatalException(
+            ProtocolHeader protocolHeader = ProtocolHeader.fromByteData(
+                TypeDecoder.fromBuffer(ByteData.view(headerBytes.buffer)));
+            throw FatalException(
                 "Could not negotiate a valid AMQP protocol version. Server supports AMQP ${protocolHeader.majorVersion}.${protocolHeader.minorVersion}.${protocolHeader.revision}");
           }
 
           // Extract header bytes and parse them
-          Uint8List headerBytes = new Uint8List(FrameHeader.LENGTH_IN_BYTES);
+          Uint8List headerBytes = Uint8List(FrameHeader.LENGTH_IN_BYTES);
           _inputBuffer.read(headerBytes, FrameHeader.LENGTH_IN_BYTES);
-          _parsedHeader = new FrameHeader.fromByteData(
-              new TypeDecoder.fromBuffer(
-                  new ByteData.view(headerBytes.buffer)));
+          _parsedHeader = FrameHeader.fromByteData(
+              TypeDecoder.fromBuffer(ByteData.view(headerBytes.buffer)));
           headerBytes = null;
 
           if (_parsedHeader.size > tuningSettings.maxFrameSize) {
-            throw new ConnectionException(
+            throw ConnectionException(
                 "Frame size cannot be larger than ${tuningSettings.maxFrameSize} bytes. Server sent ${_parsedHeader.size} bytes",
                 ErrorType.FRAME_ERROR,
                 0,
@@ -62,7 +59,7 @@ class RawFrameParser {
           }
 
           // Allocate buffer for body (and frame terminator); then reset write offset
-          _bodyData = new Uint8List(_parsedHeader.size + 1);
+          _bodyData = Uint8List(_parsedHeader.size + 1);
           _bodyWriteOffset = 0;
         } else {
           // Copy pending body data + expected frame terminator (0xCE)
@@ -74,15 +71,13 @@ class RawFrameParser {
         if (_bodyWriteOffset == _parsedHeader.size + 1) {
           // Ensure that the last byte of the payload is our frame terminator
           if (_bodyData.last != FRAME_TERMINATOR) {
-            throw new FatalException(
+            throw FatalException(
                 "Frame did not end with the expected frame terminator (0xCE)");
           }
 
           // Emit a raw frame excluding the frame terminator
-          sink.add(new RawFrame(
-              _parsedHeader,
-              new ByteData.view(
-                  _bodyData.buffer, 0, _bodyData.lengthInBytes - 1)));
+          sink.add(RawFrame(_parsedHeader,
+              ByteData.view(_bodyData.buffer, 0, _bodyData.lengthInBytes - 1)));
 
           _parsedHeader = null;
           _bodyData = null;
@@ -106,7 +101,7 @@ class RawFrameParser {
   }
 
   StreamTransformer<List<int>, RawFrame> get transformer =>
-      new StreamTransformer<List<int>, RawFrame>.fromHandlers(
+      StreamTransformer<List<int>, RawFrame>.fromHandlers(
           handleData: handleData,
           handleDone: handleDone,
           handleError: handleError);

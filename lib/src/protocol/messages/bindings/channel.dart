@@ -16,12 +16,11 @@ class ChannelOpen implements Message {
 
   ChannelOpen();
 
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
-      ..writeShortString(reserved_1)
-    ;
+      ..writeShortString(reserved_1);
   }
 }
 
@@ -33,12 +32,11 @@ class ChannelOpenOk implements Message {
   // Message arguments
   String reserved_1;
 
-  ChannelOpenOk.fromStream( TypeDecoder decoder ){
+  ChannelOpenOk.fromStream(TypeDecoder decoder) {
     reserved_1 = decoder.readLongString();
   }
 
-  void serialize( TypeEncoder encoder ) {
-  }
+  void serialize(TypeEncoder encoder) {}
 }
 
 class ChannelFlow implements Message {
@@ -50,17 +48,16 @@ class ChannelFlow implements Message {
   bool active;
 
   ChannelFlow();
-  ChannelFlow.fromStream( TypeDecoder decoder ){
+  ChannelFlow.fromStream(TypeDecoder decoder) {
     int _bitmask;
     _bitmask = decoder.readUInt8();
     active = _bitmask & 0x1 != 0;
   }
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
-      ..writeBits([active])
-    ;
+      ..writeBits([active]);
   }
 }
 
@@ -73,17 +70,16 @@ class ChannelFlowOk implements Message {
   bool active;
 
   ChannelFlowOk();
-  ChannelFlowOk.fromStream( TypeDecoder decoder ){
+  ChannelFlowOk.fromStream(TypeDecoder decoder) {
     int _bitmask;
     _bitmask = decoder.readUInt8();
     active = _bitmask & 0x1 != 0;
   }
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
-      ..writeBits([active])
-    ;
+      ..writeBits([active]);
   }
 }
 
@@ -99,21 +95,20 @@ class ChannelClose implements Message {
   int methodId;
 
   ChannelClose();
-  ChannelClose.fromStream( TypeDecoder decoder ){
+  ChannelClose.fromStream(TypeDecoder decoder) {
     replyCode = decoder.readUInt16();
     replyText = decoder.readShortString();
     classId = decoder.readUInt16();
     methodId = decoder.readUInt16();
   }
-  void serialize( TypeEncoder encoder ) {
+  void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
       ..writeUInt16(msgMethodId)
       ..writeUInt16(replyCode)
       ..writeShortString(replyText)
       ..writeUInt16(classId)
-      ..writeUInt16(methodId)
-    ;
+      ..writeUInt16(methodId);
   }
 }
 
@@ -125,12 +120,8 @@ class ChannelCloseOk implements Message {
   // Message arguments
 
   ChannelCloseOk();
-  ChannelCloseOk.fromStream( TypeDecoder decoder ){
-  }
-  void serialize( TypeEncoder encoder ) {
-    encoder
-      ..writeUInt16(msgClassId)
-      ..writeUInt16(msgMethodId)
-    ;
+  ChannelCloseOk.fromStream(TypeDecoder decoder) {}
+  void serialize(TypeEncoder encoder) {
+    encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
   }
 }
