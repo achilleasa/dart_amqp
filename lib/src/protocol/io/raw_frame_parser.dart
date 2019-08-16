@@ -100,8 +100,8 @@ class RawFrameParser {
     sink.addError(error, stackTrace);
   }
 
-  StreamTransformer<List<int>, RawFrame> get transformer =>
-      StreamTransformer<List<int>, RawFrame>.fromHandlers(
+  StreamTransformer<Uint8List, RawFrame> get transformer =>
+      StreamTransformer<Uint8List, RawFrame>.fromHandlers(
           handleData: handleData,
           handleDone: handleDone,
           handleError: handleError);
