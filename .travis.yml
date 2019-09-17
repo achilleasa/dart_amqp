@@ -1,4 +1,5 @@
 language: dart
+dist: trusty
 services:
   - rabbitmq
 jobs:

@@ -41,8 +41,9 @@ class _ClientImpl implements Client {
       _socket = s;
 
       // Bind processors and initiate handshake
-      _socket
-          .transform(RawFrameParser(tuningSettings).transformer)
+      RawFrameParser(tuningSettings)
+          .transformer
+          .bind(_socket)
           .transform(AmqpMessageDecoder().transformer)
           .listen(_handleMessage,
               onError: _handleException,
