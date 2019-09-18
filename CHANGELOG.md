@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+ Merged [#22](https://github.com/achilleasa/dart_amqp/pull/22), [#23](https://github.com/achilleasa/dart_amqp/pull/23),
+ [#27](https://github.com/achilleasa/dart_amqp/pull/27), [#28](https://github.com/achilleasa/dart_amqp/pull/27)
+ to address issues with Dart 2.5
+
 ## 0.1.1
 
 - Merged [#19](https://github.com/achilleasa/dart_amqp/pull/19) to improve support for `HEADER` exchanges.
