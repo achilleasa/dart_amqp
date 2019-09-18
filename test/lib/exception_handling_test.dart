@@ -134,12 +134,13 @@ main({bool enableLogger = true}) {
       return server.listen('127.0.0.1', port);
     });
 
-    tearDown(() {
-      return client.close().then((_) => server.shutdown());
+    tearDown(() async {
+      await client.close();
+      await server.shutdown();
     });
 
     group("fatal exceptions:", () {
-      test("protocol mismatch", () {
+      test("protocol mismatch", () async {
         TypeEncoder encoder = TypeEncoder();
         ProtocolHeader()
           ..protocolVersion = 0
@@ -158,12 +159,15 @@ main({bool enableLogger = true}) {
                   "Could not negotiate a valid AMQP protocol version. Server supports AMQP 0.8.0"));
         }
 
-        client.connect().then((_) {
+        try {
+          await client.connect();
           fail("Expected a FatalException to be thrown");
-        }).catchError(expectAsync2(handleError));
+        } catch (e, s) {
+          handleError(e, s);
+        }
       });
 
-      test("frame without terminator", () {
+      test("frame without terminator", () async {
         frameWriter.writeMessage(
             0,
             ConnectionStartMock()
@@ -185,12 +189,15 @@ main({bool enableLogger = true}) {
                   "Frame did not end with the expected frame terminator (0xCE)"));
         }
 
-        client.connect().then((_) {
+        try {
+          await client.connect();
           fail("Expected an exception to be thrown");
-        }).catchError(expectAsync2(handleError));
+        } catch (e, s) {
+          handleError(e, s);
+        }
       });
 
-      test("frame on channel > 0 while handshake in progress", () {
+      test("frame on channel > 0 while handshake in progress", () async {
         frameWriter.writeMessage(
             1,
             ConnectionStartMock()
@@ -209,12 +216,15 @@ main({bool enableLogger = true}) {
                   "Received message for channel 1 while still handshaking"));
         }
 
-        client.connect().then((_) {
+        try {
+          await client.connect();
           fail("Expected an exception to be thrown");
-        }).catchError(expectAsync2(handleError));
+        } catch (e, s) {
+          handleError(e, s);
+        }
       });
 
-      test("unexpected frame during handshake", () {
+      test("unexpected frame during handshake", () async {
         // Connection start
         frameWriter.writeMessage(
             0,
@@ -250,14 +260,17 @@ main({bool enableLogger = true}) {
                   "Received unexpected message TxSelectOk during handshake"));
         }
 
-        client.connect().then((_) {
+        try {
+          await client.connect();
           fail("Expected an exception to be thrown");
-        }).catchError(expectAsync2(handleError));
+        } catch (e, s) {
+          handleError(e, s);
+        }
       });
     });
 
     group("connection exceptions:", () {
-      test("illegal frame size", () {
+      test("illegal frame size", () async {
         frameWriter.writeMessage(
             0,
             ConnectionStartMock()
@@ -283,12 +296,15 @@ main({bool enableLogger = true}) {
                   "Frame size cannot be larger than ${tuningSettings.maxFrameSize} bytes. Server sent ${tuningSettings.maxFrameSize + 1} bytes"));
         }
 
-        client.connect().then((_) {
+        try {
+          await client.connect();
           fail("Expected an exception to be thrown");
-        }).catchError(expectAsync2(handleError));
+        } catch (e, s) {
+          handleError(e, s);
+        }
       });
 
-      test("connection-class message on channel > 0 post handshake", () {
+      test("connection-class message on channel > 0 post handshake", () async {
         generateHandshakeMessages(frameWriter, server);
 
         // Add a fake connection start message at channel 1
@@ -310,12 +326,15 @@ main({bool enableLogger = true}) {
                   "Received CONNECTION class message on a channel > 0"));
         }
 
-        client.channel().then((_) {
+        try {
+          await client.channel();
           fail("Expected an exception to be thrown");
-        }).catchError(expectAsync2(handleError));
+        } catch (e, s) {
+          handleError(e, s);
+        }
       });
 
-      test("HEARTBEAT message on channel > 0", () {
+      test("HEARTBEAT message on channel > 0", () async {
         generateHandshakeMessages(frameWriter, server);
 
         // Add a heartbeat start message at channel 1
@@ -331,12 +350,15 @@ main({bool enableLogger = true}) {
                   "Received HEARTBEAT message on a channel > 0"));
         }
 
-        client.channel().then((_) {
+        try {
+          await client.channel();
           fail("Expected an exception to be thrown");
-        }).catchError(expectAsync2(handleError));
+        } catch (e, s) {
+          handleError(e, s);
+        }
       });
 
-      test("connection close message post handshake", () {
+      test("connection close message post handshake", () async {
         generateHandshakeMessages(frameWriter, server);
 
         // Add a fake connection start message at channel 1
@@ -355,9 +377,12 @@ main({bool enableLogger = true}) {
               equals("ConnectionException(ACCESS_REFUSED): No access"));
         }
 
-        client.channel().then((_) {
+        try {
+          await client.channel();
           fail("Expected an exception to be thrown");
-        }).catchError(expectAsync2(handleError));
+        } catch (e, s) {
+          handleError(e, s);
+        }
       });
     });
     group("error stream:", () {
@@ -366,20 +391,16 @@ main({bool enableLogger = true}) {
           expect(ex, const TypeMatcher<FatalException>());
         }
 
-        server
-            .shutdown()
-            .then((_) =>
-                server.listen(client.settings.host, client.settings.port))
-            .then((_) {
+        // ignore: unawaited_futures
+        server.shutdown().then((_) async {
+          await server.listen(client.settings.host, client.settings.port);
           generateHandshakeMessages(frameWriter, server);
-          return client.connect().then((_) {
-            client.errorListener((ex) => handleError(ex));
-            return server
-                .shutdown()
-                .then((_) =>
-                    Future.delayed(Duration(seconds: 5) + server.responseDelay))
-                .then((_) => fail("Expected an exception to be thrown"));
-          });
+          await client.connect();
+          client.errorListener((ex) => handleError(ex));
+          await server.shutdown();
+          await Future.delayed(
+              const Duration(seconds: 5) + server.responseDelay);
+          fail("Expected an exception to be thrown");
         });
       });
     }, skip: true);

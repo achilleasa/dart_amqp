@@ -42,8 +42,8 @@ class MockServer {
           client.destroy();
           return Future.value(true);
         }))
-        ..add(_server.close().then(
-            (_) => Future.delayed(Duration(milliseconds: 20), () => true)));
+        ..add(_server.close().then((_) =>
+            Future.delayed(const Duration(milliseconds: 20), () => true)));
 
       clients.clear();
       _server = null;
@@ -63,18 +63,13 @@ class MockServer {
     }
   }
 
-  Future listen(String host, int port) {
-    Completer completer = Completer();
+  Future listen(String host, int port) async {
     mockLogger.info("Binding MockServer to $host:$port");
 
-    ServerSocket.bind(host, port).then((ServerSocket server) {
-      _server = server;
-      mockLogger.info("[$host:$port] Listening for incoming connections");
-      _server.listen(_handleConnection);
-      completer.complete();
-    });
-
-    return completer.future;
+    _server = await ServerSocket.bind(host, port);
+    mockLogger.info("[$host:$port] Listening for incoming connections");
+    _server.listen(_handleConnection);
+    ;
   }
 
   void _handleConnection(Socket client) {
@@ -87,7 +82,7 @@ class MockServer {
   }
 
   void _handleClientData(Socket client, dynamic data) {
-    if (replayList != null && !replayList.isEmpty) {
+    if (replayList != null && replayList.isNotEmpty) {
       // Respond with the next payload in replay list
       Future.delayed(responseDelay).then((_) {
         client

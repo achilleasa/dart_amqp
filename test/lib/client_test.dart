@@ -1,6 +1,6 @@
 library dart_amqp.test.client;
 
-import "dart:async";
+import 'dart:async';
 
 import "package:test/test.dart";
 
@@ -18,55 +18,53 @@ main({bool enableLogger = true}) {
   group("Client test:", () {
     Client client;
 
-    tearDown(() {
-      return client.close();
+    tearDown(() async {
+      await client.close();
     });
 
-    test("fail to connect after 2 attempts", () {
+    test("fail to connect after 2 attempts", () async {
       ConnectionSettings settings = ConnectionSettings(
           port: 8765,
           maxConnectionAttempts: 2,
           reconnectWaitTime: const Duration(milliseconds: 10));
       client = Client(settings: settings);
 
-      client.connect().catchError(expectAsync1((ex) {
+      try {
+        await client.connect();
+      } catch (ex) {
         expect(ex, const TypeMatcher<ConnectionFailedException>());
         expect(ex.toString(), startsWith('ConnectionFailedException'));
-      }));
+      }
     });
 
-    test("multiple open attampts should return the same future", () {
+    test("multiple open attampts should return the same future", () async {
       client = Client();
-
       Future connectFuture = client.connect();
-
       expect(client.connect(), equals(connectFuture));
-
-      return connectFuture;
+      await connectFuture;
     });
 
-    test("multiple close attampts should return the same future", () {
+    test("multiple close attampts should return the same future", () async {
       client = Client();
-
-      return client.connect().then((_) {
-        Future closeFuture = client.close();
-
-        expect(client.close(), equals(closeFuture));
-
-        return closeFuture;
-      });
+      await client.connect();
+      Future closeFuture = client.close();
+      expect(client.close(), equals(closeFuture));
+      await closeFuture;
     });
 
-    test("exception when exceeding negotiated channel limit", () {
+    test("exception when exceeding negotiated channel limit", () async {
       ConnectionSettings settings =
           ConnectionSettings(tuningSettings: TuningSettings()..maxChannels = 1);
       client = Client(settings: settings);
 
-      return client.channel().then((_) => client.channel()).catchError((ex) {
+      await client.channel();
+      try {
+        await client.channel();
+      } catch (ex) {
         expect(ex, const TypeMatcher<StateError>());
         expect(ex.message,
             equals("Cannot allocate channel; channel limit exceeded (max 1)"));
-      });
+      }
     });
   });
 }

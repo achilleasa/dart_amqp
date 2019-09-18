@@ -124,7 +124,7 @@ class _QueueImpl implements Queue {
       Map<String, Object> arguments}) {
     // If a consumer with the requested tag exists, return that
     if (consumerTag != null &&
-        !consumerTag.isEmpty &&
+        consumerTag.isNotEmpty &&
         channel._consumers.containsKey(consumerTag)) {
       return Future.value(channel._consumers[consumerTag]);
     }

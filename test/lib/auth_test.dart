@@ -153,20 +153,20 @@ main({bool enableLogger = true}) {
       return client.close();
     });
 
-    test("PLAIN authenticaion", () {
+    test("PLAIN authenticaion", () async {
       ConnectionSettings settings = ConnectionSettings(
-          authProvider: PlainAuthenticator("guest", "guest"));
+          authProvider: const PlainAuthenticator("guest", "guest"));
       client = Client(settings: settings);
 
-      client.connect().then(expectAsync1((_) {}));
+      await client.connect();
     });
 
-    test("AMQPLAIN authenticaion", () {
+    test("AMQPLAIN authenticaion", () async {
       ConnectionSettings settings = ConnectionSettings(
-          authProvider: AmqPlainAuthenticator("guest", "guest"));
+          authProvider: const AmqPlainAuthenticator("guest", "guest"));
       client = Client(settings: settings);
 
-      client.connect().then(expectAsync1((_) {}));
+      await client.connect();
     });
   });
 
@@ -184,11 +184,12 @@ main({bool enableLogger = true}) {
       return server.listen('127.0.0.1', 9000);
     });
 
-    tearDown(() {
-      return client.close().then((_) => server.shutdown());
+    tearDown(() async {
+      await client.close();
+      await server.shutdown();
     });
 
-    test("multiple challenge-response rounds", () {
+    test("multiple challenge-response rounds", () async {
       generateHandshakeMessages(frameWriter, server, 10);
 
       // Encode final connection close
@@ -196,7 +197,7 @@ main({bool enableLogger = true}) {
       server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
       frameWriter.outputEncoder.writer.clear();
 
-      client.connect().then(expectAsync1((_) {}));
+      await client.connect();
     });
   });
 
@@ -207,31 +208,35 @@ main({bool enableLogger = true}) {
       return client.close();
     });
 
-    test("unsupported SASL provider", () {
+    test("unsupported SASL provider", () async {
       ConnectionSettings settings =
           ConnectionSettings(authProvider: FooAuthProvider());
 
       client = Client(settings: settings);
 
-      client.connect().catchError(expectAsync1((e) {
+      try {
+        await client.connect();
+      } catch (e) {
         expect(e, const TypeMatcher<FatalException>());
         expect(
             e.message,
             startsWith(
                 "Selected authentication provider 'foo' is unsupported by the server"));
-      }));
+      }
     });
 
-    test("invalid auth credentials", () {
-      ConnectionSettings settings =
-          ConnectionSettings(authProvider: PlainAuthenticator("foo", "foo"));
+    test("invalid auth credentials", () async {
+      ConnectionSettings settings = ConnectionSettings(
+          authProvider: const PlainAuthenticator("foo", "foo"));
 
       client = Client(settings: settings);
 
-      client.connect().catchError(expectAsync1((e) {
+      try {
+        await client.connect();
+      } catch (e) {
         expect(e, const TypeMatcher<FatalException>());
         expect(e.message, equals("Authentication failed"));
-      }));
+      }
     });
   });
 }

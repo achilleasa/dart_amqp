@@ -11,21 +11,18 @@ class FibonacciRpcClient {
   String _replyQueueName;
 
   FibonacciRpcClient() : client = Client() {
-    client
-        .channel()
-        .then((Channel channel) => channel.queue("rpc_queue"))
-        .then((Queue rpcQueue) {
-          _serverQueue = rpcQueue;
+    _init();
+  }
 
-          // Allocate a private queue for server responses
-          return rpcQueue.channel.privateQueue();
-        })
-        .then((Queue queue) => queue.consume())
-        .then((Consumer consumer) {
-          _replyQueueName = consumer.queue.name;
-          consumer.listen(handleResponse);
-          connected.complete();
-        });
+  Future<void> _init() async {
+    Channel channel = await client.channel();
+    _serverQueue = await channel.queue("rpc_queue");
+    // Allocate a private queue for server responses
+    Queue queue = await _serverQueue.channel.privateQueue();
+    Consumer consumer = await queue.consume();
+    _replyQueueName = consumer.queue.name;
+    consumer.listen(handleResponse);
+    connected.complete();
   }
 
   void handleResponse(AmqpMessage message) {
@@ -39,22 +36,22 @@ class FibonacciRpcClient {
         .complete(int.parse(message.payloadAsString));
   }
 
-  Future<int> call(int n) {
+  Future<int> call(int n) async {
     // Make sure we are connected before sending the request
-    return connected.future.then((_) {
-      String uuid = "${_nextCorrelationId++}";
-      Completer<int> completer = Completer<int>();
+    await connected.future;
 
-      MessageProperties properties = MessageProperties()
-        ..replyTo = _replyQueueName
-        ..corellationId = uuid;
+    String uuid = "${_nextCorrelationId++}";
+    Completer<int> completer = Completer<int>();
 
-      _pendingOperations[uuid] = completer;
+    MessageProperties properties = MessageProperties()
+      ..replyTo = _replyQueueName
+      ..corellationId = uuid;
 
-      _serverQueue.publish({"n": n}, properties: properties);
+    _pendingOperations[uuid] = completer;
 
-      return completer.future;
-    });
+    _serverQueue.publish({"n": n}, properties: properties);
+
+    return completer.future;
   }
 
   Future close() {
@@ -67,17 +64,14 @@ class FibonacciRpcClient {
   }
 }
 
-main(List<String> args) {
+main(List<String> args) async {
   FibonacciRpcClient client = FibonacciRpcClient();
 
   int n = args.isEmpty ? 30 : num.parse(args[0]);
 
   // Make 10 parallel calls and get fib(1) to fib(10)
-  client
-      .call(n)
-      .then((int res) {
-        print(" [x] fib(${n}) = ${res}");
-      })
-      .then((_) => client.close())
-      .then((_) => exit(0));
+  int res = await client.call(n);
+  print(" [x] fib(${n}) = ${res}");
+  await client.close();
+  exit(0);
 }
