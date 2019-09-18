@@ -9,8 +9,7 @@ class DecodedMessageImpl implements DecodedMessage {
 
   DecodedMessageImpl(this.channel, Message this.message);
 
-  MessageProperties get properties =>
-      contentHeader != null ? contentHeader.properties : null;
+  MessageProperties get properties => contentHeader?.properties;
 
   set properties(MessageProperties properties) {
     if (contentHeader != null) {
