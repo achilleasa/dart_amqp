@@ -11,7 +11,7 @@ class FrameWriter {
 
   final TuningSettings _tuningSettings;
 
-  FrameWriter(TuningSettings this._tuningSettings)
+  FrameWriter(this._tuningSettings)
       : _frameHeader = FrameHeader(),
         _contentHeader = ContentHeader(),
         _bufferEncoder = TypeEncoder(),

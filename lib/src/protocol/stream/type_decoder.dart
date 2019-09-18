@@ -5,7 +5,7 @@ class TypeDecoder {
   ByteData _buffer;
   final Endian endianess = Endian.big;
 
-  TypeDecoder.fromBuffer(ByteData this._buffer);
+  TypeDecoder.fromBuffer(this._buffer);
 
   int readInt8() {
     return _buffer.getInt8(_offset++);

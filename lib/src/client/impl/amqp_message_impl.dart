@@ -6,8 +6,7 @@ class _AmqpMessageImpl implements AmqpMessage {
 
   MessageProperties get properties => message.properties;
 
-  _AmqpMessageImpl.fromDecodedMessage(
-      _ConsumerImpl this.consumer, DecodedMessage this.message);
+  _AmqpMessageImpl.fromDecodedMessage(this.consumer, this.message);
 
   Uint8List get payload => message.payload;
 

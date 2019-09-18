@@ -6,8 +6,12 @@ class ConnectionException implements Exception {
   final int classId;
   final int methodId;
 
-  ConnectionException(String this.message, ErrorType this.errorType,
-      int this.classId, int this.methodId);
+  ConnectionException(
+    this.message,
+    this.errorType,
+    this.classId,
+    this.methodId,
+  );
 
   String toString() {
     return "ConnectionException(${ErrorType.nameOf(errorType)}): ${message}";
