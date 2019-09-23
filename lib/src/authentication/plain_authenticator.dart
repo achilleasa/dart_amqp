@@ -5,7 +5,7 @@ class PlainAuthenticator implements Authenticator {
   final String password;
 
   /// Create a new [PlainAuthenticator] with the specified [userName] and [password]
-  const PlainAuthenticator(String this.userName, String this.password);
+  const PlainAuthenticator(this.userName, this.password);
 
   /// Get the class of this authenticator
   String get saslType => "PLAIN";

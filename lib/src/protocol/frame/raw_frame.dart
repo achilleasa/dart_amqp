@@ -4,7 +4,7 @@ class RawFrame {
   final FrameHeader header;
   final ByteData payload;
 
-  RawFrame(FrameHeader this.header, ByteData this.payload);
+  RawFrame(this.header, this.payload);
 
 //  String toString() {
 //    return """

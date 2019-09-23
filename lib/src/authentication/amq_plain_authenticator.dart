@@ -5,7 +5,7 @@ class AmqPlainAuthenticator implements Authenticator {
   final String password;
 
   /// Create a new [PlainAuthenticator] with the specified [userName] and [password]
-  const AmqPlainAuthenticator(String this.userName, String this.password);
+  const AmqPlainAuthenticator(this.userName, this.password);
 
   /// Get the class of this authenticator
   String get saslType => "AMQPLAIN";

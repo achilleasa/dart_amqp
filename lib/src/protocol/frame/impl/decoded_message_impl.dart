@@ -7,7 +7,7 @@ class DecodedMessageImpl implements DecodedMessage {
   ChunkedOutputWriter payloadBuffer;
   Uint8List payload;
 
-  DecodedMessageImpl(this.channel, Message this.message);
+  DecodedMessageImpl(this.channel, this.message);
 
   MessageProperties get properties => contentHeader?.properties;
 

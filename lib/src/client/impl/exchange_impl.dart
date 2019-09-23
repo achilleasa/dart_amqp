@@ -5,7 +5,7 @@ class _ExchangeImpl implements Exchange {
   final ExchangeType type;
   final _ChannelImpl channel;
 
-  _ExchangeImpl(_ChannelImpl this.channel, this._name, this.type);
+  _ExchangeImpl(this.channel, this._name, this.type);
 
   String get name => _name;
 

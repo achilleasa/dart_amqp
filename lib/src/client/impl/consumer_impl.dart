@@ -9,7 +9,10 @@ class _ConsumerImpl implements Consumer {
   String get tag => _tag;
 
   _ConsumerImpl(
-      _ChannelImpl this.channel, _QueueImpl this.queue, String this._tag);
+    this.channel,
+    this.queue,
+    this._tag,
+  );
 
   StreamSubscription<AmqpMessage> listen(void onData(AmqpMessage event),
           {Function onError, void onDone(), bool cancelOnError}) =>

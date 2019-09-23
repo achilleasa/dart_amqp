@@ -6,7 +6,7 @@ class _QueueImpl implements Queue {
   int _consumerCount;
   final _ChannelImpl channel;
 
-  _QueueImpl(_ChannelImpl this.channel, this._name);
+  _QueueImpl(this.channel, this._name);
 
   String get name => _name;
 

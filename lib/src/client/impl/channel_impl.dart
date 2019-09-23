@@ -15,7 +15,7 @@ class _ChannelImpl implements Channel {
   Exception _channelCloseException;
   final _basicReturnStream = StreamController<BasicReturnMessage>.broadcast();
 
-  _ChannelImpl(this.channelId, _ClientImpl this._client) {
+  _ChannelImpl(this.channelId, this._client) {
     _frameWriter = FrameWriter(_client.tuningSettings);
     _pendingOperations = ListQueue<Completer>();
     _pendingOperationPayloads = ListQueue<Object>();
