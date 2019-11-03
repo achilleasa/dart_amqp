@@ -28,6 +28,9 @@ class ConnectionSettings {
   // Tuning settings
   TuningSettings tuningSettings;
 
+  // TLS settings (if TLS connection is required)
+  SecurityContext tlsContext;
+
   ConnectionSettings({
     this.host = "127.0.0.1",
     this.port = 5672,
@@ -36,6 +39,7 @@ class ConnectionSettings {
     this.maxConnectionAttempts = 1,
     this.reconnectWaitTime = const Duration(milliseconds: 1500),
     this.tuningSettings,
+    this.tlsContext,
   }) {
     if (this.tuningSettings == null) {
       tuningSettings = TuningSettings();
