@@ -41,23 +41,24 @@ The class exposes the following parameters:
 ### Creating a new client
 
 To create a new client use the [Client](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/client.dart) factory constructor. The constructor accepts the optional
-named parameter ```settings``` that can be used to override the default connection settings.
+named parameter `settings` that can be used to override the default connection settings for more advanced use-cases. For instance, if you are trying to connect to a rabbit instance
+over TLS, you can provide a `SecurityContext` which specifies the certificates to use for establishing the secure connection.
 
 The client will not automatically establish a connection when the client instance is created but instead will connect lazily when its methods are invoked. If you wish
-to establish a connection beforehand use the ```connect``` method. 
+to establish a connection beforehand use the `connect` method. 
 
 The following table summarizes the methods available to an AMQP client. For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/client.dart).
 
 | Method             |  Description
 |--------------------|------------------
-| connect()          | Connect to the AMQP server and return a ```Future``` to be completed on a successfull connection.
-| close()            | Clean up any open channels and shutdown the connection. Returns a ```Future``` to be completed when the shutdown is complete.
-| channel()	     | Allocate a user channel and return a ```Future<Channel>```.
+| connect()          | Connect to the AMQP server and return a `Future` to be completed on a successfull connection.
+| close()            | Clean up any open channels and shutdown the connection. Returns a `Future` to be completed when the shutdown is complete.
+| channel()	     | Allocate a user channel and return a `Future<Channel>`.
 | errorListener()    | Register a listener for exceptions caught by the client.
 
 ## Channels
 
-The following table summarizes the methods available to an AMQP channel obtained via the ```channel()``` method of a ```client``` instance. For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/channel.dart).
+The following table summarizes the methods available to an AMQP channel obtained via the `channel()` method of a `client` instance. For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/channel.dart).
 
 | Method             |  Description
 |--------------------|------------------
@@ -76,7 +77,7 @@ The following table summarizes the methods available to an AMQP channel obtained
 
 ## Exchanges
 
-The following table summarizes the methods available to an AMQP exchange declared via the the ```exchange()``` method of a ```channel``` instance. For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/exchange.dart).
+The following table summarizes the methods available to an AMQP exchange declared via the the `exchange()` method of a `channel` instance. For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/exchange.dart).
 
 | Method             |  Description
 |--------------------|------------------
@@ -89,7 +90,7 @@ The following table summarizes the methods available to an AMQP exchange declare
 
 ## Queues
 
-The following table summarizes the methods available to an AMQP queue obtained via the ```queue()``` or ```privateQueue``` methods of a ```channel``` instance. For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/queue.dart).
+The following table summarizes the methods available to an AMQP queue obtained via the `queue()` or `privateQueue` methods of a `channel` instance. For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/queue.dart).
 
 | Method             |  Description
 |--------------------|------------------
@@ -104,7 +105,7 @@ The following table summarizes the methods available to an AMQP queue obtained v
 
 ## Consumers
 
-The following table summarizes the methods available to an AMQP consumer  obtained via the ```consume()``` method of a ```queue``` instance or the ```bindPrivateQueueConsumer()``` method of an ```exchange``` instance. For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/consumer.dart).
+The following table summarizes the methods available to an AMQP consumer  obtained via the `consume()` method of a `queue` instance or the `bindPrivateQueueConsumer()` method of an `exchange` instance. For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/consumer.dart).
 
 | Method             |  Description
 |--------------------|------------------
@@ -116,9 +117,9 @@ The following table summarizes the methods available to an AMQP consumer  obtain
 
 ## Messages
 
-Queue consumers are essentially StreamControllers that emit a ```Stream<AmqpMessage>```. The ```AmqpMessage``` class wraps the
+Queue consumers are essentially StreamControllers that emit a `Stream<AmqpMessage>`. The `AmqpMessage` class wraps the
 payload of the incoming message as well as the incoming message properties
-and provides helper methods for replying, ack-ing and rejecting messages. The following table summarizes the methods provided by ```AmqpMessage```.  For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/amqp_message.dart).
+and provides helper methods for replying, ack-ing and rejecting messages. The following table summarizes the methods provided by `AmqpMessage`.  For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/amqp_message.dart).
 
 | Method             |  Description
 |--------------------|------------------
@@ -134,7 +135,7 @@ and provides helper methods for replying, ack-ing and rejecting messages. The fo
 
 ## Error handling
 
-All api methods return back ```Future```. If the server reports an error then the driver will complete the future with the error and mark the channel as closed. 
+All api methods return back `Future`. If the server reports an error then the driver will complete the future with the error and mark the channel as closed. 
 
 When the application catches a server error, it should throw away the current channel and allocate a new one for further interaction with the server. Any attempt to invoke a method on a closed channel will cause an exception to be thrown.
 
@@ -144,7 +145,7 @@ The application can also register an error listener for handling socket and prot
 
 The driver manages logging using the [logging](https://pub.dartlang.org/packages/logging) package.
 
-If your application uses hierarchical logging you can control the logger output using ```dart_amqp.Connection``` as the logger name.
+If your application uses hierarchical logging you can control the logger output using `dart_amqp.Connection` as the logger name.
 
 
 ## Bindings generator tool

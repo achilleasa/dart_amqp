@@ -1,19 +1,34 @@
 language: dart
-dist: trusty
-services:
-  - rabbitmq
+dist: bionic
 jobs:
   include:
     - stage: run tests
       dart: stable
+      before_install:
+        - |
+          echo "
+          loopback_users = none
+          listeners.ssl.default = 5671
+          
+          ssl_options.cacertfile = /certs/ca_certificate.pem
+          ssl_options.certfile   = /certs/server_certificate.pem
+          ssl_options.keyfile    = /certs/server_key.pem
+          ssl_options.verify     = verify_peer
+          ssl_options.fail_if_no_peer_cert = false
+          " >  /tmp/rabbitmq.conf
+        - docker run -d --mount type=bind,source="$(pwd)"/test/lib/mocks/certs,target="/certs" --mount type=bind,source="/tmp/rabbitmq.conf",target="/etc/rabbitmq/rabbitmq.conf" -p 5671:5671 -p 5672:5672 rabbitmq:3.7.20
+        - sleep 3
       script:
-        - export PATH=$PATH:"~/.pub-cache/bin"
+        - export PATH=$PATH:"${TRAVIS_HOME}/.pub-cache/bin"
         - pub get
         - pub global activate coverage
         - dartfmt -n --set-exit-if-changed .
         - dartanalyzer --fatal-warnings --fatal-hints --fatal-lints ./
         - cd test
-        - bash run.sh
+        - AMQP_RUN_TLS_TESTS=true bash run.sh
       after_success:
         - bash test_coverage.sh
         - dart upload_coverage.dart
+cache:
+  directories:
+    - "${TRAVIS_HOME}/.pub-cache"

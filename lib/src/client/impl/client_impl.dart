@@ -33,9 +33,22 @@ class _ClientImpl implements Client {
   Future _reconnect() {
     _connected ??= Completer();
 
-    connectionLogger.info(
-        "Trying to connect to ${settings.host}:${settings.port} [attempt ${_connectionAttempt + 1}/${settings.maxConnectionAttempts}]");
-    Socket.connect(settings.host, settings.port).then((Socket s) {
+    Future<Socket> fs;
+    if (settings.tlsContext != null) {
+      connectionLogger.info(
+          "Trying to connect to ${settings.host}:${settings.port} using TLS [attempt ${_connectionAttempt + 1}/${settings.maxConnectionAttempts}]");
+      fs = SecureSocket.connect(
+        settings.host,
+        settings.port,
+        context: settings.tlsContext,
+      );
+    } else {
+      connectionLogger.info(
+          "Trying to connect to ${settings.host}:${settings.port} [attempt ${_connectionAttempt + 1}/${settings.maxConnectionAttempts}]");
+      fs = Socket.connect(settings.host, settings.port);
+    }
+
+    fs.then((Socket s) {
       _socket = s;
 
       // Bind processors and initiate handshake
