@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Fixes #31 (Issues decoding strings with ØÆÅ) via [#32](https://github.com/achilleasa/dart_amqp/pull/32)
+- Add support for connecting to rabbitmq over TLS via [#33](https://github.com/achilleasa/dart_amqp/pull/33)
+
 ## 0.1.2
 
  Merged [#22](https://github.com/achilleasa/dart_amqp/pull/22), [#23](https://github.com/achilleasa/dart_amqp/pull/23),
