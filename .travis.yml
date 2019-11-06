@@ -26,9 +26,10 @@ jobs:
         - dartanalyzer --fatal-warnings --fatal-hints --fatal-lints ./
         - cd test
         - AMQP_RUN_TLS_TESTS=true bash run.sh
+        - cd ../
       after_success:
-        - bash test_coverage.sh
-        - dart upload_coverage.dart
+        - AMQP_RUN_TLS_TESTS=true pub run test_coverage --no-badge
+        - dart test/upload_coverage.dart
 cache:
   directories:
     - "${TRAVIS_HOME}/.pub-cache"
