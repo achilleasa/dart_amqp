@@ -87,6 +87,7 @@ The following table summarizes the methods available to an AMQP exchange declare
 | delete()           | Delete the exchange.
 | publish()          | Publish message using a routing key
 | bindPrivateQueueConsumer() | Convenience method that allocates a private [queue](#queues), binds it to the exchange via a routing key and returns a [consumer](#consumers) for processing messages.
+| bindQueueConsumer() | Convenience method that allocates a named [queue](#queues), binds it to the exchange via a routing key and returns a [consumer](#consumers) for processing messages.
 
 ## Queues
 

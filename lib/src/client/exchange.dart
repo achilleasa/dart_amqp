@@ -44,4 +44,15 @@ abstract class Exchange {
   /// messages or not.
   Future<Consumer> bindPrivateQueueConsumer(List<String> routingKeys,
       {String consumerTag, bool noAck = true});
+
+  /// Allocate a named [Queue], bind it to this exchange using the supplied [routingKeys],
+  /// allocate a [Consumer] and return a [Future<Consumer>].
+  ///
+  /// You may specify a queue name and a [consumerTag] to label this consumer. If left unspecified,
+  /// the server will assign a random tag to this consumer. Consumer tags are local to the current channel.
+  ///
+  /// The [noAck] flag will notify the server whether the consumer is expected to acknowledge incoming
+  /// messages or not.
+  Future<Consumer> bindQueueConsumer(String queueName, List<String> routingKeys,
+      {String consumerTag, bool noAck = true});
 }
