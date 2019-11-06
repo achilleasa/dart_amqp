@@ -70,6 +70,10 @@ main({bool enableLogger = true}) {
   });
 
   var certPath = "${Directory.current.path}/lib/mocks/certs";
+  // When collecting code coverage metrics, current path will be the package root instead.
+  if (!Directory(certPath).existsSync()) {
+    certPath = "${Directory.current.path}/test/lib/mocks/certs";
+  }
   var skipTLSTests = Platform.environment.containsKey("AMQP_RUN_TLS_TESTS")
       ? null
       : """

@@ -4,7 +4,7 @@ import 'package:coveralls/coveralls.dart';
 
 Future<void> main() async {
   try {
-    final coverage = File('coverage/coverage.lcov');
+    final coverage = File('coverage/lcov.info');
     await Client().upload(await coverage.readAsString());
     print('Code coverage report uploaded to coveralls.io');
   } on Exception catch (err) {
