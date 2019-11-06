@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4
+
+- Merged [#30](https://github.com/achilleasa/dart_amqp/pull/30) to add support
+for binding to a named exchange queue.
+
 ## 0.1.3
 
 - Fixes #31 (Issues decoding strings with ØÆÅ) via [#32](https://github.com/achilleasa/dart_amqp/pull/32)
