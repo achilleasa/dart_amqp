@@ -3,7 +3,8 @@
 .idea
 .pub/
 build/
-test/coverage
+coverage/
+test/.test_coverage.dart
 packages
 pubspec.lock
 tool/amqp0-9-1.xml
