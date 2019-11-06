@@ -301,7 +301,7 @@ main({bool enableLogger = true}) {
       test("declare exchange and bind named queue consumer", () async {
         Channel channel = await client.channel();
         Exchange exchange =
-            await channel.exchange("ex_test_1", ExchangeType.DIRECT);
+            await channel.exchange("ex_test_named", ExchangeType.DIRECT);
         Consumer consumer =
             await exchange.bindQueueConsumer("my_test_queue", ["test"]);
         expect(consumer.channel, const TypeMatcher<Channel>());
