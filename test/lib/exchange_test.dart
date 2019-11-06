@@ -302,7 +302,8 @@ main({bool enableLogger = true}) {
         Channel channel = await client.channel();
         Exchange exchange =
             await channel.exchange("ex_test_1", ExchangeType.DIRECT);
-        Consumer consumer = await exchange.bindQueueConsumer("my_test_queue", ["test"]);
+        Consumer consumer =
+            await exchange.bindQueueConsumer("my_test_queue", ["test"]);
         expect(consumer.channel, const TypeMatcher<Channel>());
         expect(consumer.queue, const TypeMatcher<Queue>());
         expect(consumer.tag, isNotEmpty);
