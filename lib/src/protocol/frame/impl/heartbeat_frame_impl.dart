@@ -15,7 +15,7 @@ class HeartbeatFrameImpl implements DecodedMessage {
 //    return sb.toString();
 //  }
 
-  Message get message => null;
+  Message get message => HeartbeatMessage();
 
   MessageProperties get properties => null;
 
@@ -24,4 +24,16 @@ class HeartbeatFrameImpl implements DecodedMessage {
   String get payloadAsString => null;
 
   Map get payloadAsJson => null;
+}
+
+class HeartbeatMessage implements Message {
+  final bool msgHasContent = false;
+  final int msgClassId = 0;
+  final int msgMethodId = 0;
+
+  HeartbeatMessage();
+  HeartbeatMessage.fromStream(TypeDecoder decoder) {}
+  void serialize(TypeEncoder encoder) {
+    encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
+  }
 }
