@@ -103,7 +103,7 @@ class _ChannelImpl implements Channel {
         ConnectionStartOk clientResponse = ConnectionStartOk()
           ..clientProperties = {
             "product": "Dart AMQP client",
-            "version": "0.0.1",
+            "version": "0.0.2",
             "platform": "Dart/${Platform.operatingSystem}"
           }
           ..locale = 'en_US'
@@ -135,13 +135,16 @@ class _ChannelImpl implements Channel {
           ..maxChannels = _client.tuningSettings.maxChannels > 0
               ? _client.tuningSettings.maxChannels
               : serverResponse.channelMax
-          ..heartbeatPeriod = Duration.zero;
+          ..heartbeatPeriod =
+              _client.tuningSettings.heartbeatPeriod.inSeconds > 0
+                  ? _client.tuningSettings.heartbeatPeriod
+                  : Duration(seconds: serverResponse.heartbeat);
 
         // Respond with the mirrored tuning settings
         ConnectionTuneOk clientResponse = ConnectionTuneOk()
           ..frameMax = serverResponse.frameMax
           ..channelMax = _client.tuningSettings.maxChannels
-          ..heartbeat = 0;
+          ..heartbeat = _client.tuningSettings.heartbeatPeriod.inSeconds;
 
         _lastHandshakeMessage = clientResponse;
         writeMessage(clientResponse);
@@ -217,6 +220,7 @@ class _ChannelImpl implements Channel {
 
     if (serverMessage is HeartbeatFrameImpl) {
       connectionLogger.info("Received heartbeat frame");
+      writeHeartbeat();
       return;
     }
 
