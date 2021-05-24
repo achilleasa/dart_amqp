@@ -253,6 +253,7 @@ class _ClientImpl implements Client {
       _connected = null;
       _error.close();
       _clientClosed.complete();
+      _clientClosed = null;
     });
 
     return _clientClosed.future;
