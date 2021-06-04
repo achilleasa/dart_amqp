@@ -67,6 +67,21 @@ main({bool enableLogger = true}) {
             equals("Cannot allocate channel; channel limit exceeded (max 1)"));
       }
     });
+
+    test("should be able to close a client connection after re-opening", () async {
+      client = Client();
+      await client.connect();
+      Future firstClose = client.close();
+      
+      firstClose.then((_) async {
+      	await client.connect();
+      	Future secondClose = client.close();
+      	
+      	secondClose.then((_) {
+      	    expect(identical(firstClose, secondClose), false);
+      	});
+      });
+    });
   });
 
   var certPath = "${Directory.current.path}/lib/mocks/certs";
