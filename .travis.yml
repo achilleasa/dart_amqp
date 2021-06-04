@@ -26,11 +26,9 @@ jobs:
         - dartfmt -n --set-exit-if-changed .
         - dartanalyzer --fatal-warnings --fatal-hints --fatal-lints ./
         - AMQP_RUN_TLS_TESTS=true dart --pause-isolates-on-exit --disable-service-auth-codes --enable-vm-service=9292 test/run_all.dart &
-        - status=$?
         - pub global activate coverage
         - pub global run coverage:collect_coverage --port=9292 --out=coverage/coverage.json --wait-paused --resume-isolates
         - pub global run coverage:format_coverage --lcov --in=coverage/coverage.json --out=coverage/lcov.info --packages=.packages --report-on=lib --check-ignore
-        - exit $status
       after_success:
         - coveralls-lcov coverage/lcov.info
 cache:
