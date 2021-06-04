@@ -27,7 +27,7 @@ void main(List<String> args) async {
   print(" [x] Awaiting RPC request");
   consumer.listen((message) {
     int n = message.payloadAsJson["n"];
-    print(" [.] fib(${n})");
+    print(" [.] fib($n)");
     message.reply(fib(n).toString());
   });
 }

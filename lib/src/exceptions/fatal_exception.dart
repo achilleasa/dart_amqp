@@ -5,7 +5,8 @@ class FatalException implements Exception {
 
   FatalException(this.message);
 
+  @override
   String toString() {
-    return "FatalException: ${message}";
+    return "FatalException: $message";
   }
 }

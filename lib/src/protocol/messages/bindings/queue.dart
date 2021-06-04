@@ -9,8 +9,11 @@
 part of dart_amqp.protocol;
 
 class QueueDeclare implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 50;
+  @override
   final int msgMethodId = 10;
 
   // Message arguments
@@ -25,6 +28,7 @@ class QueueDeclare implements Message {
 
   QueueDeclare();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -37,8 +41,11 @@ class QueueDeclare implements Message {
 }
 
 class QueueDeclareOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 50;
+  @override
   final int msgMethodId = 11;
 
   // Message arguments
@@ -52,12 +59,16 @@ class QueueDeclareOk implements Message {
     consumerCount = decoder.readUInt32();
   }
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }
 
 class QueueBind implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 50;
+  @override
   final int msgMethodId = 20;
 
   // Message arguments
@@ -70,6 +81,7 @@ class QueueBind implements Message {
 
   QueueBind();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -84,20 +96,27 @@ class QueueBind implements Message {
 }
 
 class QueueBindOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 50;
+  @override
   final int msgMethodId = 21;
 
   // Message arguments
 
   QueueBindOk.fromStream(TypeDecoder decoder) {}
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }
 
 class QueueUnbind implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 50;
+  @override
   final int msgMethodId = 50;
 
   // Message arguments
@@ -109,6 +128,7 @@ class QueueUnbind implements Message {
 
   QueueUnbind();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -122,20 +142,27 @@ class QueueUnbind implements Message {
 }
 
 class QueueUnbindOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 50;
+  @override
   final int msgMethodId = 51;
 
   // Message arguments
 
   QueueUnbindOk.fromStream(TypeDecoder decoder) {}
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }
 
 class QueuePurge implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 50;
+  @override
   final int msgMethodId = 30;
 
   // Message arguments
@@ -145,6 +172,7 @@ class QueuePurge implements Message {
 
   QueuePurge();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -156,8 +184,11 @@ class QueuePurge implements Message {
 }
 
 class QueuePurgeOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 50;
+  @override
   final int msgMethodId = 31;
 
   // Message arguments
@@ -167,12 +198,16 @@ class QueuePurgeOk implements Message {
     messageCount = decoder.readUInt32();
   }
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }
 
 class QueueDelete implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 50;
+  @override
   final int msgMethodId = 40;
 
   // Message arguments
@@ -184,6 +219,7 @@ class QueueDelete implements Message {
 
   QueueDelete();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -195,8 +231,11 @@ class QueueDelete implements Message {
 }
 
 class QueueDeleteOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 50;
+  @override
   final int msgMethodId = 41;
 
   // Message arguments
@@ -206,5 +245,6 @@ class QueueDeleteOk implements Message {
     messageCount = decoder.readUInt32();
   }
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }

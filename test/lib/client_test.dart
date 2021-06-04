@@ -99,9 +99,9 @@ main({bool enableLogger = true}) {
 
         listeners.ssl.default = 5671
 
-        ssl_options.cacertfile = ${certPath}/ca_certificate.pem
-        ssl_options.certfile   = ${certPath}/server_certificate.pem
-        ssl_options.keyfile    = ${certPath}/server_key.pem
+        ssl_options.cacertfile = $certPath/ca_certificate.pem
+        ssl_options.certfile   = $certPath/server_certificate.pem
+        ssl_options.keyfile    = $certPath/server_key.pem
         ssl_options.verify     = verify_peer
         ssl_options.fail_if_no_peer_cert = false
 
@@ -117,7 +117,7 @@ main({bool enableLogger = true}) {
 
     test("connect to server over TLS", () async {
       SecurityContext ctx = SecurityContext(withTrustedRoots: true)
-        ..setTrustedCertificates("${certPath}/ca_certificate.pem");
+        ..setTrustedCertificates("$certPath/ca_certificate.pem");
 
       ConnectionSettings settings =
           ConnectionSettings(port: 5671, tlsContext: ctx);
@@ -127,9 +127,9 @@ main({bool enableLogger = true}) {
 
     test("connect to server over TLS using client certificate", () async {
       SecurityContext ctx = SecurityContext(withTrustedRoots: true)
-        ..setTrustedCertificates("${certPath}/ca_certificate.pem")
-        ..useCertificateChain("${certPath}/client_certificate.pem")
-        ..usePrivateKey("${certPath}/client_key.pem");
+        ..setTrustedCertificates("$certPath/ca_certificate.pem")
+        ..useCertificateChain("$certPath/client_certificate.pem")
+        ..usePrivateKey("$certPath/client_key.pem");
 
       ConnectionSettings settings =
           ConnectionSettings(port: 5671, tlsContext: ctx);

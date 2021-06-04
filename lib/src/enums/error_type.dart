@@ -26,7 +26,8 @@ class ErrorType extends Enum<int> {
       : isHardError = hardError,
         super(value);
 
-  String toString() => "${value}";
+  @override
+  String toString() => "$value";
 
   static ErrorType valueOf(int value) {
     if (value == SUCCESS.value) return SUCCESS;

@@ -5,10 +5,10 @@ class ChannelException implements Exception {
   final int channel;
   final ErrorType errorType;
 
-  ChannelException(
-      String this.message, int this.channel, ErrorType this.errorType);
+  ChannelException(this.message, this.channel, this.errorType);
 
+  @override
   String toString() {
-    return "ChannelException(${ErrorType.nameOf(errorType)}): ${message}";
+    return "ChannelException(${ErrorType.nameOf(errorType)}): $message";
   }
 }

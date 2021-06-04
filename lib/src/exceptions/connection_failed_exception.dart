@@ -5,7 +5,8 @@ class ConnectionFailedException implements Exception {
 
   ConnectionFailedException(this.message);
 
+  @override
   String toString() {
-    return "ConnectionFailedException: ${message}";
+    return "ConnectionFailedException: $message";
   }
 }

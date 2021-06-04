@@ -9,8 +9,11 @@
 part of dart_amqp.protocol;
 
 class ConnectionStart implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 10;
+  @override
   final int msgMethodId = 10;
 
   // Message arguments
@@ -28,12 +31,16 @@ class ConnectionStart implements Message {
     locales = decoder.readLongString();
   }
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }
 
 class ConnectionStartOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 10;
+  @override
   final int msgMethodId = 11;
 
   // Message arguments
@@ -44,6 +51,7 @@ class ConnectionStartOk implements Message {
 
   ConnectionStartOk();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -56,8 +64,11 @@ class ConnectionStartOk implements Message {
 }
 
 class ConnectionSecure implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 10;
+  @override
   final int msgMethodId = 20;
 
   // Message arguments
@@ -67,12 +78,16 @@ class ConnectionSecure implements Message {
     challenge = decoder.readLongString();
   }
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }
 
 class ConnectionSecureOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 10;
+  @override
   final int msgMethodId = 21;
 
   // Message arguments
@@ -80,6 +95,7 @@ class ConnectionSecureOk implements Message {
 
   ConnectionSecureOk();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -89,8 +105,11 @@ class ConnectionSecureOk implements Message {
 }
 
 class ConnectionTune implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 10;
+  @override
   final int msgMethodId = 30;
 
   // Message arguments
@@ -104,12 +123,16 @@ class ConnectionTune implements Message {
     heartbeat = decoder.readUInt16();
   }
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }
 
 class ConnectionTuneOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 10;
+  @override
   final int msgMethodId = 31;
 
   // Message arguments
@@ -119,6 +142,7 @@ class ConnectionTuneOk implements Message {
 
   ConnectionTuneOk();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -130,8 +154,11 @@ class ConnectionTuneOk implements Message {
 }
 
 class ConnectionOpen implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 10;
+  @override
   final int msgMethodId = 40;
 
   // Message arguments
@@ -141,6 +168,7 @@ class ConnectionOpen implements Message {
 
   ConnectionOpen();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -152,8 +180,11 @@ class ConnectionOpen implements Message {
 }
 
 class ConnectionOpenOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 10;
+  @override
   final int msgMethodId = 41;
 
   // Message arguments
@@ -163,12 +194,16 @@ class ConnectionOpenOk implements Message {
     reserved_1 = decoder.readShortString();
   }
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }
 
 class ConnectionClose implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 10;
+  @override
   final int msgMethodId = 50;
 
   // Message arguments
@@ -184,6 +219,7 @@ class ConnectionClose implements Message {
     classId = decoder.readUInt16();
     methodId = decoder.readUInt16();
   }
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -196,14 +232,18 @@ class ConnectionClose implements Message {
 }
 
 class ConnectionCloseOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 10;
+  @override
   final int msgMethodId = 51;
 
   // Message arguments
 
   ConnectionCloseOk();
   ConnectionCloseOk.fromStream(TypeDecoder decoder) {}
+  @override
   void serialize(TypeEncoder encoder) {
     encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
   }

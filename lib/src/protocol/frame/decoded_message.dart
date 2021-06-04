@@ -13,5 +13,6 @@ abstract class DecodedMessage {
 
   Map get payloadAsJson;
 
+  @override
   String toString();
 }

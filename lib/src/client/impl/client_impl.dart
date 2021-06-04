@@ -2,9 +2,11 @@ part of dart_amqp.client;
 
 class _ClientImpl implements Client {
   // Configuration options
+  @override
   ConnectionSettings settings;
 
   // Tuning settings
+  @override
   TuningSettings get tuningSettings => settings.tuningSettings;
 
   // The connection to the server
@@ -12,7 +14,7 @@ class _ClientImpl implements Client {
   Socket _socket;
 
   // The list of open channels. Channel 0 is always reserved for signaling
-  Map<int, _ChannelImpl> _channels = Map<int, _ChannelImpl>();
+  final Map<int, _ChannelImpl> _channels = <int, _ChannelImpl>{};
 
   // Connection status
   Completer _connected;
@@ -23,7 +25,7 @@ class _ClientImpl implements Client {
 
   _ClientImpl({ConnectionSettings settings}) {
     // Use defaults if no settings specified
-    this.settings = settings == null ? ConnectionSettings() : settings;
+    this.settings = settings ?? ConnectionSettings();
   }
 
   /// Attempt to reconnect to the server. If the attempt fails, it will be retried after
@@ -88,6 +90,7 @@ class _ClientImpl implements Client {
   }
 
   /// Check if a connection is currently in handshake state
+  @override
   bool get handshaking =>
       _socket != null && _connected != null && !_connected.isCompleted;
 
@@ -216,6 +219,7 @@ class _ClientImpl implements Client {
   /// Open a working connection to the server using [config.cqlVersion] and optionally select
   /// keyspace [defaultKeyspace]. Returns a [Future] to be completed on a successful protocol handshake
 
+  @override
   Future connect() {
     // Prevent multiple connection attempts
     if (_connected != null) {
@@ -228,6 +232,7 @@ class _ClientImpl implements Client {
 
   /// Shutdown any open channels and disconnect the socket. Return a [Future] to be completed
   /// when the client has shut down
+  @override
   Future close() {
     if (_socket == null) {
       return Future.value();
@@ -259,6 +264,7 @@ class _ClientImpl implements Client {
     return _clientClosed.future;
   }
 
+  @override
   Future<Channel> channel() {
     return connect().then((_) {
       // Check if we have exceeded our channel limit (open channels excluding channel 0)
@@ -290,8 +296,12 @@ class _ClientImpl implements Client {
     });
   }
 
-  StreamSubscription<Exception> errorListener(void onData(Exception error),
-          {Function onError, void onDone(), bool cancelOnError}) =>
+  @override
+  StreamSubscription<Exception> errorListener(
+          void Function(Exception error) onData,
+          {Function onError,
+          void Function() onDone,
+          bool cancelOnError}) =>
       _error.stream.listen(onData,
           onError: onError, onDone: onDone, cancelOnError: cancelOnError);
 

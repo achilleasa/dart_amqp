@@ -38,11 +38,7 @@ class ConnectionSettings {
     this.authProvider = const PlainAuthenticator("guest", "guest"),
     this.maxConnectionAttempts = 1,
     this.reconnectWaitTime = const Duration(milliseconds: 1500),
-    this.tuningSettings,
+    TuningSettings tuningSettings,
     this.tlsContext,
-  }) {
-    if (this.tuningSettings == null) {
-      tuningSettings = TuningSettings();
-    }
-  }
+  }) : tuningSettings = tuningSettings ?? TuningSettings();
 }

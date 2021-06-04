@@ -1,7 +1,7 @@
 part of dart_amqp.protocol;
 
 class RawFrameParser {
-  static final int FRAME_TERMINATOR = 0xCE;
+  static const int FRAME_TERMINATOR = 0xCE;
   TuningSettings tuningSettings;
 
   final ChunkedInputReader _inputBuffer = ChunkedInputReader();

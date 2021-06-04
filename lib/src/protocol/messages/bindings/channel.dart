@@ -9,8 +9,11 @@
 part of dart_amqp.protocol;
 
 class ChannelOpen implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 20;
+  @override
   final int msgMethodId = 10;
 
   // Message arguments
@@ -18,6 +21,7 @@ class ChannelOpen implements Message {
 
   ChannelOpen();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -27,8 +31,11 @@ class ChannelOpen implements Message {
 }
 
 class ChannelOpenOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 20;
+  @override
   final int msgMethodId = 11;
 
   // Message arguments
@@ -38,12 +45,16 @@ class ChannelOpenOk implements Message {
     reserved_1 = decoder.readLongString();
   }
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }
 
 class ChannelFlow implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 20;
+  @override
   final int msgMethodId = 20;
 
   // Message arguments
@@ -55,6 +66,7 @@ class ChannelFlow implements Message {
     _bitmask = decoder.readUInt8();
     active = _bitmask & 0x1 != 0;
   }
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -64,8 +76,11 @@ class ChannelFlow implements Message {
 }
 
 class ChannelFlowOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 20;
+  @override
   final int msgMethodId = 21;
 
   // Message arguments
@@ -77,6 +92,7 @@ class ChannelFlowOk implements Message {
     _bitmask = decoder.readUInt8();
     active = _bitmask & 0x1 != 0;
   }
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -86,8 +102,11 @@ class ChannelFlowOk implements Message {
 }
 
 class ChannelClose implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 20;
+  @override
   final int msgMethodId = 40;
 
   // Message arguments
@@ -103,6 +122,7 @@ class ChannelClose implements Message {
     classId = decoder.readUInt16();
     methodId = decoder.readUInt16();
   }
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -115,14 +135,18 @@ class ChannelClose implements Message {
 }
 
 class ChannelCloseOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 20;
+  @override
   final int msgMethodId = 41;
 
   // Message arguments
 
   ChannelCloseOk();
   ChannelCloseOk.fromStream(TypeDecoder decoder) {}
+  @override
   void serialize(TypeEncoder encoder) {
     encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
   }

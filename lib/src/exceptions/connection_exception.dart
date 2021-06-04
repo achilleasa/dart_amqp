@@ -13,7 +13,8 @@ class ConnectionException implements Exception {
     this.methodId,
   );
 
+  @override
   String toString() {
-    return "ConnectionException(${ErrorType.nameOf(errorType)}): ${message}";
+    return "ConnectionException(${ErrorType.nameOf(errorType)}): $message";
   }
 }

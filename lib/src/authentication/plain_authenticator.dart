@@ -8,9 +8,11 @@ class PlainAuthenticator implements Authenticator {
   const PlainAuthenticator(this.userName, this.password);
 
   /// Get the class of this authenticator
+  @override
   String get saslType => "PLAIN";
 
   /// Process the [challenge] sent by the server and return a [String] response
+  @override
   String answerChallenge(String challenge) {
     StringBuffer sb = StringBuffer()
       ..writeCharCode(0)

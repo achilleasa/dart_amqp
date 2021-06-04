@@ -1,8 +1,7 @@
 part of dart_amqp.protocol;
 
 class AmqpMessageDecoder {
-  Map<int, DecodedMessageImpl> incompleteMessages =
-      Map<int, DecodedMessageImpl>();
+  Map<int, DecodedMessageImpl> incompleteMessages = <int, DecodedMessageImpl>{};
 
   StreamTransformer<RawFrame, DecodedMessage> get transformer =>
       StreamTransformer<RawFrame, DecodedMessage>.fromHandlers(

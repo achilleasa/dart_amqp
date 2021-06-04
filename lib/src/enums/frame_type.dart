@@ -8,7 +8,8 @@ class FrameType extends Enum<int> {
 
   const FrameType._(int value) : super(value);
 
-  String toString() => "${value}";
+  @override
+  String toString() => "$value";
 
   static FrameType valueOf(int value) {
     if (value == METHOD.value) return METHOD;

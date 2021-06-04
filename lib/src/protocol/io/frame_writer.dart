@@ -47,7 +47,7 @@ class FrameWriter {
       } else if (payloadContent is Map || payloadContent is Iterable) {
         serializedContent =
             Uint8List.fromList(utf8.encode(json.encode(payloadContent)));
-        properties = (properties == null ? MessageProperties() : properties)
+        properties = (properties ?? MessageProperties())
           ..contentType = "application/json"
           ..contentEncoding = "UTF-8";
       } else if (payloadContent is String) {
