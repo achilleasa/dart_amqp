@@ -9,7 +9,7 @@ jobs:
           echo "
           loopback_users = none
           listeners.ssl.default = 5671
-          
+
           ssl_options.cacertfile = /certs/ca_certificate.pem
           ssl_options.certfile   = /certs/server_certificate.pem
           ssl_options.keyfile    = /certs/server_key.pem
@@ -18,18 +18,21 @@ jobs:
           " >  /tmp/rabbitmq.conf
         - docker run -d --mount type=bind,source="$(pwd)"/test/lib/mocks/certs,target="/certs" --mount type=bind,source="/tmp/rabbitmq.conf",target="/etc/rabbitmq/rabbitmq.conf" -p 5671:5671 -p 5672:5672 rabbitmq:3.7.20
         - sleep 3
+      install:
+        - gem install coveralls-lcov
       script:
         - export PATH=$PATH:"${TRAVIS_HOME}/.pub-cache/bin"
         - pub get
-        - pub global activate coverage
         - dartfmt -n --set-exit-if-changed .
         - dartanalyzer --fatal-warnings --fatal-hints --fatal-lints ./
-        - cd test
-        - AMQP_RUN_TLS_TESTS=true bash run.sh
-        - cd ../
+        - AMQP_RUN_TLS_TESTS=true dart --pause-isolates-on-exit --disable-service-auth-codes --enable-vm-service=9292 test/run_all.dart &
+        - status=$?
+        - pub global activate coverage
+        - pub global run coverage:collect_coverage --port=9292 --out=coverage/coverage.json --wait-paused --resume-isolates
+        - pub global run coverage:format_coverage --lcov --in=coverage/coverage.json --out=coverage/lcov.info --packages=.packages --report-on=lib --check-ignore
+        - exit $status
       after_success:
-        - AMQP_RUN_TLS_TESTS=true pub run test_coverage --no-badge
-        - dart test/upload_coverage.dart
+        - coveralls-lcov coverage/lcov.info
 cache:
   directories:
     - "${TRAVIS_HOME}/.pub-cache"
