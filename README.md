@@ -12,7 +12,7 @@ Main features:
  - supports both plain-text and TLS connections
 
 Things not working yet:
-- the driver does not currently support recovering client topologies when re-establishing connections. This feature may be implemented in a future version. 
+- the driver does not currently support recovering client topologies when re-establishing connections. This feature may be implemented in a future version.
 - heartbeats.
 
 # Quick start
@@ -22,14 +22,13 @@ Listening to a queue:
 ```dart
 import "package:dart_amqp/dart_amqp.dart";
 
-void main() {
-  Client client = new Client();
+void main() async {
+  Client client = Client();
 
-  client
-  .channel() // auto-connect to localhost:5672 using guest credentials
-  .then((Channel channel) => channel.queue("hello"))
-  .then((Queue queue) => queue.consume())
-  .then((Consumer consumer) => consumer.listen((AmqpMessage message) {
+  Channel channel = await client.channel(); // auto-connect to localhost:5672 using guest credentials
+  Queue queue = await channel.queue("hello");
+  Consumer consumer = await queue.consume();
+  consumer.listen((AmqpMessage message) {
     // Get the payload as a string
     print(" [x] Received string: ${message.payloadAsString}");
 
@@ -38,11 +37,11 @@ void main() {
 
     // Or just get the raw data as a Uint8List
     print(" [x] Received raw: ${message.payload}");
-    
-    // The message object contains helper methods for 
+
+    // The message object contains helper methods for
     // replying, ack-ing and rejecting
     message.reply("world");
-  }));
+  });
 }
 ```
 
@@ -50,24 +49,21 @@ Sending messages via an exchange:
 ```dart
 import "package:dart_amqp/dart_amqp.dart";
 
-void main() {
-  
+void main() async {
+
   // You can provide a settings object to override the
   // default connection settings
-  ConnectionSettings settings = new ConnectionSettings(
-      host : "remote.amqp.server.com",
-      authProvider : new PlainAuthenticator("user", "pass")
+  ConnectionSettings settings = ConnectionSettings(
+    host: "remote.amqp.server.com",
+    authProvider: PlainAuthenticator("user", "pass")
   );
-  Client client = new Client(settings : settings);
-  
-  client
-  .channel()
-  .then((Channel channel) => channel.exchange("logs", ExchangeType.FANOUT))
-  .then((Exchange exchange) {
-    // We dont care about the routing key as our exchange type is FANOUT
-    exchange.publish("Testing 1-2-3", null);
-    return client.close();
-  });
+  Client client = Client(settings: settings);
+
+  Channel channel = await client.channel();
+  Exchange exchange = await channel.exchange("logs", ExchangeType.FANOUT);
+  // We dont care about the routing key as our exchange type is FANOUT
+  exchange.publish("Testing 1-2-3", null);
+  client.close();
 }
 ```
 
@@ -77,7 +73,7 @@ See the [Api documentation](https://github.com/achilleasa/dart_amqp/blob/master/
 
 # RPC calls over AMQP
 
-This [example](https://github.com/achilleasa/dart_amqp/tree/master/example/rpc) illustrates how to get a basic RPC server/client up and running using just the provided api calls. 
+This [example](https://github.com/achilleasa/dart_amqp/tree/master/example/rpc) illustrates how to get a basic RPC server/client up and running using just the provided api calls.
 
 The driver does not provide any helper classes for easily performing RPC calls over AMQP as not everyone needs this
 functionality. If you need RPC support for your application you may want to consider using the [dart\_amqp\_rpc](https://pub.dartlang.org/packages/dart_amqp_rpc) package.
