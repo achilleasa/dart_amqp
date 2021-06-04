@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.5
+
+- Merged [#49](https://github.com/achilleasa/dart_amqp/pull/49) to fix a bug
+that prevented re-opening a client that was previously closed.
+
 ## 0.1.4
 
 - Merged [#30](https://github.com/achilleasa/dart_amqp/pull/30) to add support
