@@ -72,7 +72,7 @@ class AmqpMessageDecoder {
         }
 
         // Store the content header and set the message properties to point to the parsed header properties
-        decodedMessage..contentHeader = contentHeader;
+        decodedMessage.contentHeader = contentHeader;
 
         // If the frame defines no content emit it now
         if (decodedMessage.contentHeader.bodySize == 0) {

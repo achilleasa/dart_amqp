@@ -346,7 +346,7 @@ ${String.fromCharCodes(List<int>.filled(className.length + methodName.length + 1
     }
 //      ..write("\n")
 //      ..write(toStringMethod)
-    generatedClass..write("}\n");
+    generatedClass.write("}\n");
 
     return generatedClass.toString();
   }
@@ -489,5 +489,5 @@ main() {
   logger.info("Building amqp bindings");
 
   AmqpBindingsBuilder()
-    ..build("https://www.rabbitmq.com/resources/specs/amqp0-9-1.xml");
+      .build("https://www.rabbitmq.com/resources/specs/amqp0-9-1.xml");
 }
