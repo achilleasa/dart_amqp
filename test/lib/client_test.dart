@@ -68,18 +68,19 @@ main({bool enableLogger = true}) {
       }
     });
 
-    test("should be able to close a client connection after re-opening", () async {
+    test("should be able to close a client connection after re-opening",
+        () async {
       client = Client();
       await client.connect();
       Future firstClose = client.close();
-      
-      firstClose.then((_) async {
-      	await client.connect();
-      	Future secondClose = client.close();
-      	
-      	secondClose.then((_) {
-      	    expect(identical(firstClose, secondClose), false);
-      	});
+
+      await firstClose.then((_) async {
+        await client.connect();
+        Future secondClose = client.close();
+
+        await secondClose.then((_) {
+          expect(identical(firstClose, secondClose), false);
+        });
       });
     });
   });
