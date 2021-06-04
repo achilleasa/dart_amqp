@@ -1,14 +1,18 @@
 part of dart_amqp.client;
 
 class _ExchangeImpl implements Exchange {
-  String _name;
+  final String _name;
+  @override
   final ExchangeType type;
+  @override
   final _ChannelImpl channel;
 
   _ExchangeImpl(this.channel, this._name, this.type);
 
+  @override
   String get name => _name;
 
+  @override
   Future<Exchange> delete({bool ifUnused = false, bool noWait = false}) {
     ExchangeDelete deleteRequest = ExchangeDelete()
       ..reserved_1 = 0
@@ -22,6 +26,7 @@ class _ExchangeImpl implements Exchange {
     return completer.future;
   }
 
+  @override
   void publish(Object message, String routingKey,
       {MessageProperties properties,
       bool mandatory = false,
@@ -44,6 +49,7 @@ class _ExchangeImpl implements Exchange {
         properties: properties, payloadContent: message);
   }
 
+  @override
   Future<Consumer> bindPrivateQueueConsumer(List<String> routingKeys,
       {String consumerTag, bool noAck = true}) async {
     // Fanout and headers exchanges do not need to specify any keys. Use the default one if none is specified
@@ -64,6 +70,7 @@ class _ExchangeImpl implements Exchange {
     return queue.consume(consumerTag: consumerTag, noAck: noAck);
   }
 
+  @override
   Future<Consumer> bindQueueConsumer(String queueName, List<String> routingKeys,
       {String consumerTag, bool noAck = true}) async {
     // Fanout and headers exchanges do not need to specify any keys. Use the default one if none is specified

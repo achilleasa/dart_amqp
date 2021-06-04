@@ -8,6 +8,6 @@ void main(List<String> args) async {
   String message = args.join(' ');
   // We dont care about the routing key as our exchange type is FANOUT
   exchange.publish(message, null);
-  print(" [x] Sent ${message}");
+  print(" [x] Sent $message");
   await client.close();
 }

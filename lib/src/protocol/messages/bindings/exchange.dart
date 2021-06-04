@@ -9,8 +9,11 @@
 part of dart_amqp.protocol;
 
 class ExchangeDeclare implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 40;
+  @override
   final int msgMethodId = 10;
 
   // Message arguments
@@ -26,6 +29,7 @@ class ExchangeDeclare implements Message {
 
   ExchangeDeclare();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -39,20 +43,27 @@ class ExchangeDeclare implements Message {
 }
 
 class ExchangeDeclareOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 40;
+  @override
   final int msgMethodId = 11;
 
   // Message arguments
 
   ExchangeDeclareOk.fromStream(TypeDecoder decoder) {}
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }
 
 class ExchangeDelete implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 40;
+  @override
   final int msgMethodId = 20;
 
   // Message arguments
@@ -63,6 +74,7 @@ class ExchangeDelete implements Message {
 
   ExchangeDelete();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -74,13 +86,17 @@ class ExchangeDelete implements Message {
 }
 
 class ExchangeDeleteOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 40;
+  @override
   final int msgMethodId = 21;
 
   // Message arguments
 
   ExchangeDeleteOk.fromStream(TypeDecoder decoder) {}
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }

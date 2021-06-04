@@ -19,7 +19,7 @@ abstract class Queue {
   /// If the [ifEmpty] flag is set, the server will only delete the queue if it has no messages. If the
   /// flag is set and the queue has any messages on it, the server will raise an exception.
   Future<Queue> delete(
-      {bool ifUnused = false, bool IfEmpty = false, bool noWait = false});
+      {bool ifUnused = false, bool ifEmpty = false, bool noWait = false});
 
   /// Purge any queued messages that are not awaiting acknowledgment.
   ///

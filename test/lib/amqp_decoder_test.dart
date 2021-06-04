@@ -13,17 +13,26 @@ import "package:dart_amqp/src/exceptions.dart";
 import "mocks/mocks.dart" as mock;
 
 class ConnectionStartMock extends Mock implements ConnectionStart {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 10;
+  @override
   final int msgMethodId = 10;
 
   // Message arguments
+  @override
   int versionMajor;
+  @override
   int versionMinor;
+  @override
   Map<String, Object> serverProperties;
+  @override
   String mechanisms;
+  @override
   String locales;
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -37,15 +46,22 @@ class ConnectionStartMock extends Mock implements ConnectionStart {
 }
 
 class ConnectionTuneMock extends Mock implements ConnectionTune {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 10;
+  @override
   final int msgMethodId = 30;
 
   // Message arguments
+  @override
   int channelMax;
+  @override
   int frameMax;
+  @override
   int heartbeat;
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -57,11 +73,16 @@ class ConnectionTuneMock extends Mock implements ConnectionTune {
 }
 
 class ConnectionOpenOkMock extends Mock implements ConnectionOpenOk {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 10;
+  @override
   final int msgMethodId = 41;
+  @override
   String reserved_1;
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -71,17 +92,26 @@ class ConnectionOpenOkMock extends Mock implements ConnectionOpenOk {
 }
 
 class BasicDeliverMock extends Mock implements BasicDeliver {
+  @override
   final bool msgHasContent = true;
+  @override
   final int msgClassId = 60;
+  @override
   final int msgMethodId = 60;
 
   // Message arguments
+  @override
   String consumerTag;
+  @override
   int deliveryTag;
+  @override
   bool redelivered;
+  @override
   String exchange;
+  @override
   String routingKey;
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -181,7 +211,6 @@ main({bool enableLogger = true}) {
       header.channel = 1;
       header.type = FrameType.HEADER;
       header.size = frameWriter.outputEncoder.writer.lengthInBytes;
-      ;
 
       serializedData = frameWriter.outputEncoder.writer.joinChunks();
       frameWriter.outputEncoder.writer.clear();

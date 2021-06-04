@@ -1,14 +1,18 @@
 part of dart_amqp.protocol;
 
 class DecodedMessageImpl implements DecodedMessage {
+  @override
   final int channel;
+  @override
   final Message message;
   ContentHeader contentHeader;
   ChunkedOutputWriter payloadBuffer;
+  @override
   Uint8List payload;
 
   DecodedMessageImpl(this.channel, this.message);
 
+  @override
   MessageProperties get properties => contentHeader?.properties;
 
   set properties(MessageProperties properties) {
@@ -43,10 +47,12 @@ class DecodedMessageImpl implements DecodedMessage {
 //    return sb.toString();
 //  }
 
+  @override
   String get payloadAsString {
     return utf8.decode(payload);
   }
 
+  @override
   Map get payloadAsJson {
     return json.decode(utf8.decode(payload));
   }

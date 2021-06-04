@@ -6,7 +6,7 @@ class TypeEncoder {
   final Endian endianess = Endian.big;
 
   TypeEncoder({ChunkedOutputWriter withWriter}) {
-    _writer = withWriter == null ? ChunkedOutputWriter() : withWriter;
+    _writer = withWriter ?? ChunkedOutputWriter();
   }
 
   void writeInt8(int value) {
@@ -158,7 +158,9 @@ class TypeEncoder {
 
     TypeEncoder buffer = TypeEncoder();
 
-    value.forEach((Object v) => buffer._writeField(fieldName, v));
+    for (Object v in value) {
+      buffer._writeField(fieldName, v);
+    }
 
     // Now that the length in bytes is known append it to output
     // followed by the buffered data
@@ -217,7 +219,7 @@ class TypeEncoder {
       writeUInt8(FieldType.VOID.value);
     } else {
       throw ArgumentError(
-          "Could not encode field ${fieldName} with value ${value}");
+          "Could not encode field $fieldName with value $value");
     }
   }
 

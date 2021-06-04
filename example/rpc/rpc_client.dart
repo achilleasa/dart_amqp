@@ -6,7 +6,7 @@ class FibonacciRpcClient {
   int _nextCorrelationId = 1;
   final Completer connected = Completer();
   final Client client;
-  final Map<String, Completer> _pendingOperations = Map<String, Completer>();
+  final Map<String, Completer> _pendingOperations = <String, Completer>{};
   Queue _serverQueue;
   String _replyQueueName;
 
@@ -71,7 +71,7 @@ main(List<String> args) async {
 
   // Make 10 parallel calls and get fib(1) to fib(10)
   int res = await client.call(n);
-  print(" [x] fib(${n}) = ${res}");
+  print(" [x] fib($n) = $res");
   await client.close();
   exit(0);
 }

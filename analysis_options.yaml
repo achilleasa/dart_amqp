@@ -1,4 +1,8 @@
-include: package:pedantic/analysis_options.yaml
+include: package:lints/recommended.yaml
+analyzer:
+  errors:
+    constant_identifier_names: ignore
+    non_constant_identifier_names: ignore
 linter:
   rules:
     - avoid_null_checks_in_equality_operators

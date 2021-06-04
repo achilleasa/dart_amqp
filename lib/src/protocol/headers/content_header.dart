@@ -67,6 +67,7 @@ class ContentHeader implements Header {
     }
   }
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(classId)

@@ -35,9 +35,9 @@ Client getClient(bool useClientCert) {
 
         listeners.ssl.default = 5671
 
-        ssl_options.cacertfile = ${certPath}/ca_certificate.pem
-        ssl_options.certfile   = ${certPath}/server_certificate.pem
-        ssl_options.keyfile    = ${certPath}/server_key.pem
+        ssl_options.cacertfile = $certPath/ca_certificate.pem
+        ssl_options.certfile   = $certPath/server_certificate.pem
+        ssl_options.keyfile    = $certPath/server_key.pem
         ssl_options.verify     = verify_peer
         ssl_options.fail_if_no_peer_cert = false
 
@@ -47,12 +47,12 @@ Client getClient(bool useClientCert) {
   }
 
   SecurityContext ctx = SecurityContext(withTrustedRoots: true)
-    ..setTrustedCertificates("${certPath}/ca_certificate.pem");
+    ..setTrustedCertificates("$certPath/ca_certificate.pem");
 
   if (useClientCert) {
     ctx
-      ..useCertificateChain("${certPath}/client_certificate.pem")
-      ..usePrivateKey("${certPath}/client_key.pem");
+      ..useCertificateChain("$certPath/client_certificate.pem")
+      ..usePrivateKey("$certPath/client_key.pem");
   }
 
   ConnectionSettings settings = ConnectionSettings(port: 5671, tlsContext: ctx);

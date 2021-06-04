@@ -19,6 +19,7 @@ class ProtocolHeader implements Header {
     revision = decoder.readUInt8();
   }
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writer.addLast(Uint8List.fromList(ascii.encode("AMQP")))

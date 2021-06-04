@@ -1,8 +1,7 @@
 part of dart_amqp.protocol;
 
 class AmqpMessageDecoder {
-  Map<int, DecodedMessageImpl> incompleteMessages =
-      Map<int, DecodedMessageImpl>();
+  Map<int, DecodedMessageImpl> incompleteMessages = <int, DecodedMessageImpl>{};
 
   StreamTransformer<RawFrame, DecodedMessage> get transformer =>
       StreamTransformer<RawFrame, DecodedMessage>.fromHandlers(
@@ -72,7 +71,7 @@ class AmqpMessageDecoder {
         }
 
         // Store the content header and set the message properties to point to the parsed header properties
-        decodedMessage..contentHeader = contentHeader;
+        decodedMessage.contentHeader = contentHeader;
 
         // If the frame defines no content emit it now
         if (decodedMessage.contentHeader.bodySize == 0) {

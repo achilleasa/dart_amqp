@@ -104,6 +104,6 @@ abstract class Message {
 
     // Message decoding failed; unknown message
     throw ArgumentError(
-        "Unknown message type (class: ${msgClassId}, method: ${msgMethodId})");
+        "Unknown message type (class: $msgClassId, method: $msgMethodId)");
   }
 }

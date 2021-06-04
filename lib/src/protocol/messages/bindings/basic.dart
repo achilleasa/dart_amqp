@@ -9,8 +9,11 @@
 part of dart_amqp.protocol;
 
 class BasicQos implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 60;
+  @override
   final int msgMethodId = 10;
 
   // Message arguments
@@ -20,6 +23,7 @@ class BasicQos implements Message {
 
   BasicQos();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -31,20 +35,27 @@ class BasicQos implements Message {
 }
 
 class BasicQosOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 60;
+  @override
   final int msgMethodId = 11;
 
   // Message arguments
 
   BasicQosOk.fromStream(TypeDecoder decoder) {}
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }
 
 class BasicConsume implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 60;
+  @override
   final int msgMethodId = 20;
 
   // Message arguments
@@ -59,6 +70,7 @@ class BasicConsume implements Message {
 
   BasicConsume();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -72,8 +84,11 @@ class BasicConsume implements Message {
 }
 
 class BasicConsumeOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 60;
+  @override
   final int msgMethodId = 21;
 
   // Message arguments
@@ -83,12 +98,16 @@ class BasicConsumeOk implements Message {
     consumerTag = decoder.readShortString();
   }
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }
 
 class BasicCancel implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 60;
+  @override
   final int msgMethodId = 30;
 
   // Message arguments
@@ -97,6 +116,7 @@ class BasicCancel implements Message {
 
   BasicCancel();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -107,8 +127,11 @@ class BasicCancel implements Message {
 }
 
 class BasicCancelOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 60;
+  @override
   final int msgMethodId = 31;
 
   // Message arguments
@@ -118,12 +141,16 @@ class BasicCancelOk implements Message {
     consumerTag = decoder.readShortString();
   }
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }
 
 class BasicPublish implements Message {
+  @override
   final bool msgHasContent = true;
+  @override
   final int msgClassId = 60;
+  @override
   final int msgMethodId = 40;
 
   // Message arguments
@@ -135,6 +162,7 @@ class BasicPublish implements Message {
 
   BasicPublish();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -147,8 +175,11 @@ class BasicPublish implements Message {
 }
 
 class BasicReturn implements Message {
+  @override
   final bool msgHasContent = true;
+  @override
   final int msgClassId = 60;
+  @override
   final int msgMethodId = 50;
 
   // Message arguments
@@ -164,12 +195,16 @@ class BasicReturn implements Message {
     routingKey = decoder.readShortString();
   }
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }
 
 class BasicDeliver implements Message {
+  @override
   final bool msgHasContent = true;
+  @override
   final int msgClassId = 60;
+  @override
   final int msgMethodId = 60;
 
   // Message arguments
@@ -189,12 +224,16 @@ class BasicDeliver implements Message {
     routingKey = decoder.readShortString();
   }
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }
 
 class BasicAck implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 60;
+  @override
   final int msgMethodId = 80;
 
   // Message arguments
@@ -203,6 +242,7 @@ class BasicAck implements Message {
 
   BasicAck();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -213,8 +253,11 @@ class BasicAck implements Message {
 }
 
 class BasicReject implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 60;
+  @override
   final int msgMethodId = 90;
 
   // Message arguments
@@ -223,6 +266,7 @@ class BasicReject implements Message {
 
   BasicReject();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -233,8 +277,11 @@ class BasicReject implements Message {
 }
 
 class BasicRecover implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 60;
+  @override
   final int msgMethodId = 110;
 
   // Message arguments
@@ -242,6 +289,7 @@ class BasicRecover implements Message {
 
   BasicRecover();
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt16(msgClassId)
@@ -251,13 +299,17 @@ class BasicRecover implements Message {
 }
 
 class BasicRecoverOk implements Message {
+  @override
   final bool msgHasContent = false;
+  @override
   final int msgClassId = 60;
+  @override
   final int msgMethodId = 111;
 
   // Message arguments
 
   BasicRecoverOk.fromStream(TypeDecoder decoder) {}
 
+  @override
   void serialize(TypeEncoder encoder) {}
 }

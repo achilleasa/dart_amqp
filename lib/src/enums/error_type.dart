@@ -22,11 +22,10 @@ class ErrorType extends Enum<int> {
 
   final bool isHardError;
 
-  const ErrorType._(int value, bool hardError)
-      : isHardError = hardError,
-        super(value);
+  const ErrorType._(int value, this.isHardError) : super(value);
 
-  String toString() => "${value}";
+  @override
+  String toString() => "$value";
 
   static ErrorType valueOf(int value) {
     if (value == SUCCESS.value) return SUCCESS;

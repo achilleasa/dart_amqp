@@ -2,7 +2,7 @@ part of dart_amqp.protocol;
 
 class TypeDecoder {
   int _offset = 0;
-  ByteData _buffer;
+  final ByteData _buffer;
   final Endian endianess = Endian.big;
 
   TypeDecoder.fromBuffer(this._buffer);
@@ -115,7 +115,9 @@ class TypeDecoder {
     FieldType type;
     try {
       type = FieldType.valueOf(typeValue);
-    } catch (e) {}
+    } catch (e) {
+      // ignore the error
+    }
 
     switch (type) {
       case FieldType.BOOLEAN:
@@ -157,7 +159,7 @@ class TypeDecoder {
         return null;
       default:
         throw ArgumentError(
-            "Could not decode field ${fieldName} with type 0x${typeValue.toRadixString(16)}");
+            "Could not decode field $fieldName with type 0x${typeValue.toRadixString(16)}");
     }
   }
 }

@@ -21,6 +21,7 @@ class FrameHeader implements Header {
     size = decoder.readUInt32();
   }
 
+  @override
   void serialize(TypeEncoder encoder) {
     encoder
       ..writeUInt8(type.value)

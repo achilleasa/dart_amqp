@@ -90,8 +90,8 @@ abstract class Channel {
 
   /// Register a listener for basicReturn Messages
   StreamSubscription<BasicReturnMessage> basicReturnListener(
-      void onData(BasicReturnMessage message),
+      void Function(BasicReturnMessage message) onData,
       {Function onError,
-      void onDone(),
+      void Function() onDone,
       bool cancelOnError});
 }

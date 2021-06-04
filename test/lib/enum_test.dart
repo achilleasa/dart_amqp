@@ -63,17 +63,18 @@ main({bool enableLogger = true}) {
 
           Object formattedJunkValue =
               junkValue is String ? "\"BADFOOD\"" : "0xBADF00D";
-          if (cm.reflectedType == ExchangeType)
-            test("valueOf(${formattedJunkValue}) creates Custom Exchange", () {
+          if (cm.reflectedType == ExchangeType) {
+            test("valueOf($formattedJunkValue) creates Custom Exchange", () {
               ExchangeType customExchange =
                   cm.invoke(#valueOf, [junkValue]).reflectee;
               expect(customExchange.isCustom, isTrue);
             });
-          else
-            test("valueOf(${formattedJunkValue}) throws ArgumentError", () {
+          } else {
+            test("valueOf($formattedJunkValue) throws ArgumentError", () {
               expect(() => cm.invoke(#valueOf, [junkValue]).reflectee,
                   throwsArgumentError);
             });
+          }
         });
       }
 
@@ -94,10 +95,10 @@ main({bool enableLogger = true}) {
           return;
         }
 
-        group("${declName}:", () {
+        group("$declName:", () {
           // Generate valueOf tests
           if (valueOfMirror != null) {
-            test("valueOf(${declName}.value) == ${declName}", () {
+            test("valueOf($declName.value) == $declName", () {
               dynamic staticEnumInstance = cm.getField(enumSymbol).reflectee;
               dynamic enumValue =
                   cm.getField(enumSymbol).getField(#value).reflectee;
@@ -108,7 +109,7 @@ main({bool enableLogger = true}) {
 
           // Generate nameOf tests
           if (nameOfMirror != null) {
-            test("nameOf(${declName}) == \"${declName}\"", () {
+            test("nameOf($declName) == \"$declName\"", () {
               dynamic staticEnumInstance = cm.getField(enumSymbol).reflectee;
               expect(cm.invoke(#nameOf, [staticEnumInstance]).reflectee,
                   equals(declName));
@@ -117,14 +118,14 @@ main({bool enableLogger = true}) {
 
           // Generate toString tests
           if (toStringMirror != null) {
-            test("${declName}.toString()", () {
+            test("$declName.toString()", () {
               Enum<Object> staticEnumInstance =
                   cm.getField(enumSymbol).reflectee;
               Object enumValue = staticEnumInstance.value;
 
               Object expectedValue = _getGenericType(cm) == String
                   ? enumValue
-                  : "${(enumValue as int).toRadixString(10)}";
+                  : (enumValue as int).toRadixString(10);
 
               expect(staticEnumInstance.toString(), equals(expectedValue));
             });

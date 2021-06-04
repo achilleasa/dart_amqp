@@ -35,11 +35,11 @@ class ChunkedOutputWriter {
   Uint8List joinChunks() {
     Uint8List out = Uint8List(lengthInBytes);
     int offset = 0;
-    _bufferedChunks.forEach((Uint8List block) {
+    for (Uint8List block in _bufferedChunks) {
       int len = block.lengthInBytes;
       out.setRange(offset, offset + len, block);
       offset += len;
-    });
+    }
 
     return out;
   }

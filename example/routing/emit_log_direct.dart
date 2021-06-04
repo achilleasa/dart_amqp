@@ -25,6 +25,6 @@ void main(List<String> args) async {
   String message = args.sublist(1).join(' ');
   // Use 'severity' as our routing key
   exchange.publish(message, severity);
-  print(" [x] Sent [${severity}] ${message}");
+  print(" [x] Sent [$severity] $message");
   await client.close();
 }

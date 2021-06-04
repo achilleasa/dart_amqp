@@ -24,6 +24,9 @@ abstract class Client {
   Future<Channel> channel();
 
   /// Register listener for errors
-  StreamSubscription<Exception> errorListener(void onData(Exception error),
-      {Function onError, void onDone(), bool cancelOnError});
+  StreamSubscription<Exception> errorListener(
+      void Function(Exception error) onData,
+      {Function onError,
+      void Function() onDone,
+      bool cancelOnError});
 }

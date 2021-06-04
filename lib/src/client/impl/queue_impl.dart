@@ -1,26 +1,33 @@
 part of dart_amqp.client;
 
 class _QueueImpl implements Queue {
+  // https://github.com/dart-lang/linter/issues/2697
+  // ignore: prefer_final_fields
   String _name;
   int _messageCount;
   int _consumerCount;
+  @override
   final _ChannelImpl channel;
 
   _QueueImpl(this.channel, this._name);
 
+  @override
   String get name => _name;
 
+  @override
   int get messageCount => _messageCount;
 
+  @override
   int get consumerCount => _consumerCount;
 
+  @override
   Future<Queue> delete(
-      {bool ifUnused = false, bool IfEmpty = false, bool noWait = false}) {
+      {bool ifUnused = false, bool ifEmpty = false, bool noWait = false}) {
     QueueDelete deleteRequest = QueueDelete()
       ..reserved_1 = 0
       ..queue = name
       ..ifUnused = ifUnused
-      ..ifEmpty = IfEmpty
+      ..ifEmpty = ifEmpty
       ..noWait = noWait;
 
     Completer<Queue> completer = Completer<Queue>();
@@ -29,6 +36,7 @@ class _QueueImpl implements Queue {
     return completer.future;
   }
 
+  @override
   Future<Queue> purge({bool noWait = false}) {
     QueuePurge purgeRequest = QueuePurge()
       ..reserved_1 = 0
@@ -41,6 +49,7 @@ class _QueueImpl implements Queue {
     return completer.future;
   }
 
+  @override
   Future<Queue> bind(Exchange exchange, String routingKey,
       {bool noWait, Map<String, Object> arguments}) {
     if (exchange == null) {
@@ -71,6 +80,7 @@ class _QueueImpl implements Queue {
     return completer.future;
   }
 
+  @override
   Future<Queue> unbind(Exchange exchange, String routingKey,
       {bool noWait, Map<String, Object> arguments}) {
     if (exchange == null) {
@@ -100,6 +110,7 @@ class _QueueImpl implements Queue {
     return completer.future;
   }
 
+  @override
   void publish(Object message,
       {MessageProperties properties,
       bool mandatory = false,
@@ -115,6 +126,7 @@ class _QueueImpl implements Queue {
         properties: properties, payloadContent: message);
   }
 
+  @override
   Future<Consumer> consume(
       {String consumerTag,
       bool noLocal = false,

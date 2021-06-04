@@ -1,11 +1,16 @@
 part of dart_amqp.client;
 
 class _ConsumerImpl implements Consumer {
+  // https://github.com/dart-lang/linter/issues/2697
+  // ignore: prefer_final_fields
   String _tag;
   final _controller = StreamController<AmqpMessage>();
+  @override
   final _ChannelImpl channel;
+  @override
   final _QueueImpl queue;
 
+  @override
   String get tag => _tag;
 
   _ConsumerImpl(
@@ -14,11 +19,16 @@ class _ConsumerImpl implements Consumer {
     this._tag,
   );
 
-  StreamSubscription<AmqpMessage> listen(void onData(AmqpMessage event),
-          {Function onError, void onDone(), bool cancelOnError}) =>
+  @override
+  StreamSubscription<AmqpMessage> listen(
+          void Function(AmqpMessage event) onData,
+          {Function onError,
+          void Function() onDone,
+          bool cancelOnError}) =>
       _controller.stream.listen(onData,
           onError: onError, onDone: onDone, cancelOnError: cancelOnError);
 
+  @override
   Future<Consumer> cancel({bool noWait = false}) {
     BasicCancel cancelRequest = BasicCancel()
       ..consumerTag = _tag

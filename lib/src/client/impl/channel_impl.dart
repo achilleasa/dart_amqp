@@ -4,7 +4,7 @@ class _ChannelImpl implements Channel {
   // The allocated channel id
   final int channelId;
 
-  _ClientImpl _client;
+  final _ClientImpl _client;
   FrameWriter _frameWriter;
   Completer<Channel> _channelOpened;
   Completer<Channel> _channelClosed;
@@ -19,7 +19,7 @@ class _ChannelImpl implements Channel {
     _frameWriter = FrameWriter(_client.tuningSettings);
     _pendingOperations = ListQueue<Completer>();
     _pendingOperationPayloads = ListQueue<Object>();
-    _consumers = Map<String, _ConsumerImpl>();
+    _consumers = <String, _ConsumerImpl>{};
 
     // If we are opening a user channel signal to the server; otherwise perform connection handshake
     if (channelId > 0) {
@@ -61,16 +61,13 @@ class _ChannelImpl implements Channel {
       Completer completer,
       Object futurePayload}) {
     if (_channelClosed != null && (_channelClosed != completer)) {
-      throw _channelCloseException == null
-          ? StateError("Channel has been closed")
-          : _channelCloseException;
+      throw _channelCloseException ?? StateError("Channel has been closed");
     }
 
     // If an op completer is specified add it to the queue
     if (completer != null) {
       _pendingOperations.addLast(completer);
-      _pendingOperationPayloads
-          .addLast(futurePayload != null ? futurePayload : true);
+      _pendingOperationPayloads.addLast(futurePayload ?? true);
     }
 
     _frameWriter
@@ -410,11 +407,11 @@ class _ChannelImpl implements Channel {
     }
 
     // Abort any pending operations unless we are currently opening the channel
-    _pendingOperations.forEach((Completer completer) {
+    for (Completer completer in _pendingOperations) {
       if (!completer.isCompleted) {
         completer.completeError(exception);
       }
-    });
+    }
     _pendingOperations.clear();
     _pendingOperationPayloads.clear();
   }
@@ -422,9 +419,11 @@ class _ChannelImpl implements Channel {
   /// Close the channel and return a [Future<Channel>] to be completed when the channel is closed.
   ///
   /// After closing the channel any attempt to send a message over it will cause a [StateError]
+  @override
   Future<Channel> close() =>
       _close(replyCode: ErrorType.SUCCESS, replyText: "Normal shutdown");
 
+  @override
   Future<Queue> queue(String name,
       {bool passive = false,
       bool durable = false,
@@ -448,6 +447,7 @@ class _ChannelImpl implements Channel {
     return opCompleter.future;
   }
 
+  @override
   Future<Queue> privateQueue(
       {bool noWait = false, Map<String, Object> arguments}) {
     QueueDeclare queueRequest = QueueDeclare()
@@ -466,6 +466,7 @@ class _ChannelImpl implements Channel {
     return opCompleter.future;
   }
 
+  @override
   Future<Exchange> exchange(String name, ExchangeType type,
       {bool passive = false,
       bool durable = false,
@@ -494,14 +495,16 @@ class _ChannelImpl implements Channel {
     return opCompleter.future;
   }
 
+  @override
   StreamSubscription<BasicReturnMessage> basicReturnListener(
-          void onData(BasicReturnMessage message),
+          void Function(BasicReturnMessage message) onData,
           {Function onError,
-          void onDone(),
+          void Function() onDone,
           bool cancelOnError}) =>
       _basicReturnStream.stream.listen(onData,
           onError: onError, onDone: onDone, cancelOnError: cancelOnError);
 
+  @override
   Future<Channel> qos(int prefetchSize, int prefetchCount,
       {bool global = true}) {
     prefetchSize ??= 0;
@@ -516,6 +519,7 @@ class _ChannelImpl implements Channel {
     return opCompleter.future;
   }
 
+  @override
   void ack(int deliveryTag, {bool multiple = false}) {
     BasicAck ackRequest = BasicAck()
       ..deliveryTag = deliveryTag
@@ -524,6 +528,7 @@ class _ChannelImpl implements Channel {
     writeMessage(ackRequest);
   }
 
+  @override
   Future<Channel> select() {
     TxSelect selectRequest = TxSelect();
     Completer<Channel> opCompleter = Completer<Channel>();
@@ -531,6 +536,7 @@ class _ChannelImpl implements Channel {
     return opCompleter.future;
   }
 
+  @override
   Future<Channel> commit() {
     TxCommit commitRequest = TxCommit();
     Completer<Channel> opCompleter = Completer<Channel>();
@@ -538,6 +544,7 @@ class _ChannelImpl implements Channel {
     return opCompleter.future;
   }
 
+  @override
   Future<Channel> rollback() {
     TxRollback rollbackRequest = TxRollback();
     Completer<Channel> opCompleter = Completer<Channel>();
@@ -545,6 +552,7 @@ class _ChannelImpl implements Channel {
     return opCompleter.future;
   }
 
+  @override
   Future<Channel> flow(bool active) {
     ChannelFlow flowRequest = ChannelFlow()..active = active;
 
@@ -553,6 +561,7 @@ class _ChannelImpl implements Channel {
     return opCompleter.future;
   }
 
+  @override
   Future<Channel> recover(bool requeue) {
     BasicRecover recoverRequest = BasicRecover()..requeue = requeue;
 

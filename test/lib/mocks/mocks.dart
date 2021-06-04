@@ -37,13 +37,14 @@ class MockServer {
       mockLogger
           .info("Shutting down server [${_server.address}:${_server.port}]");
 
-      List<Future> cleanupFutures = []
-        ..addAll(clients.map((Socket client) {
+      List<Future> cleanupFutures = [
+        ...clients.map((Socket client) async {
           client.destroy();
-          return Future.value(true);
-        }))
-        ..add(_server.close().then((_) =>
-            Future.delayed(const Duration(milliseconds: 20), () => true)));
+          return true;
+        }),
+        _server.close().then((_) =>
+            Future.delayed(const Duration(milliseconds: 20), () => true)),
+      ];
 
       clients.clear();
       _server = null;
@@ -69,7 +70,6 @@ class MockServer {
     _server = await ServerSocket.bind(host, port);
     mockLogger.info("[$host:$port] Listening for incoming connections");
     _server.listen(_handleConnection);
-    ;
   }
 
   void _handleConnection(Socket client) {
@@ -105,6 +105,7 @@ class _RotEncoder extends Converter<Map, Uint8List> {
 
   const _RotEncoder(this._key, this.throwOnConvert);
 
+  @override
   Uint8List convert(Map input) {
     if (throwOnConvert) {
       throw Exception("Something has gone awfully wrong...");
@@ -126,6 +127,7 @@ class _RotDecoder extends Converter<Uint8List, Map> {
 
   const _RotDecoder(this._key, this.throwOnConvert);
 
+  @override
   Map convert(Uint8List input) {
     if (throwOnConvert) {
       throw Exception("Something has gone awfully wrong...");
@@ -153,10 +155,12 @@ class RotCodec extends Codec<Map, Uint8List> {
     _decoder = _RotDecoder(-13, throwOnDecode);
   }
 
+  @override
   Converter<Map, Uint8List> get encoder {
     return _encoder;
   }
 
+  @override
   Converter<Uint8List, Map> get decoder {
     return _decoder;
   }

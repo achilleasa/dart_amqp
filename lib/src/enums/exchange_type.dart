@@ -10,7 +10,8 @@ class ExchangeType extends BaseExchange<String> {
 
   const ExchangeType.custom(String value) : super._(value, true);
 
-  String toString() => "${value}";
+  @override
+  String toString() => value;
 
   static ExchangeType valueOf(String value) {
     if (value == FANOUT.value) return FANOUT;
