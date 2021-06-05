@@ -5,7 +5,7 @@ version: 0.1.5
 author: Achilleas Anagnostopoulos
 homepage: https://github.com/achilleasa/dart_amqp
 environment:
-  sdk: '>=2.2.2 <3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
 dependencies:
   logging: ^1.0.1
 dev_dependencies:
