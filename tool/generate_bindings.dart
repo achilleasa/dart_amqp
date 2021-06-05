@@ -124,10 +124,11 @@ part "protocol/io/amqp_message_decoder.dart";
     // Check for cached copy
     File cachedCopy = File(schemaUrl.split('/').last);
     bool exists = await cachedCopy.exists();
-    String data =
-        exists ? await cachedCopy.readAsString() : await http.read(schemaUrl);
+    String data = exists
+        ? await cachedCopy.readAsString()
+        : await http.read(Uri.parse(schemaUrl));
     logger.info("- Parsing schema");
-    return xml.parse(data);
+    return xml.XmlDocument.parse(data);
   }
 
   String _parseMethod(
