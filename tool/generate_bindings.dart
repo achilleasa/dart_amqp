@@ -135,19 +135,19 @@ part "protocol/io/amqp_message_decoder.dart";
       String className, int classId, xml.XmlElement amqpMethod) {
     // Convert dashed field name to class case
     String methodName = amqpMethod
-        .getAttribute("name")
+        .getAttribute("name")!
         .replaceAllMapped(RegExp(r"^([a-z])"), (Match m) {
-      return m.group(1).toUpperCase();
+      return m.group(1)!.toUpperCase();
     }).replaceAllMapped(RegExp(r"-([a-z])"), (Match m) {
-      return m.group(1).toUpperCase();
+      return m.group(1)!.toUpperCase();
     });
 
     // Check if method message should have a body
-    String hasContentAttr = amqpMethod.getAttribute("content");
+    String? hasContentAttr = amqpMethod.getAttribute("content");
     bool hasContent = hasContentAttr != null && hasContentAttr == "1";
 
     // Extract clmethod id
-    int methodId = int.parse(amqpMethod.getAttribute("index"), radix: 10);
+    int methodId = int.parse(amqpMethod.getAttribute("index")!, radix: 10);
 
     bool implementedByClient = amqpMethod
         .findAllElements("chassis")
@@ -213,18 +213,18 @@ ${String.fromCharCodes(List<int>.filled(className.length + methodName.length + 1
 
       // Convert dashed field name to camelCase
       String fieldName = amqpMethodField
-          .getAttribute("name")
+          .getAttribute("name")!
           .replaceAllMapped(RegExp(r"-([a-z])"), (Match m) {
-        return m.group(1).toUpperCase();
+        return m.group(1)!.toUpperCase();
       }).replaceAll("-", "_");
 
       // Retrieve Dart type for field domain
-      String fieldDomain = amqpMethodField.getAttribute("domain") ??
+      String? fieldDomain = amqpMethodField.getAttribute("domain") ??
           amqpMethodField.getAttribute("type");
-      String amqpType = _amqpCustomTypeToBasicType.containsKey(fieldDomain)
+      String? amqpType = _amqpCustomTypeToBasicType.containsKey(fieldDomain)
           ? _amqpCustomTypeToBasicType[fieldDomain]
           : fieldDomain;
-      String dartType = _amqpTypeToDartType[amqpType];
+      String? dartType = _amqpTypeToDartType[amqpType];
 
       logger.fine("      Field: $fieldName (=> $dartType)");
 
@@ -355,15 +355,15 @@ ${String.fromCharCodes(List<int>.filled(className.length + methodName.length + 1
   void _parseClass(xml.XmlElement amqpClass) {
     // Convert dashed field name to class case
     String className = amqpClass
-        .getAttribute("name")
+        .getAttribute("name")!
         .replaceAllMapped(RegExp(r"^([a-z])"), (Match m) {
-      return m.group(1).toUpperCase();
+      return m.group(1)!.toUpperCase();
     }).replaceAllMapped(RegExp(r"-([a-z])"), (Match m) {
-      return m.group(1).toUpperCase();
+      return m.group(1)!.toUpperCase();
     });
 
     // Extract class id
-    int classId = int.parse(amqpClass.getAttribute("index"), radix: 10);
+    int classId = int.parse(amqpClass.getAttribute("index")!, radix: 10);
 
     logger.fine("  Class: $className (id: $classId)");
 
@@ -395,11 +395,11 @@ part of dart_amqp.protocol;
 
       // Apply method exclusion list
       String methodName = node
-          .getAttribute("name")
+          .getAttribute("name")!
           .replaceAllMapped(RegExp(r"^([a-z])"), (Match m) {
-        return m.group(1).toUpperCase();
+        return m.group(1)!.toUpperCase();
       }).replaceAllMapped(RegExp(r"-([a-z])"), (Match m) {
-        return m.group(1).toUpperCase();
+        return m.group(1)!.toUpperCase();
       });
 
       String fullClassName = "$className$methodName";
@@ -428,8 +428,8 @@ part of dart_amqp.protocol;
 
   void _parseDomain(xml.XmlElement amqpDomain) {
     // If this is an unknown domain but has an alias to a known type add it to the list
-    String name = amqpDomain.getAttribute("name");
-    String type = amqpDomain.getAttribute("type");
+    String name = amqpDomain.getAttribute("name")!;
+    String type = amqpDomain.getAttribute("type")!;
 
     // Already there
     if (_amqpTypeToDartType.containsKey(name) ||
@@ -461,7 +461,7 @@ part of dart_amqp.protocol;
         .forEach((xml.XmlNode elemNode) {
       xml.XmlElement amqpClassElement = elemNode as xml.XmlElement;
 
-      String className = amqpClassElement.getAttribute("name").toLowerCase();
+      String className = amqpClassElement.getAttribute("name")!.toLowerCase();
       generatedLibraryFile
           .write("part \"protocol/messages/bindings/$className.dart\";\n");
       _parseClass(amqpClassElement);

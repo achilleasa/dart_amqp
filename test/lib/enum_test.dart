@@ -10,7 +10,7 @@ Type _getMethodArgType(MethodMirror methodMirror) {
 }
 
 Type _getGenericType(ClassMirror classMirror) {
-  return classMirror.superclass.typeArguments.first.reflectedType;
+  return classMirror.superclass!.typeArguments.first.reflectedType;
 }
 
 main({bool enableLogger = true}) {
@@ -25,9 +25,9 @@ main({bool enableLogger = true}) {
   for (Type enumClass in enumClasses) {
     ClassMirror cm = reflectClass(enumClass);
 
-    MethodMirror valueOfMirror;
-    MethodMirror nameOfMirror;
-    MethodMirror toStringMirror;
+    MethodMirror? valueOfMirror;
+    MethodMirror? nameOfMirror;
+    MethodMirror? toStringMirror;
 
     // Run a first pass to detect which methods we can use
     cm.declarations.forEach((Symbol enumSymbol, declarationMirror) {
@@ -57,7 +57,7 @@ main({bool enableLogger = true}) {
       // Generate tests for exceptions
       if (valueOfMirror != null) {
         group("Exceptions:", () {
-          Object junkValue = _getMethodArgType(valueOfMirror) == String
+          Object junkValue = _getMethodArgType(valueOfMirror!) == String
               ? "BADFOOD"
               : 0xBADF00D;
 

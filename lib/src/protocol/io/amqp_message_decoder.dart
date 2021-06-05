@@ -46,7 +46,7 @@ class AmqpMessageDecoder {
         // Read the content header
         ContentHeader contentHeader = ContentHeader.fromByteData(decoder);
 
-        DecodedMessageImpl decodedMessage =
+        DecodedMessageImpl? decodedMessage =
             incompleteMessages[rawFrame.header.channel];
 
         // Check for errors
@@ -74,14 +74,15 @@ class AmqpMessageDecoder {
         decodedMessage.contentHeader = contentHeader;
 
         // If the frame defines no content emit it now
-        if (decodedMessage.contentHeader.bodySize == 0) {
-          sink.add(incompleteMessages.remove(decodedMessage.channel));
+        if (decodedMessage.contentHeader!.bodySize == 0) {
+          sink.add(incompleteMessages.remove(decodedMessage.channel)
+              as DecodedMessage);
         } else {
           decodedMessage.payloadBuffer = ChunkedOutputWriter();
         }
         break;
       case FrameType.BODY:
-        DecodedMessageImpl decodedMessage =
+        DecodedMessageImpl? decodedMessage =
             incompleteMessages[rawFrame.header.channel];
 
         // Check for errors
@@ -100,14 +101,15 @@ class AmqpMessageDecoder {
         }
 
         // Append the payload chunk
-        decodedMessage.payloadBuffer.addLast(Uint8List.view(
+        decodedMessage.payloadBuffer!.addLast(Uint8List.view(
             rawFrame.payload.buffer, 0, rawFrame.payload.lengthInBytes));
 
         // Are we done?
-        if (decodedMessage.payloadBuffer.lengthInBytes ==
-            decodedMessage.contentHeader.bodySize) {
+        if (decodedMessage.payloadBuffer!.lengthInBytes ==
+            decodedMessage.contentHeader!.bodySize) {
           decodedMessage.finalizePayload();
-          sink.add(incompleteMessages.remove(decodedMessage.channel));
+          sink.add(incompleteMessages.remove(decodedMessage.channel)
+              as DecodedMessage);
         }
         break;
       case FrameType.HEARTBEAT:

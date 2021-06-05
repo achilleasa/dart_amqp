@@ -12,7 +12,7 @@ class DeliveryMode extends Enum<int> {
     throw ArgumentError("Invalid delivery mode value $value");
   }
 
-  static String nameOf(DeliveryMode value) {
+  static String? nameOf(DeliveryMode value) {
     if (value == TRANSIENT) return "TRANSIENT";
     if (value == PERSISTENT) return "PERSISTENT";
     return null;

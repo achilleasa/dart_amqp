@@ -44,7 +44,7 @@ class FieldType extends Enum<int> {
     throw ArgumentError("Invalid field type value $value");
   }
 
-  static String nameOf(FieldType value) {
+  static String? nameOf(FieldType value) {
     if (value == BOOLEAN) return "BOOLEAN";
     if (value == SHORT_SHORT_INT) return "SHORT_SHORT_INT";
     if (value == SHORT_SHORT_UINT) return "SHORT_SHORT_UINT";

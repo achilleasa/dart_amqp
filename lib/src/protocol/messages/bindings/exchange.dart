@@ -17,15 +17,15 @@ class ExchangeDeclare implements Message {
   final int msgMethodId = 10;
 
   // Message arguments
-  int reserved_1;
-  String exchange;
-  String type;
-  bool passive;
-  bool durable;
-  bool reserved_2;
-  bool reserved_3;
-  bool noWait;
-  Map<String, Object> arguments;
+  int reserved_1 = 0;
+  String? exchange;
+  String? type;
+  bool passive = false;
+  bool durable = false;
+  bool reserved_2 = false;
+  bool reserved_3 = false;
+  bool noWait = false;
+  Map<String, Object>? arguments;
 
   ExchangeDeclare();
 
@@ -67,10 +67,10 @@ class ExchangeDelete implements Message {
   final int msgMethodId = 20;
 
   // Message arguments
-  int reserved_1;
-  String exchange;
-  bool ifUnused;
-  bool noWait;
+  int reserved_1 = 0;
+  String? exchange;
+  bool ifUnused = false;
+  bool noWait = false;
 
   ExchangeDelete();
 

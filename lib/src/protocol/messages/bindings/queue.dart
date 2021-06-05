@@ -17,14 +17,14 @@ class QueueDeclare implements Message {
   final int msgMethodId = 10;
 
   // Message arguments
-  int reserved_1;
-  String queue;
-  bool passive;
-  bool durable;
-  bool exclusive;
-  bool autoDelete;
-  bool noWait;
-  Map<String, Object> arguments;
+  int reserved_1 = 0;
+  String? queue;
+  bool passive = false;
+  bool durable = false;
+  bool exclusive = false;
+  bool autoDelete = false;
+  bool noWait = false;
+  Map<String, Object>? arguments;
 
   QueueDeclare();
 
@@ -49,9 +49,9 @@ class QueueDeclareOk implements Message {
   final int msgMethodId = 11;
 
   // Message arguments
-  String queue;
-  int messageCount;
-  int consumerCount;
+  String? queue;
+  int messageCount = 0;
+  int consumerCount = 0;
 
   QueueDeclareOk.fromStream(TypeDecoder decoder) {
     queue = decoder.readShortString();
@@ -72,12 +72,12 @@ class QueueBind implements Message {
   final int msgMethodId = 20;
 
   // Message arguments
-  int reserved_1;
-  String queue;
-  String exchange;
-  String routingKey;
-  bool noWait;
-  Map<String, Object> arguments;
+  int reserved_1 = 0;
+  String? queue;
+  String? exchange;
+  String? routingKey;
+  bool noWait = false;
+  Map<String, Object>? arguments;
 
   QueueBind();
 
@@ -120,11 +120,11 @@ class QueueUnbind implements Message {
   final int msgMethodId = 50;
 
   // Message arguments
-  int reserved_1;
-  String queue;
-  String exchange;
-  String routingKey;
-  Map<String, Object> arguments;
+  int reserved_1 = 0;
+  String? queue;
+  String? exchange;
+  String? routingKey;
+  Map<String, Object>? arguments;
 
   QueueUnbind();
 
@@ -166,9 +166,9 @@ class QueuePurge implements Message {
   final int msgMethodId = 30;
 
   // Message arguments
-  int reserved_1;
-  String queue;
-  bool noWait;
+  int reserved_1 = 0;
+  String? queue;
+  bool noWait = false;
 
   QueuePurge();
 
@@ -192,7 +192,7 @@ class QueuePurgeOk implements Message {
   final int msgMethodId = 31;
 
   // Message arguments
-  int messageCount;
+  int messageCount = 0;
 
   QueuePurgeOk.fromStream(TypeDecoder decoder) {
     messageCount = decoder.readUInt32();
@@ -211,11 +211,11 @@ class QueueDelete implements Message {
   final int msgMethodId = 40;
 
   // Message arguments
-  int reserved_1;
-  String queue;
-  bool ifUnused;
-  bool ifEmpty;
-  bool noWait;
+  int reserved_1 = 0;
+  String? queue;
+  bool ifUnused = false;
+  bool ifEmpty = false;
+  bool noWait = false;
 
   QueueDelete();
 
@@ -239,7 +239,7 @@ class QueueDeleteOk implements Message {
   final int msgMethodId = 41;
 
   // Message arguments
-  int messageCount;
+  int messageCount = 0;
 
   QueueDeleteOk.fromStream(TypeDecoder decoder) {
     messageCount = decoder.readUInt32();

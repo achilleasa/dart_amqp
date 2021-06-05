@@ -19,7 +19,7 @@ class FrameType extends Enum<int> {
     throw ArgumentError("Invalid frame type value $value");
   }
 
-  static String nameOf(FrameType value) {
+  static String? nameOf(FrameType value) {
     if (value == METHOD) return "METHOD";
     if (value == HEADER) return "HEADER";
     if (value == BODY) return "BODY";

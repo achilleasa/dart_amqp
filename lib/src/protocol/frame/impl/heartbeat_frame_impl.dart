@@ -6,28 +6,18 @@ class HeartbeatFrameImpl implements DecodedMessage {
 
   HeartbeatFrameImpl(this.channel);
 
-//  String toString() {
-//    StringBuffer sb = new StringBuffer("""
-//HeartbeatFrame
-//------------
-//  channel    : ${channel}
-//""");
-//
-//    return sb.toString();
-//  }
+  @override
+  Message? get message => null;
 
   @override
-  Message get message => null;
+  MessageProperties? get properties => null;
 
   @override
-  MessageProperties get properties => null;
+  Uint8List get payload => Uint8List(0);
 
   @override
-  Uint8List get payload => null;
+  String get payloadAsString => "";
 
   @override
-  String get payloadAsString => null;
-
-  @override
-  Map get payloadAsJson => null;
+  Map get payloadAsJson => {};
 }

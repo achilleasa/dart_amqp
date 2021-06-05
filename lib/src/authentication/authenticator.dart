@@ -5,5 +5,5 @@ abstract class Authenticator {
   String get saslType;
 
   /// Process the [challenge] sent by the server and return a [String] response
-  String answerChallenge(String challenge);
+  String answerChallenge(String? challenge);
 }

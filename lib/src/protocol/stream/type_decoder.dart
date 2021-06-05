@@ -87,7 +87,7 @@ class TypeDecoder {
     return utf8.decode(Uint8List.view(_buffer.buffer, _offset - len, len));
   }
 
-  DateTime readTimestamp() {
+  DateTime? readTimestamp() {
     int value = readUInt64();
     return value > 0 ? DateTime.fromMillisecondsSinceEpoch(value * 1000) : null;
   }
@@ -101,22 +101,22 @@ class TypeDecoder {
     return items;
   }
 
-  Map<String, Object> readFieldTable(String fieldName) {
+  Map<String, Object?> readFieldTable(String fieldName) {
     int tableEndOffset = readInt32() + _offset;
-    Map<String, Object> items = HashMap<String, Object>();
+    var items = HashMap<String, Object?>();
     while (_offset < tableEndOffset) {
       items[readShortString()] = _readField(fieldName);
     }
     return items;
   }
 
-  Object _readField(String fieldName) {
+  Object? _readField(String fieldName) {
     int typeValue = readUInt8();
     FieldType type;
     try {
       type = FieldType.valueOf(typeValue);
-    } catch (e) {
-      // ignore the error
+    } catch (_) {
+      return null;
     }
 
     switch (type) {
@@ -144,7 +144,6 @@ class TypeDecoder {
         return readDouble();
       case FieldType.DECIMAL:
         throw ArgumentError("Not implemented");
-        break;
       case FieldType.SHORT_STRING:
         return readShortString();
       case FieldType.LONG_STRING:

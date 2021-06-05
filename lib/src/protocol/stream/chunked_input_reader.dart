@@ -16,7 +16,7 @@ class ChunkedInputReader {
   /// Return the next byte in the buffer without modifying the read pointer.
   /// Returns the [int] value of the next byte or null if no data is available
 
-  int peekNextByte() {
+  int? peekNextByte() {
     // No data available
     if (_bufferedChunks.isEmpty || length < 1) {
       return null;

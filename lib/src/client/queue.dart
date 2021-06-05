@@ -72,10 +72,10 @@ abstract class Queue {
   /// If the [exclusive] flag is set then only this consumer has access to the queue. If the flag is set
   /// and the queue already has attached consumers, then the server will raise an error.
   Future<Consumer> consume(
-      {String consumerTag,
+      {String? consumerTag,
       bool noLocal = false,
       bool noAck = true,
       bool exclusive = false,
       bool noWait = false,
-      Map<String, Object> arguments});
+      Map<String, Object>? arguments});
 }

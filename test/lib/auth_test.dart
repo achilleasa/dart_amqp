@@ -20,15 +20,15 @@ class ConnectionStartMock extends Mock implements ConnectionStart {
 
   // Message arguments
   @override
-  int versionMajor;
+  int versionMajor = 0;
   @override
-  int versionMinor;
+  int versionMinor = 0;
   @override
-  Map<String, Object> serverProperties;
+  Map<String, Object?>? serverProperties;
   @override
-  String mechanisms;
+  String mechanisms = "";
   @override
-  String locales;
+  String locales = "";
 
   @override
   void serialize(TypeEncoder encoder) {
@@ -53,7 +53,7 @@ class ConnectionSecureMock extends Mock implements ConnectionSecure {
 
   // Message arguments
   @override
-  String challenge;
+  String? challenge;
 
   @override
   void serialize(TypeEncoder encoder) {
@@ -74,11 +74,11 @@ class ConnectionTuneMock extends Mock implements ConnectionTune {
 
   // Message arguments
   @override
-  int channelMax;
+  int channelMax = 0;
   @override
-  int frameMax;
+  int frameMax = 0;
   @override
-  int heartbeat;
+  int heartbeat = 0;
 
   @override
   void serialize(TypeEncoder encoder) {
@@ -99,7 +99,7 @@ class ConnectionOpenOkMock extends Mock implements ConnectionOpenOk {
   @override
   final int msgMethodId = 41;
   @override
-  String reserved_1;
+  String? reserved_1;
 
   @override
   void serialize(TypeEncoder encoder) {
@@ -129,8 +129,8 @@ class FooAuthProvider implements Authenticator {
   String get saslType => "foo";
 
   @override
-  String answerChallenge(String challenge) {
-    return null;
+  String answerChallenge(String? challenge) {
+    return "";
   }
 }
 
@@ -179,7 +179,7 @@ main({bool enableLogger = true}) {
   }
 
   group("Built-in authentication providers with real server:", () {
-    Client client;
+    late Client client;
 
     tearDown(() {
       return client.close();
@@ -203,9 +203,9 @@ main({bool enableLogger = true}) {
   });
 
   group("Challenge-response:", () {
-    Client client;
-    mock.MockServer server;
-    FrameWriter frameWriter;
+    late Client client;
+    late mock.MockServer server;
+    late FrameWriter frameWriter;
     TuningSettings tuningSettings;
 
     setUp(() {
@@ -234,7 +234,7 @@ main({bool enableLogger = true}) {
   });
 
   group("Exception handling:", () {
-    Client client;
+    late Client client;
 
     tearDown(() {
       return client.close();
@@ -251,7 +251,7 @@ main({bool enableLogger = true}) {
       } catch (e) {
         expect(e, const TypeMatcher<FatalException>());
         expect(
-            e.message,
+            (e as FatalException).message,
             startsWith(
                 "Selected authentication provider 'foo' is unsupported by the server"));
       }
@@ -267,7 +267,7 @@ main({bool enableLogger = true}) {
         await client.connect();
       } catch (e) {
         expect(e, const TypeMatcher<FatalException>());
-        expect(e.message, equals("Authentication failed"));
+        expect((e as FatalException).message, equals("Authentication failed"));
       }
     });
   });

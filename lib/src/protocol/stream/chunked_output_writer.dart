@@ -22,7 +22,7 @@ class ChunkedOutputWriter {
 
   /// Pipe all buffered chunks to [destination] and clear the buffer queue
 
-  void pipe(Sink destination) {
+  void pipe(Sink? destination) {
     if (destination == null) {
       return;
     }

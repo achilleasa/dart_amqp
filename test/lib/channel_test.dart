@@ -15,7 +15,7 @@ main({bool enableLogger = true}) {
   }
 
   group("Channels:", () {
-    Client client;
+    late Client client;
 
     setUp(() {
       client = Client();

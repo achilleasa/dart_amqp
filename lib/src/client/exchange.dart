@@ -29,7 +29,7 @@ abstract class Exchange {
   /// if the [immediate] flag is set, the server will immediately return undeliverable messages to the client
   /// if it cannot route them. If the flag is set to false, the server will queue the message even though
   /// there is no guarantee that it will ever be consumed.
-  void publish(Object message, String routingKey,
+  void publish(Object message, String? routingKey,
       {MessageProperties properties,
       bool mandatory = false,
       bool immediate = false});
@@ -42,7 +42,7 @@ abstract class Exchange {
   ///
   /// The [noAck] flag will notify the server whether the consumer is expected to acknowledge incoming
   /// messages or not.
-  Future<Consumer> bindPrivateQueueConsumer(List<String> routingKeys,
+  Future<Consumer> bindPrivateQueueConsumer(List<String>? routingKeys,
       {String consumerTag, bool noAck = true});
 
   /// Allocate a named [Queue], bind it to this exchange using the supplied [routingKeys],

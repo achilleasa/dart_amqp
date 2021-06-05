@@ -5,13 +5,13 @@ class RawFrameParser {
   TuningSettings tuningSettings;
 
   final ChunkedInputReader _inputBuffer = ChunkedInputReader();
-  FrameHeader _parsedHeader;
-  Uint8List _bodyData;
+  FrameHeader? _parsedHeader;
+  Uint8List? _bodyData;
   int _bodyWriteOffset = 0;
 
   RawFrameParser(this.tuningSettings);
 
-  void handleData(List<int> chunk, EventSink<RawFrame> sink) {
+  void handleData(List<int>? chunk, EventSink<RawFrame> sink) {
     try {
       // Append incoming chunk to input buffer
       if (chunk != null) {
@@ -44,40 +44,42 @@ class RawFrameParser {
           }
 
           // Extract header bytes and parse them
-          Uint8List headerBytes = Uint8List(FrameHeader.LENGTH_IN_BYTES);
+          Uint8List? headerBytes = Uint8List(FrameHeader.LENGTH_IN_BYTES);
           _inputBuffer.read(headerBytes, FrameHeader.LENGTH_IN_BYTES);
           _parsedHeader = FrameHeader.fromByteData(
               TypeDecoder.fromBuffer(ByteData.view(headerBytes.buffer)));
           headerBytes = null;
 
-          if (_parsedHeader.size > tuningSettings.maxFrameSize) {
+          if (_parsedHeader!.size > tuningSettings.maxFrameSize) {
             throw ConnectionException(
-                "Frame size cannot be larger than ${tuningSettings.maxFrameSize} bytes. Server sent ${_parsedHeader.size} bytes",
+                "Frame size cannot be larger than ${tuningSettings.maxFrameSize} bytes. Server sent ${_parsedHeader!.size} bytes",
                 ErrorType.FRAME_ERROR,
                 0,
                 0);
           }
 
           // Allocate buffer for body (and frame terminator); then reset write offset
-          _bodyData = Uint8List(_parsedHeader.size + 1);
+          _bodyData = Uint8List(_parsedHeader!.size + 1);
           _bodyWriteOffset = 0;
         } else {
           // Copy pending body data + expected frame terminator (0xCE)
-          _bodyWriteOffset += _inputBuffer.read(_bodyData,
-              _parsedHeader.size + 1 - _bodyWriteOffset, _bodyWriteOffset);
+          _bodyWriteOffset += _inputBuffer.read(_bodyData!,
+              _parsedHeader!.size + 1 - _bodyWriteOffset, _bodyWriteOffset);
         }
 
         // If we are done emit the frame to the next pipeline stage and cleanup
-        if (_bodyWriteOffset == _parsedHeader.size + 1) {
+        if (_bodyWriteOffset == _parsedHeader!.size + 1) {
           // Ensure that the last byte of the payload is our frame terminator
-          if (_bodyData.last != FRAME_TERMINATOR) {
+          if (_bodyData!.last != FRAME_TERMINATOR) {
             throw FatalException(
                 "Frame did not end with the expected frame terminator (0xCE)");
           }
 
           // Emit a raw frame excluding the frame terminator
-          sink.add(RawFrame(_parsedHeader,
-              ByteData.view(_bodyData.buffer, 0, _bodyData.lengthInBytes - 1)));
+          sink.add(RawFrame(
+              _parsedHeader!,
+              ByteData.view(
+                  _bodyData!.buffer, 0, _bodyData!.lengthInBytes - 1)));
 
           _parsedHeader = null;
           _bodyData = null;

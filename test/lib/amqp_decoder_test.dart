@@ -22,15 +22,15 @@ class ConnectionStartMock extends Mock implements ConnectionStart {
 
   // Message arguments
   @override
-  int versionMajor;
+  int versionMajor = 0;
   @override
-  int versionMinor;
+  int versionMinor = 0;
   @override
-  Map<String, Object> serverProperties;
+  Map<String, Object?>? serverProperties;
   @override
-  String mechanisms;
+  String mechanisms = "";
   @override
-  String locales;
+  String locales = "";
 
   @override
   void serialize(TypeEncoder encoder) {
@@ -55,11 +55,11 @@ class ConnectionTuneMock extends Mock implements ConnectionTune {
 
   // Message arguments
   @override
-  int channelMax;
+  int channelMax = 0;
   @override
-  int frameMax;
+  int frameMax = 0;
   @override
-  int heartbeat;
+  int heartbeat = 0;
 
   @override
   void serialize(TypeEncoder encoder) {
@@ -80,7 +80,7 @@ class ConnectionOpenOkMock extends Mock implements ConnectionOpenOk {
   @override
   final int msgMethodId = 41;
   @override
-  String reserved_1;
+  String? reserved_1;
 
   @override
   void serialize(TypeEncoder encoder) {
@@ -101,15 +101,15 @@ class BasicDeliverMock extends Mock implements BasicDeliver {
 
   // Message arguments
   @override
-  String consumerTag;
+  String? consumerTag;
   @override
-  int deliveryTag;
+  int deliveryTag = 0;
   @override
-  bool redelivered;
+  bool redelivered = false;
   @override
-  String exchange;
+  String exchange = "";
   @override
-  String routingKey;
+  String routingKey = "";
 
   @override
   void serialize(TypeEncoder encoder) {
@@ -160,11 +160,11 @@ main({bool enableLogger = true}) {
   }
 
   group("AMQP decoder:", () {
-    StreamController<RawFrame> controller;
-    Stream<DecodedMessage> rawStream;
-    RawFrame rawFrame;
-    FrameWriter frameWriter;
-    TuningSettings tuningSettings;
+    late StreamController<RawFrame> controller;
+    late Stream<DecodedMessage> rawStream;
+    late RawFrame rawFrame;
+    late FrameWriter frameWriter;
+    late TuningSettings tuningSettings;
 
     setUp(() {
       tuningSettings = TuningSettings();
@@ -415,7 +415,7 @@ main({bool enableLogger = true}) {
         header.type = FrameType.BODY;
         header.size = 0;
 
-        rawFrame = RawFrame(header, null);
+        rawFrame = RawFrame(header, ByteData(0));
         controller.add(rawFrame);
       });
 
@@ -457,7 +457,7 @@ main({bool enableLogger = true}) {
         header.type = FrameType.BODY;
         header.size = 0;
 
-        rawFrame = RawFrame(header, null);
+        rawFrame = RawFrame(header, ByteData(0));
         controller.add(rawFrame);
       });
     });

@@ -3,10 +3,10 @@ part of dart_amqp.protocol;
 class ProtocolHeader implements Header {
   static const int LENGTH_IN_BYTES = 8;
 
-  int protocolVersion;
-  int majorVersion;
-  int minorVersion;
-  int revision;
+  int protocolVersion = 0;
+  int majorVersion = 0;
+  int minorVersion = 0;
+  int revision = 0;
 
   ProtocolHeader();
 

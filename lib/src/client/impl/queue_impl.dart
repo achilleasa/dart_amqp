@@ -4,8 +4,8 @@ class _QueueImpl implements Queue {
   // https://github.com/dart-lang/linter/issues/2697
   // ignore: prefer_final_fields
   String _name;
-  int _messageCount;
-  int _consumerCount;
+  int _messageCount = 0;
+  int _consumerCount = 0;
   @override
   final _ChannelImpl channel;
 
@@ -50,8 +50,8 @@ class _QueueImpl implements Queue {
   }
 
   @override
-  Future<Queue> bind(Exchange exchange, String routingKey,
-      {bool noWait, Map<String, Object> arguments}) {
+  Future<Queue> bind(Exchange? exchange, String? routingKey,
+      {bool noWait = false, Map<String, Object>? arguments}) {
     if (exchange == null) {
       throw ArgumentError("Exchange cannot be null");
     }
@@ -81,11 +81,8 @@ class _QueueImpl implements Queue {
   }
 
   @override
-  Future<Queue> unbind(Exchange exchange, String routingKey,
-      {bool noWait, Map<String, Object> arguments}) {
-    if (exchange == null) {
-      throw ArgumentError("Exchange cannot be null");
-    }
+  Future<Queue> unbind(Exchange exchange, String? routingKey,
+      {bool noWait = false, Map<String, Object>? arguments}) {
     // Fanout and headers exchanges do not need to specify any keys. Use the default one if none is specified
     if (routingKey == null || routingKey.isEmpty) {
       if (exchange.type == ExchangeType.FANOUT ||
@@ -112,7 +109,7 @@ class _QueueImpl implements Queue {
 
   @override
   void publish(Object message,
-      {MessageProperties properties,
+      {MessageProperties? properties,
       bool mandatory = false,
       bool immediate = false}) {
     BasicPublish pubRequest = BasicPublish()
@@ -128,12 +125,12 @@ class _QueueImpl implements Queue {
 
   @override
   Future<Consumer> consume(
-      {String consumerTag,
+      {String? consumerTag,
       bool noLocal = false,
       bool noAck = true,
       bool exclusive = false,
       bool noWait = false,
-      Map<String, Object> arguments}) {
+      Map<String, Object>? arguments}) {
     // If a consumer with the requested tag exists, return that
     if (consumerTag != null &&
         consumerTag.isNotEmpty &&
@@ -155,5 +152,10 @@ class _QueueImpl implements Queue {
     channel.writeMessage(consumeRequest,
         completer: completer, futurePayload: _ConsumerImpl(channel, this, ""));
     return completer.future;
+  }
+
+  void _overrideCounts(int msgCount, int consumerCount) {
+    _messageCount = msgCount;
+    _consumerCount = consumerCount;
   }
 }

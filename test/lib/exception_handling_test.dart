@@ -24,15 +24,15 @@ class ConnectionStartMock extends Mock implements ConnectionStart {
 
   // Message arguments
   @override
-  int versionMajor;
+  int versionMajor = 0;
   @override
-  int versionMinor;
+  int versionMinor = 0;
   @override
-  Map<String, Object> serverProperties;
+  Map<String, Object?>? serverProperties;
   @override
-  String mechanisms;
+  String mechanisms = "";
   @override
-  String locales;
+  String locales = "";
 
   @override
   void serialize(TypeEncoder encoder) {
@@ -57,11 +57,11 @@ class ConnectionTuneMock extends Mock implements ConnectionTune {
 
   // Message arguments
   @override
-  int channelMax;
+  int channelMax = 0;
   @override
-  int frameMax;
+  int frameMax = 0;
   @override
-  int heartbeat;
+  int heartbeat = 0;
 
   @override
   void serialize(TypeEncoder encoder) {
@@ -82,7 +82,7 @@ class ConnectionOpenOkMock extends Mock implements ConnectionOpenOk {
   @override
   final int msgMethodId = 41;
   @override
-  String reserved_1;
+  String? reserved_1;
 
   @override
   void serialize(TypeEncoder encoder) {
@@ -144,11 +144,11 @@ main({bool enableLogger = true}) {
   }
 
   group("Exception handling:", () {
-    Client client;
-    mock.MockServer server;
-    FrameWriter frameWriter;
-    TuningSettings tuningSettings;
-    int port;
+    late Client client;
+    late mock.MockServer server;
+    late FrameWriter frameWriter;
+    late TuningSettings tuningSettings;
+    late int port;
 
     setUp(() {
       tuningSettings = TuningSettings();

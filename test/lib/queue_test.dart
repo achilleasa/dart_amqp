@@ -18,7 +18,7 @@ main({bool enableLogger = true}) {
   }
 
   group("Queues:", () {
-    Client client;
+    late Client client;
 
     setUp(() {
       client = Client();
@@ -70,8 +70,8 @@ main({bool enableLogger = true}) {
   });
 
   group("inter-queue messaging:", () {
-    Client client;
-    Client client2;
+    late Client client;
+    late Client client2;
 
     setUp(() {
       client = Client();
@@ -144,7 +144,7 @@ main({bool enableLogger = true}) {
 
       consumer.listen(expectAsync1((AmqpMessage message) {
         expect(message.payloadAsJson, equals({"message": "Test payload"}));
-        expect(message.properties.contentType, equals("application/json"));
+        expect(message.properties!.contentType, equals("application/json"));
         testCompleter.complete();
       }));
 
@@ -172,7 +172,7 @@ main({bool enableLogger = true}) {
       consumer.listen(expectAsync1((AmqpMessage message) {
         expect(message.payloadAsJson,
             equals({"message_ø": "This string contains ø, æ or å"}));
-        expect(message.properties.contentType, equals("application/json"));
+        expect(message.properties!.contentType, equals("application/json"));
         testCompleter.complete();
       }));
 
@@ -204,17 +204,17 @@ main({bool enableLogger = true}) {
 
       consumer.listen(expectAsync1((AmqpMessage message) {
         expect(message.payloadAsJson, equals({"message": "Test payload"}));
-        expect(message.properties.contentType, equals("application/json"));
-        expect(message.properties.headers, equals({'X-HEADER': 'ok'}));
-        expect(message.properties.priority, equals(1));
-        expect(message.properties.corellationId, equals("123"));
-        expect(message.properties.replyTo, equals("/dev/null"));
-        expect(message.properties.expiration, equals("60000"));
-        expect(message.properties.messageId, equals("0xf00"));
-        expect(message.properties.timestamp, equals(now));
-        expect(message.properties.type, equals("test"));
-        expect(message.properties.userId, equals("guest"));
-        expect(message.properties.appId, equals("unit-test"));
+        expect(message.properties!.contentType, equals("application/json"));
+        expect(message.properties!.headers, equals({'X-HEADER': 'ok'}));
+        expect(message.properties!.priority, equals(1));
+        expect(message.properties!.corellationId, equals("123"));
+        expect(message.properties!.replyTo, equals("/dev/null"));
+        expect(message.properties!.expiration, equals("60000"));
+        expect(message.properties!.messageId, equals("0xf00"));
+        expect(message.properties!.timestamp, equals(now));
+        expect(message.properties!.type, equals("test"));
+        expect(message.properties!.userId, equals("guest"));
+        expect(message.properties!.appId, equals("unit-test"));
         testCompleter.complete();
       }));
 
@@ -339,7 +339,7 @@ main({bool enableLogger = true}) {
         } catch (ex) {
           expect(ex, const TypeMatcher<ArgumentError>());
           expect(
-              ex.message,
+              (ex as ArgumentError).message,
               equals(
                   "Message payload should be either a Map, an Iterable, a String or an UInt8List instance"));
         }

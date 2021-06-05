@@ -22,9 +22,9 @@ class _ConsumerImpl implements Consumer {
   @override
   StreamSubscription<AmqpMessage> listen(
           void Function(AmqpMessage event) onData,
-          {Function onError,
-          void Function() onDone,
-          bool cancelOnError}) =>
+          {Function? onError,
+          void Function()? onDone,
+          bool cancelOnError = false}) =>
       _controller.stream.listen(onData,
           onError: onError, onDone: onDone, cancelOnError: cancelOnError);
 

@@ -13,7 +13,7 @@ class PlainAuthenticator implements Authenticator {
 
   /// Process the [challenge] sent by the server and return a [String] response
   @override
-  String answerChallenge(String challenge) {
+  String answerChallenge(String? challenge) {
     StringBuffer sb = StringBuffer()
       ..writeCharCode(0)
       ..write(userName)

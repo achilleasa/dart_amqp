@@ -1,7 +1,7 @@
 part of dart_amqp.client;
 
 abstract class Client {
-  factory Client({ConnectionSettings settings}) =>
+  factory Client({ConnectionSettings? settings}) =>
       _ClientImpl(settings: settings);
 
   // Configuration options
