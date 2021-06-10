@@ -1,9 +1,10 @@
 # Changelog
 
-## 0.1.6
+## 0.2.0
 
 - Merged [#55](https://github.com/achilleasa/dart_amqp/pull/55) which enables
 null-safety for the package.
+- Bumped minor version since null safety is a breaking change.
 
 ## 0.1.5
 

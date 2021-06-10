@@ -1,7 +1,7 @@
 name: dart_amqp
 description: >
   A native dart AMQP client supporting version 0.9.1 of the AMQP protocol. It features an asynchronous API, pluggable authentication providers and TLS support.
-version: 0.1.6
+version: 0.2.0
 homepage: https://github.com/achilleasa/dart_amqp
 environment:
   sdk: ">=2.12.0 <3.0.0"
