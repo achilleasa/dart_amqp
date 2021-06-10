@@ -23,7 +23,7 @@ void initLogger() {
 }
 
 class MockServer {
-  ServerSocket _server;
+  ServerSocket? _server;
   List<Socket> clients = [];
   List replayList = [];
   Duration responseDelay = const Duration(seconds: 0);
@@ -35,14 +35,14 @@ class MockServer {
 
     if (_server != null) {
       mockLogger
-          .info("Shutting down server [${_server.address}:${_server.port}]");
+          .info("Shutting down server [${_server!.address}:${_server!.port}]");
 
       List<Future> cleanupFutures = [
         ...clients.map((Socket client) async {
           client.destroy();
           return true;
         }),
-        _server.close().then((_) =>
+        _server!.close().then((_) =>
             Future.delayed(const Duration(milliseconds: 20), () => true)),
       ];
 
@@ -69,7 +69,7 @@ class MockServer {
 
     _server = await ServerSocket.bind(host, port);
     mockLogger.info("[$host:$port] Listening for incoming connections");
-    _server.listen(_handleConnection);
+    _server!.listen(_handleConnection);
   }
 
   void _handleConnection(Socket client) {
@@ -82,7 +82,7 @@ class MockServer {
   }
 
   void _handleClientData(Socket client, dynamic data) {
-    if (replayList != null && replayList.isNotEmpty) {
+    if (replayList.isNotEmpty) {
       // Respond with the next payload in replay list
       Future.delayed(responseDelay).then((_) {
         client
@@ -147,8 +147,8 @@ class RotCodec extends Codec<Map, Uint8List> {
   bool throwOnDecode;
 
   // For our test apply ROT-13 to compress/decompress
-  _RotEncoder _encoder;
-  _RotDecoder _decoder;
+  late _RotEncoder _encoder;
+  late _RotDecoder _decoder;
 
   RotCodec({this.throwOnEncode = false, this.throwOnDecode = false}) {
     _encoder = _RotEncoder(13, throwOnEncode);

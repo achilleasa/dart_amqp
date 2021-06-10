@@ -21,8 +21,8 @@ main({bool enableLogger = true}) {
   }
 
   group("Encode/decode:", () {
-    TypeEncoder encoder;
-    TypeDecoder decoder;
+    late TypeEncoder encoder;
+    late TypeDecoder decoder;
 
     setUp(() {
       encoder = TypeEncoder();

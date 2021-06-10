@@ -1,11 +1,11 @@
 part of dart_amqp.protocol;
 
 class TypeEncoder {
-  ChunkedOutputWriter _writer;
+  late ChunkedOutputWriter _writer;
 
   final Endian endianess = Endian.big;
 
-  TypeEncoder({ChunkedOutputWriter withWriter}) {
+  TypeEncoder({ChunkedOutputWriter? withWriter}) {
     _writer = withWriter ?? ChunkedOutputWriter();
   }
 
@@ -90,13 +90,13 @@ class TypeEncoder {
     writeUInt8(mask);
   }
 
-  void writeShortString(String value) {
+  void writeShortString(String? value) {
     if (value == null || value.isEmpty) {
       writeUInt8(0);
       return;
     }
 
-    List<int> data = utf8.encode(value);
+    var data = Uint8List.fromList(utf8.encode(value));
 
     if (data.length > 255) {
       throw ArgumentError("Short string values should have a length <= 255");
@@ -107,20 +107,20 @@ class TypeEncoder {
     _writer.addLast(data);
   }
 
-  void writeLongString(String value) {
+  void writeLongString(String? value) {
     if (value == null || value.isEmpty) {
       writeUInt32(0);
       return;
     }
 
-    List<int> data = utf8.encode(value);
+    var data = Uint8List.fromList(utf8.encode(value));
 
     // Write the length followed by the actual bytes
     writeUInt32(data.length);
     _writer.addLast(data);
   }
 
-  void writeTimestamp(DateTime value) {
+  void writeTimestamp(DateTime? value) {
     if (value == null) {
       writeUInt64(0);
       return;
@@ -130,7 +130,7 @@ class TypeEncoder {
     writeUInt64(value.millisecondsSinceEpoch ~/ 1000);
   }
 
-  void writeFieldTable(Map<String, Object> table) {
+  void writeFieldTable(Map<String, Object?>? table) {
     if (table == null || table.isEmpty) {
       writeInt32(0);
       return;
@@ -139,7 +139,7 @@ class TypeEncoder {
     TypeEncoder buffer = TypeEncoder();
 
     // Encode each keypair to the buffer
-    table.forEach((String fieldName, Object value) {
+    table.forEach((String fieldName, Object? value) {
       buffer.writeShortString(fieldName);
       buffer._writeField(fieldName, value);
     });
@@ -150,7 +150,7 @@ class TypeEncoder {
     writer.addLast(buffer.writer.joinChunks());
   }
 
-  void writeArray(String fieldName, Iterable value) {
+  void writeArray(String fieldName, Iterable? value) {
     if (value == null || value.isEmpty) {
       writeInt32(0);
       return;
@@ -168,8 +168,8 @@ class TypeEncoder {
     writer.addLast(buffer.writer.joinChunks());
   }
 
-  void _writeField(String fieldName, Object value) {
-    if (value is Map) {
+  void _writeField(String fieldName, Object? value) {
+    if (value is Map<String, Object>) {
       writeUInt8(FieldType.FIELD_TABLE.value);
       writeFieldTable(value);
     } else if (value is Iterable) {

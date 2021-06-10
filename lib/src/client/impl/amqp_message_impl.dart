@@ -5,12 +5,12 @@ class _AmqpMessageImpl implements AmqpMessage {
   final DecodedMessage message;
 
   @override
-  MessageProperties get properties => message.properties;
+  MessageProperties? get properties => message.properties;
 
   _AmqpMessageImpl.fromDecodedMessage(this.consumer, this.message);
 
   @override
-  Uint8List get payload => message.payload;
+  Uint8List? get payload => message.payload;
 
   @override
   String get payloadAsString => message.payloadAsString;
@@ -26,21 +26,21 @@ class _AmqpMessageImpl implements AmqpMessage {
 
   @override
   void reply(Object responseMessage,
-      {MessageProperties properties,
+      {MessageProperties? properties,
       bool mandatory = false,
       bool immediate = false}) {
-    if (message.properties.replyTo == null) {
+    if (message.properties!.replyTo == null) {
       throw ArgumentError(
           "No reply-to property specified in the incoming message");
     }
 
     MessageProperties responseProperties = properties ?? MessageProperties();
 
-    responseProperties.corellationId = message.properties.corellationId;
+    responseProperties.corellationId = message.properties!.corellationId;
 
     BasicPublish pubRequest = BasicPublish()
       ..reserved_1 = 0
-      ..routingKey = message.properties.replyTo // send to 'reply-to'
+      ..routingKey = message.properties!.replyTo // send to 'reply-to'
       ..exchange = ""
       ..mandatory = mandatory
       ..immediate = immediate;

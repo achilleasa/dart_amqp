@@ -48,7 +48,7 @@ abstract class Channel {
   /// Setup the [prefetchSize] and [prefetchCount] QoS parameters.
   /// Returns a [Future<Channel>] with the affected channel once the server
   /// confirms the updated QoS settings.
-  Future<Channel> qos(int prefetchSize, int prefetchCount);
+  Future<Channel> qos(int? prefetchSize, int? prefetchCount);
 
   /// Acknowledge a [deliveryTag]. The [multiple] flag can be set to true
   /// to notify the server that the client ack-ed all pending messages up to [deliveryTag].

@@ -18,7 +18,7 @@ class FrameWriter {
         _outputEncoder = TypeEncoder();
 
   void writeMessage(int channelId, Message message,
-      {MessageProperties properties, Object payloadContent}) {
+      {MessageProperties? properties, Object? payloadContent}) {
     // Make sure our buffer contains no stale data from previous messages
     _outputEncoder.writer.clear();
 

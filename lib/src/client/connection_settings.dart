@@ -29,7 +29,7 @@ class ConnectionSettings {
   TuningSettings tuningSettings;
 
   // TLS settings (if TLS connection is required)
-  SecurityContext tlsContext;
+  SecurityContext? tlsContext;
 
   ConnectionSettings({
     this.host = "127.0.0.1",
@@ -38,7 +38,7 @@ class ConnectionSettings {
     this.authProvider = const PlainAuthenticator("guest", "guest"),
     this.maxConnectionAttempts = 1,
     this.reconnectWaitTime = const Duration(milliseconds: 1500),
-    TuningSettings tuningSettings,
+    TuningSettings? tuningSettings,
     this.tlsContext,
   }) : tuningSettings = tuningSettings ?? TuningSettings();
 }

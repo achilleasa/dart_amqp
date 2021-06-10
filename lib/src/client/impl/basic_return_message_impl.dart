@@ -7,13 +7,13 @@ class _BasicReturnMessageImpl implements BasicReturnMessage {
   _BasicReturnMessageImpl.fromDecodedMessage(this.basicReturn, this.message);
 
   @override
-  Uint8List get payload => message.payload;
+  Uint8List? get payload => message.payload;
 
   @override
-  String get payloadAsString => message.payloadAsString;
+  String? get payloadAsString => message.payloadAsString;
 
   @override
-  Map get payloadAsJson => message.payloadAsJson;
+  Map? get payloadAsJson => message.payloadAsJson;
 
   @override
   String get exchangeName => basicReturn.exchange;
@@ -28,5 +28,5 @@ class _BasicReturnMessageImpl implements BasicReturnMessage {
   String get replyText => basicReturn.replyText;
 
   @override
-  MessageProperties get properties => message.properties;
+  MessageProperties? get properties => message.properties;
 }

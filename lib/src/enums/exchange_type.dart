@@ -21,7 +21,7 @@ class ExchangeType extends BaseExchange<String> {
     return ExchangeType.custom(value);
   }
 
-  static String nameOf(ExchangeType value) {
+  static String? nameOf(ExchangeType value) {
     if (value == FANOUT) return "FANOUT";
     if (value == DIRECT) return "DIRECT";
     if (value == TOPIC) return "TOPIC";

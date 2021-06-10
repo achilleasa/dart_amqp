@@ -13,7 +13,7 @@ class AmqPlainAuthenticator implements Authenticator {
 
   /// Process the [challenge] sent by the server and return a [String] response
   @override
-  String answerChallenge(String challenge) {
+  String answerChallenge(String? challenge) {
     // Encode as a able
     TypeEncoder encoder = TypeEncoder();
     encoder.writeFieldTable({"LOGIN": userName, "PASSWORD": password});

@@ -17,8 +17,8 @@ main({bool enableLogger = true}) {
   }
 
   group("Exchanges:", () {
-    Client client;
-    Client client2;
+    late Client client;
+    late Client client2;
 
     setUp(() {
       client = Client();
@@ -138,7 +138,7 @@ main({bool enableLogger = true}) {
         expect(message.payloadAsJson, equals({"message": "1234"}));
         expect(message.payload, equals(message.payloadAsString.codeUnits));
         expect(message.routingKey, equals("test"));
-        expect(message.properties.corellationId, equals("123"));
+        expect(message.properties!.corellationId, equals("123"));
         expect(message.exchangeName, equals("ex_test_1"));
 
         // Reply with echo to sender
@@ -156,7 +156,7 @@ main({bool enableLogger = true}) {
 
       // Bind reply listener
       replyConsumer.listen((AmqpMessage reply) {
-        expect(reply.properties.corellationId, equals("123"));
+        expect(reply.properties!.corellationId, equals("123"));
         expect(reply.payloadAsString, equals('echo:{"message":"1234"}'));
 
         // Pass!
@@ -207,20 +207,10 @@ main({bool enableLogger = true}) {
       test("missing exchange name", () async {
         Channel channel = await client.channel();
         expect(
-            () => channel.exchange(null, null),
+            () => channel.exchange("", ExchangeType.DIRECT),
             throwsA((ex) =>
                 ex is ArgumentError &&
                 ex.message == "The name of the exchange cannot be empty"));
-      });
-
-      test("missing exchange type", () async {
-        Channel channel = await client.channel();
-        expect(
-            () => channel.exchange("foo", null),
-            throwsA((ex) =>
-                ex is ArgumentError &&
-                ex.message ==
-                    "The type of the exchange needs to be specified"));
       });
 
       test("missing routing key for non-fanout exchange publish", () async {
@@ -271,31 +261,6 @@ main({bool enableLogger = true}) {
                 ex is ArgumentError &&
                 ex.message ==
                     "A routing key needs to be specified to unbind from this exchange type"));
-      });
-
-      test("bind queue to null exchange", () async {
-        Channel channel = await client.channel();
-        Exchange exchange = await channel.exchange("test", ExchangeType.DIRECT);
-
-        Queue queue = await exchange.channel.privateQueue();
-        expect(
-            () => queue.bind(null, ""),
-            throwsA((ex) =>
-                ex is ArgumentError &&
-                ex.message == "Exchange cannot be null"));
-      });
-
-      test("unbind queue from null exchange", () async {
-        Channel channel = await client.channel();
-        Exchange exchange = await channel.exchange("test", ExchangeType.DIRECT);
-
-        Queue queue = await exchange.channel.privateQueue();
-        queue = await queue.bind(exchange, "test");
-        expect(
-            () => queue.unbind(null, ""),
-            throwsA((ex) =>
-                ex is ArgumentError &&
-                ex.message == "Exchange cannot be null"));
       });
 
       test("declare exchange and bind named queue consumer", () async {

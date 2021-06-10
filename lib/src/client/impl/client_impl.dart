@@ -3,27 +3,27 @@ part of dart_amqp.client;
 class _ClientImpl implements Client {
   // Configuration options
   @override
-  ConnectionSettings settings;
+  late ConnectionSettings settings;
 
   // Tuning settings
   @override
   TuningSettings get tuningSettings => settings.tuningSettings;
 
   // The connection to the server
-  int _connectionAttempt;
-  Socket _socket;
+  int _connectionAttempt = 0;
+  Socket? _socket;
 
   // The list of open channels. Channel 0 is always reserved for signaling
   final Map<int, _ChannelImpl> _channels = <int, _ChannelImpl>{};
 
   // Connection status
-  Completer _connected;
-  Completer _clientClosed;
+  Completer? _connected;
+  Completer? _clientClosed;
 
-  //Error Stream
+  // Error Stream
   final _error = StreamController<Exception>.broadcast();
 
-  _ClientImpl({ConnectionSettings settings}) {
+  _ClientImpl({ConnectionSettings? settings}) {
     // Use defaults if no settings specified
     this.settings = settings ?? ConnectionSettings();
   }
@@ -56,7 +56,7 @@ class _ClientImpl implements Client {
       // Bind processors and initiate handshake
       RawFrameParser(tuningSettings)
           .transformer
-          .bind(_socket)
+          .bind(_socket!)
           .transform(AmqpMessageDecoder().transformer)
           .listen(_handleMessage,
               onError: _handleException,
@@ -68,7 +68,7 @@ class _ClientImpl implements Client {
       _channels.putIfAbsent(0, () => _ChannelImpl(0, this));
     }).catchError((err, trace) {
       // Connection attempt completed with an error (probably protocol mismatch)
-      if (_connected.isCompleted) {
+      if (_connected!.isCompleted) {
         return;
       }
 
@@ -76,7 +76,7 @@ class _ClientImpl implements Client {
         String errorMessage =
             "Could not connect to ${settings.host}:${settings.port} after ${settings.maxConnectionAttempts} attempts. Giving up";
         connectionLogger.severe(errorMessage);
-        _connected.completeError(ConnectionFailedException(errorMessage));
+        _connected!.completeError(ConnectionFailedException(errorMessage));
 
         // Clear _connected future so the client can invoke open() in the future
         _connected = null;
@@ -86,13 +86,13 @@ class _ClientImpl implements Client {
       }
     });
 
-    return _connected.future;
+    return _connected!.future;
   }
 
   /// Check if a connection is currently in handshake state
   @override
   bool get handshaking =>
-      _socket != null && _connected != null && !_connected.isCompleted;
+      _socket != null && _connected != null && !_connected!.isCompleted;
 
   void _handleMessage(DecodedMessage serverMessage) {
     try {
@@ -103,23 +103,23 @@ class _ClientImpl implements Client {
       }
 
       // If we are still handshaking and we receive a message on another channel this is an error
-      if (!_connected.isCompleted && serverMessage.channel != 0) {
+      if (!_connected!.isCompleted && serverMessage.channel != 0) {
         throw FatalException(
             "Received message for channel ${serverMessage.channel} while still handshaking");
       }
 
       // Connection-class messages should only be received on channel 0
-      if (serverMessage.message.msgClassId == 10 &&
+      if (serverMessage.message!.msgClassId == 10 &&
           serverMessage.channel != 0) {
         throw ConnectionException(
             "Received CONNECTION class message on a channel > 0",
             ErrorType.COMMAND_INVALID,
-            serverMessage.message.msgClassId,
-            serverMessage.message.msgMethodId);
+            serverMessage.message!.msgClassId,
+            serverMessage.message!.msgMethodId);
       }
 
       // Fetch target channel and forward frame for processing
-      _ChannelImpl target = _channels[serverMessage.channel];
+      _ChannelImpl? target = _channels[serverMessage.channel];
       if (target == null) {
         // message on unknown channel; ignore
         return;
@@ -128,12 +128,12 @@ class _ClientImpl implements Client {
       // If we got a ConnectionClose message from the server, throw the appropriate exception
       if (serverMessage.message is ConnectionClose) {
         // Ack the closing of the connection
-        _channels[0].writeMessage(ConnectionCloseOk());
+        _channels[0]!.writeMessage(ConnectionCloseOk());
 
         ConnectionClose serverResponse =
             (serverMessage.message as ConnectionClose);
         throw ConnectionException(
-            serverResponse.replyText,
+            serverResponse.replyText!,
             ErrorType.valueOf(serverResponse.replyCode),
             serverResponse.msgClassId,
             serverResponse.msgMethodId);
@@ -148,7 +148,7 @@ class _ClientImpl implements Client {
         _channels.values
             .where((_ChannelImpl channel) =>
                 channel._channelClosed != null &&
-                !channel._channelClosed.isCompleted)
+                !channel._channelClosed!.isCompleted)
             .forEach((_ChannelImpl channel) =>
                 channel._completeOperation(serverMessage.message));
       }
@@ -170,8 +170,8 @@ class _ClientImpl implements Client {
       // Wrap the exception
       if (handshaking &&
           _channels.containsKey(0) &&
-          (_channels[0]._lastHandshakeMessage is ConnectionStartOk ||
-              _channels[0]._lastHandshakeMessage is ConnectionSecureOk)) {
+          (_channels[0]!._lastHandshakeMessage is ConnectionStartOk ||
+              _channels[0]!._lastHandshakeMessage is ConnectionSecureOk)) {
         ex = FatalException("Authentication failed");
       } else {
         ex = FatalException("Lost connection to the server");
@@ -183,12 +183,12 @@ class _ClientImpl implements Client {
     // If we are still handshaking, abort the connection; flush the channels and shut down
     if (handshaking) {
       _channels.clear();
-      _connected.completeError(ex);
+      _connected!.completeError(ex);
       close();
       return;
     }
 
-    if (_error != null && _error.hasListener && !_error.isClosed) {
+    if (_error.hasListener && !_error.isClosed) {
       _error.add(ex);
     }
 
@@ -206,7 +206,7 @@ class _ClientImpl implements Client {
         break;
       case ChannelException:
         // Forward to the appropriate channel and remove it from our list
-        _ChannelImpl target = _channels[ex.channel];
+        _ChannelImpl? target = _channels[ex.channel];
         if (target != null) {
           target.handleException(ex);
           _channels.remove(ex.channel);
@@ -223,7 +223,7 @@ class _ClientImpl implements Client {
   Future connect() {
     // Prevent multiple connection attempts
     if (_connected != null) {
-      return _connected.future;
+      return _connected!.future;
     }
 
     _connectionAttempt = 0;
@@ -240,7 +240,7 @@ class _ClientImpl implements Client {
 
     // Already shutting down
     if (_clientClosed != null) {
-      return _clientClosed.future;
+      return _clientClosed!.future;
     }
 
     // Close all channels in reverse order so we send a connection close message when we close channel 0
@@ -249,19 +249,19 @@ class _ClientImpl implements Client {
             .toList()
             .reversed
             .map((_ChannelImpl channel) => channel.close()))
-        .then((_) => _socket.flush())
-        .then((_) => _socket.close(), onError: (e) {
+        .then((_) => _socket!.flush())
+        .then((_) => _socket!.close(), onError: (e) {
       // Mute exception as the socket may be already closed
     }).whenComplete(() {
-      _socket.destroy();
+      _socket!.destroy();
       _socket = null;
       _connected = null;
       _error.close();
-      _clientClosed.complete();
+      _clientClosed!.complete();
       _clientClosed = null;
     });
 
-    return _clientClosed.future;
+    return _clientClosed!.future;
   }
 
   @override
@@ -275,7 +275,7 @@ class _ClientImpl implements Client {
       }
 
       // Find next available channel
-      _ChannelImpl userChannel;
+      _ChannelImpl? userChannel;
       int nextChannelId = 0;
       while (nextChannelId < 65536) {
         if (!_channels.containsKey(++nextChannelId)) {
@@ -299,11 +299,11 @@ class _ClientImpl implements Client {
   @override
   StreamSubscription<Exception> errorListener(
           void Function(Exception error) onData,
-          {Function onError,
-          void Function() onDone,
-          bool cancelOnError}) =>
+          {Function? onError,
+          void Function()? onDone,
+          bool cancelOnError = false}) =>
       _error.stream.listen(onData,
           onError: onError, onDone: onDone, cancelOnError: cancelOnError);
 
-  _ChannelImpl _removeChannel(int channelId) => _channels.remove(channelId);
+  _ChannelImpl _removeChannel(int channelId) => _channels.remove(channelId)!;
 }
