@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.6
+
+- Merged [#55](https://github.com/achilleasa/dart_amqp/pull/55) which enables
+null-safety for the package.
+
 ## 0.1.5
 
 - Merged [#49](https://github.com/achilleasa/dart_amqp/pull/49) to fix a bug
