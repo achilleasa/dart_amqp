@@ -30,6 +30,7 @@ class ConnectionSettings {
 
   // TLS settings (if TLS connection is required)
   SecurityContext? tlsContext;
+  bool Function(X509Certificate)? onBadCertificate;
 
   ConnectionSettings({
     this.host = "127.0.0.1",
@@ -40,5 +41,6 @@ class ConnectionSettings {
     this.reconnectWaitTime = const Duration(milliseconds: 1500),
     TuningSettings? tuningSettings,
     this.tlsContext,
+    this.onBadCertificate,
   }) : tuningSettings = tuningSettings ?? TuningSettings();
 }
