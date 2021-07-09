@@ -429,8 +429,9 @@ class _ChannelImpl implements Channel {
       bool noWait = false,
       Map<String, Object>? arguments}) {
     var q = _QueueImpl(this, name);
-    if (arguments != null && arguments.containsKey('declare') && !(arguments['declare'] as bool))
+    if (arguments != null && arguments.containsKey('declare') && !(arguments['declare'] as bool)) {
         return Future<Queue>.value(q);
+    }
 
     QueueDeclare queueRequest = QueueDeclare()
       ..reserved_1 = 0
