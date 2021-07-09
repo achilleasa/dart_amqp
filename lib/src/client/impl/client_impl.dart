@@ -43,6 +43,7 @@ class _ClientImpl implements Client {
         settings.host,
         settings.port,
         context: settings.tlsContext,
+        onBadCertificate: settings.onBadCertificate,
       );
     } else {
       connectionLogger.info(
