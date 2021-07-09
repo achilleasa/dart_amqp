@@ -428,6 +428,10 @@ class _ChannelImpl implements Channel {
       bool autoDelete = false,
       bool noWait = false,
       Map<String, Object>? arguments}) {
+    var q = _QueueImpl(this, name);
+    if (arguments != null && arguments.containsKey('declare') && !(arguments['declare'] as bool))
+        return Future<Queue>.value(q);
+
     QueueDeclare queueRequest = QueueDeclare()
       ..reserved_1 = 0
       ..queue = name
@@ -439,8 +443,7 @@ class _ChannelImpl implements Channel {
       ..arguments = arguments;
 
     Completer<Queue> opCompleter = Completer<Queue>();
-    writeMessage(queueRequest,
-        completer: opCompleter, futurePayload: _QueueImpl(this, name));
+    writeMessage(queueRequest, completer: opCompleter, futurePayload: q);
     return opCompleter.future;
   }
 
