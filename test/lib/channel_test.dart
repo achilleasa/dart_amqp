@@ -84,7 +84,7 @@ main({bool enableLogger = true}) {
         }
       });
 
-      test("revocer()", () async {
+      test("recover()", () async {
         Channel channel = await client.channel();
         channel = await channel.recover(true);
       });
