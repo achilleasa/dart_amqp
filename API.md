@@ -60,34 +60,47 @@ The following table summarizes the methods available to an AMQP client. For deta
 
 The following table summarizes the methods available to an AMQP channel obtained via the `channel()` method of a `client` instance. For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/channel.dart).
 
-| Method             |  Description
-|--------------------|------------------
-| close()            | Close the channel and abort any pending operations.
-| queue()            | Define a named queue.
-| privateQueue()     | Define a private queue with a random name that will be deleted when the channel closes.
-| exchange()         | Define an exchange that can be used to route messages to multiple recipients.
-| qos()              | Manage the QoS settings for the channel (prefetech size & count).
-| ack()              | Acknowledge a message by its id.
-| select()           | Begin a transaction.
-| commit()           | Commit a transaction.
-| rollback()         | Rollback a transaction.
-| flow()             | Control message flow.
-| recover()          | Recover unacknowledged messages.
-| basicReturnListener()| Get a StreamSubscription for handling undelivered messages.
+| Method                     | Description
+|----------------------------|
+| close()                    | Close the channel and abort any pending operations.
+| queue()                    | Define a named queue.
+| privateQueue()             | Define a private queue with a random name that will be deleted when the channel closes.
+| exchange()                 | Define an exchange that can be used to route messages to multiple recipients.
+| qos()                      | Manage the QoS settings for the channel (prefetech size & count).
+| ack()                      | Acknowledge a message by its id.
+| select()                   | Begin a transaction.
+| commit()                   | Commit a transaction.
+| rollback()                 | Rollback a transaction.
+| flow()                     | Control message flow.
+| recover()                  | Recover unacknowledged messages.
+| basicReturnListener()      | Get a StreamSubscription for handling undelivered messages.
+| confirmPublishedMessages() | Request that the broker ACKs/NACKs the handling of published messages.
+| publishNotifier()          | Register a listener for publish notifications emitted by the broker.
+
+The `confirmPublishedMessages` and `publishNotifier` methods leverage the _publisher confirms_
+[extension](https://www.rabbitmq.com/confirms.html#publisher-confirms). 
+
+Notifications obtained using this mechanism only guarantee that the broker has
+either processed (persisted) a published message successfully or it has dropped
+it (e.g. out of disk space). Applications should never assume that receiving an
+ACK from the broker for a published message means that a consumer has
+successfully processed the message. As demonstrated by [examples/confirm](https://github.com/achilleasa/dart_amqp/blob/master/examples/confirm),
+the broker will ACK messages published to a queue even if there are no consumers listening
+on the other end.
 
 ## Exchanges
 
 The following table summarizes the methods available to an AMQP exchange declared via the the `exchange()` method of a `channel` instance. For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/exchange.dart).
 
-| Method             |  Description
-|--------------------|------------------
-| name()             | A getter for the exchange name.
-| type()             | A getter for the exchange [type](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/enums/exchange_type.dart).
-| channel()          | A getter for the [channel](#channels) where this exchange was declared.
-| delete()           | Delete the exchange.
-| publish()          | Publish message using a routing key
+| Method                     | Description
+|----------------------------|
+| name()                     | A getter for the exchange name.
+| type()                     | A getter for the exchange [type](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/enums/exchange_type.dart).
+| channel()                  | A getter for the [channel](#channels) where this exchange was declared.
+| delete()                   | Delete the exchange.
+| publish()                  | Publish message using a routing key
 | bindPrivateQueueConsumer() | Convenience method that allocates a private [queue](#queues), binds it to the exchange via a routing key and returns a [consumer](#consumers) for processing messages.
-| bindQueueConsumer() | Convenience method that allocates a named [queue](#queues), binds it to the exchange via a routing key and returns a [consumer](#consumers) for processing messages.
+| bindQueueConsumer()        | Convenience method that allocates a named [queue](#queues), binds it to the exchange via a routing key and returns a [consumer](#consumers) for processing messages.
 
 ## Queues
 
@@ -122,17 +135,17 @@ Queue consumers are essentially StreamControllers that emit a `Stream<AmqpMessag
 payload of the incoming message as well as the incoming message properties
 and provides helper methods for replying, ack-ing and rejecting messages. The following table summarizes the methods provided by `AmqpMessage`.  For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/amqp_message.dart).
 
-| Method             |  Description
-|--------------------|------------------
-| payload()          | A getter for retrieving the raw message paylaod as an Uint8List.
-| payloadAsString()  | A getter for retrieving the message payload as an UTF8 String.
-| payloadAsJson()    | A getter for retrieving the message payload as a parsed JSON document.
-| exchangeName()     | A getter for the [exchange](#exchanges) where the message was published.
-| routingKey()       | A getter for the routing key used for publishing this message.
-| properties()       | A getter for retrieving message [properties](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/protocol/messages/message_properties.dart).
-| ack()				 | Acknowledge this message.
-| reply()            | Reply to the message sender with a new message.
-| reject()           | Reject this message.
+| Method            | Description
+|-------------------|
+| payload()         | A getter for retrieving the raw message paylaod as an Uint8List.
+| payloadAsString() | A getter for retrieving the message payload as an UTF8 String.
+| payloadAsJson()   | A getter for retrieving the message payload as a parsed JSON document.
+| exchangeName()    | A getter for the [exchange](#exchanges) where the message was published.
+| routingKey()      | A getter for the routing key used for publishing this message.
+| properties()      | A getter for retrieving message [properties](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/protocol/messages/message_properties.dart).
+| ack()             | Acknowledge this message.
+| reply()           | Reply to the message sender with a new message.
+| reject()          | Reject this message.
 
 ## Error handling
 

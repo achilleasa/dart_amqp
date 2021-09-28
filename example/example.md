@@ -59,4 +59,5 @@ functionality. If you need RPC support for your application you may want to cons
 
 # Additional examples
 
-The [example](https://github.com/achilleasa/dart_amqp/tree/master/example) folder contains implementations of the six RabbitMQ getting started [tutorials](https://www.rabbitmq.com/getstarted.html).
+The [example](https://github.com/achilleasa/dart_amqp/tree/master/example) folder contains implementations of the six RabbitMQ getting started [tutorials](https://www.rabbitmq.com/getstarted.html)
+plus an [extra](https://github.com/achilleasa/dart_amqp/tree/master/example/confirm) example of working with publish confirmations.
