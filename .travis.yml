@@ -23,7 +23,7 @@ jobs:
       script:
         - export PATH=$PATH:"${TRAVIS_HOME}/.pub-cache/bin"
         - pub get
-        - dartfmt -n --set-exit-if-changed .
+        - dart format --set-exit-if-changed .
         - dartanalyzer --fatal-warnings --fatal-hints --fatal-lints ./
         - AMQP_RUN_TLS_TESTS=true dart --pause-isolates-on-exit --disable-service-auth-codes --enable-vm-service=9292 test/run_all.dart &
         - pub global activate coverage
