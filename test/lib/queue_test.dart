@@ -287,6 +287,29 @@ main({bool enableLogger = true}) {
       return testCompleter.future;
     });
 
+    test("confirm published messages", () async {
+      Completer testCompleter = Completer();
+
+      Channel channel = await client.channel();
+      Queue queue = await channel.privateQueue();
+      await channel.confirmPublishedMessages();
+      await channel.confirmPublishedMessages(); // second call should be a no-op
+
+      channel.publishNotifier((PublishNotification notification) {
+        expect(notification.message, equals("test"));
+        expect(notification.properties?.corellationId, equals("42"));
+        expect(notification.published, equals(true));
+        testCompleter.complete();
+      });
+
+      // Publish message and wait for broker to notify us that it has
+      // successfully processed the message.
+      MessageProperties msgProps = MessageProperties()..corellationId = "42";
+      queue.publish("test", properties: msgProps);
+
+      return testCompleter.future;
+    });
+
     test("queue cancel consumer", () async {
       Completer testCompleter = Completer();
 

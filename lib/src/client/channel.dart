@@ -94,4 +94,27 @@ abstract class Channel {
       {Function onError,
       void Function() onDone,
       bool cancelOnError});
+
+  /// Register a listener to be notified when the broker ACKs or NACKs
+  /// published messages.
+  ///
+  /// When publish confirmations have been enabled on the channel via
+  /// [confirmPublishedMessages]), the broker will either ACK each published
+  /// message to indicate that it has been successfully handled/queued for
+  /// deliver or NACK it to indicate that the message was lost (e.g. out of
+  /// disk space).
+  ///
+  /// Note that receiving an ACK for a message does not guarantee that it has
+  /// been processed by one or more consumers. For example, when publishing to
+  /// a queue with no consumers, the broker will still ACK the message.
+  StreamSubscription<PublishNotification> publishNotifier(
+      void Function(PublishNotification notification) onData,
+      {Function onError,
+      void Function() onDone,
+      bool cancelOnError});
+
+  /// Request that from this point onwards, the broker must confirm whether it
+  /// has processed or dropped each message published to this channel. A
+  /// listener for these notifications can be registered via [publishNotifier].
+  Future confirmPublishedMessages();
 }
