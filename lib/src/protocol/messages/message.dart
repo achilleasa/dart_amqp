@@ -88,6 +88,11 @@ abstract class Message {
             return BasicDeliver.fromStream(decoder);
           case 111:
             return BasicRecoverOk.fromStream(decoder);
+          // Sent by the server when confirm mode is enabled
+          case 80:
+            return BasicAck.fromStream(decoder);
+          case 120:
+            return BasicNack.fromStream(decoder);
         }
         break;
       case 90: // Class: Tx
@@ -100,6 +105,11 @@ abstract class Message {
             return TxRollbackOk.fromStream(decoder);
         }
         break;
+      case 85: // Class Confirm (see: https://github.com/rabbitmq/rabbitmq-codegen/blob/master/amqp-rabbitmq-0.9.1.json#L471-L480)
+        switch (msgMethodId) {
+          case 11:
+            return ConfirmSelectOk();
+        }
     }
 
     // Message decoding failed; unknown message
