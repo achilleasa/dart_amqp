@@ -120,7 +120,9 @@ class ConnectionCloseOkMock extends Mock implements ConnectionCloseOk {
 
   @override
   void serialize(TypeEncoder encoder) {
-    encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
+    encoder
+      ..writeUInt16(msgClassId)
+      ..writeUInt16(msgMethodId);
   }
 }
 
