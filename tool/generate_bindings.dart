@@ -333,15 +333,23 @@ ${String.fromCharCodes(List<int>.filled(className.length + methodName.length + 1
     }
 
     // End casacade
-    serializerMethod..write("    ;\n")..write("  }\n");
+    serializerMethod
+      ..write("    ;\n")
+      ..write("  }\n");
 
-    generatedClass..write("\n")..write(ctors);
+    generatedClass
+      ..write("\n")
+      ..write(ctors);
 
     if (implementedByServer || !implementedByClient) {
-      generatedClass..write("\n")..write(serializerMethod);
+      generatedClass
+        ..write("\n")
+        ..write(serializerMethod);
     } else {
       // Write an empty serializer stub to avoid warnings
-      generatedClass..write("\n\n")..write("""
+      generatedClass
+        ..write("\n\n")
+        ..write("""
   void serialize(TypeEncoder encoder) {}
 """);
     }

@@ -22,7 +22,9 @@ class TxSelect implements Message {
 
   @override
   void serialize(TypeEncoder encoder) {
-    encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
+    encoder
+      ..writeUInt16(msgClassId)
+      ..writeUInt16(msgMethodId);
   }
 }
 
@@ -56,7 +58,9 @@ class TxCommit implements Message {
 
   @override
   void serialize(TypeEncoder encoder) {
-    encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
+    encoder
+      ..writeUInt16(msgClassId)
+      ..writeUInt16(msgMethodId);
   }
 }
 
@@ -90,7 +94,9 @@ class TxRollback implements Message {
 
   @override
   void serialize(TypeEncoder encoder) {
-    encoder..writeUInt16(msgClassId)..writeUInt16(msgMethodId);
+    encoder
+      ..writeUInt16(msgClassId)
+      ..writeUInt16(msgMethodId);
   }
 }
 
