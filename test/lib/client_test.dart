@@ -136,5 +136,24 @@ main({bool enableLogger = true}) {
       client = Client(settings: settings);
       await client.connect();
     });
+
+    test("bad certificate handler", () async {
+      Completer testCompleter = Completer();
+
+      SecurityContext ctx = SecurityContext(withTrustedRoots: true);
+      ConnectionSettings settings = ConnectionSettings(
+          port: 5671,
+          tlsContext: ctx,
+          onBadCertificate: (X509Certificate cert) {
+            print(
+                " [x] onBadCertificate: allowing TLS connection to be established even though we cannot verify the certificate");
+            testCompleter.complete();
+            return true; // allow connection to proceed
+          });
+      client = Client(settings: settings);
+      await client.connect();
+
+      return testCompleter.future;
+    });
   }, skip: skipTLSTests);
 }
