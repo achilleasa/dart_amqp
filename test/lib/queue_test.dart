@@ -82,6 +82,30 @@ main({bool enableLogger = true}) {
       return Future.wait([client.close(), client2.close()]);
     });
 
+    test("queue message delivery when using noWait", () async {
+      Completer testCompleter = Completer();
+
+      Channel channel = await client.channel();
+      Queue testQueue = await channel.queue("test_2", noWait: true);
+      Consumer consumer = await testQueue.consume();
+
+      expect(consumer.channel, const TypeMatcher<Channel>());
+      expect(consumer.queue, const TypeMatcher<Queue>());
+      expect(consumer.tag, isNotEmpty);
+
+      consumer.listen(expectAsync1((AmqpMessage message) {
+        expect(message.payloadAsString, equals("Test payload"));
+        testCompleter.complete();
+      }));
+
+      // Using second client publish a message to the queue
+      Channel channel2 = await client2.channel();
+      Queue target = await channel2.queue(consumer.queue.name, noWait: true);
+      target.publish("Test payload");
+
+      return testCompleter.future;
+    });
+
     test("queue message delivery", () async {
       Completer testCompleter = Completer();
 

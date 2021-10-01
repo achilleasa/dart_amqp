@@ -68,13 +68,14 @@ class _ChannelImpl implements Channel {
       {MessageProperties? properties,
       Object? payloadContent,
       Completer? completer,
-      Object? futurePayload}) {
+      Object? futurePayload,
+      bool noWait = false}) {
     if (_channelClosed != null && (_channelClosed != completer)) {
       throw _channelCloseException ?? StateError("Channel has been closed");
     }
 
-    // If an op completer is specified add it to the queue
-    if (completer != null) {
+    // If an op completer is specified add it to the queue unless noWait is set.
+    if (completer != null && !noWait) {
       _pendingOperations.addLast(completer);
       _pendingOperationPayloads.addLast(futurePayload ?? true);
     }
@@ -91,6 +92,12 @@ class _ChannelImpl implements Channel {
       ..writeMessage(channelId, message,
           properties: properties, payloadContent: payloadContent)
       ..pipe(_client._socket!);
+
+    // If the noWait flag was specified, complete the future now. The broken
+    // will raise any errors asynchronously via the channel or connection.
+    if (completer != null && noWait) {
+      completer.complete(futurePayload ?? true);
+    }
   }
 
   /// Implement the handshake flow specified by the AMQP spec by
@@ -474,7 +481,9 @@ class _ChannelImpl implements Channel {
 
     Completer<Queue> opCompleter = Completer<Queue>();
     writeMessage(queueRequest,
-        completer: opCompleter, futurePayload: _QueueImpl(this, name));
+        completer: opCompleter,
+        futurePayload: _QueueImpl(this, name),
+        noWait: noWait);
     return opCompleter.future;
   }
 
@@ -493,7 +502,9 @@ class _ChannelImpl implements Channel {
 
     Completer<Queue> opCompleter = Completer<Queue>();
     writeMessage(queueRequest,
-        completer: opCompleter, futurePayload: _QueueImpl(this, ""));
+        completer: opCompleter,
+        futurePayload: _QueueImpl(this, ""),
+        noWait: noWait);
     return opCompleter.future;
   }
 
@@ -519,7 +530,9 @@ class _ChannelImpl implements Channel {
 
     Completer<Exchange> opCompleter = Completer<Exchange>();
     writeMessage(exchangeRequest,
-        completer: opCompleter, futurePayload: _ExchangeImpl(this, name, type));
+        completer: opCompleter,
+        futurePayload: _ExchangeImpl(this, name, type),
+        noWait: noWait);
     return opCompleter.future;
   }
 
