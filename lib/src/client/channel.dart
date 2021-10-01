@@ -19,12 +19,16 @@ abstract class Channel {
   ///
   /// The [autoDelete] flag will notify the server that the queue should be deleted when no more connections
   /// are using it.
+  ///
+  /// The [declare] flag can be set to false to skip the queue declaration step
+  /// for clients with read-only access to the broker.
   Future<Queue> queue(String name,
       {bool passive = false,
       bool durable = false,
       bool exclusive = false,
       bool autoDelete = false,
       bool noWait = false,
+      bool declare = true,
       Map<String, Object> arguments});
 
   /// A convenience method for allocating private queues. The client will allocate
