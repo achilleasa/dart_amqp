@@ -2,6 +2,7 @@ library dart_amqp.test.queues;
 
 import "dart:async";
 
+import 'package:dart_amqp/dart_amqp.dart';
 import "package:test/test.dart";
 
 import "package:dart_amqp/src/client.dart";
@@ -102,6 +103,33 @@ main({bool enableLogger = true}) {
       Channel channel2 = await client2.channel();
       Queue target = await channel2.queue(consumer.queue.name, noWait: true);
       target.publish("Test payload");
+
+      return testCompleter.future;
+    });
+
+    test("queue message delivery when consumer has RO access", () async {
+      Completer testCompleter = Completer();
+
+      // Use the second client to define the queue in advance and publish a
+      // message to it
+      Channel channel2 = await client2.channel();
+      Queue target = await channel2.queue("test_ro");
+      target.publish("Test payload");
+
+      // Pretend we are a RO consumer that cannot declare the queue but should
+      // still be able to consume from it.
+      Channel channel = await client.channel();
+      Queue testQueue = await channel.queue("test_ro", declare: false);
+      Consumer consumer = await testQueue.consume();
+
+      expect(consumer.channel, const TypeMatcher<Channel>());
+      expect(consumer.queue, const TypeMatcher<Queue>());
+      expect(consumer.tag, isNotEmpty);
+
+      consumer.listen(expectAsync1((AmqpMessage message) {
+        expect(message.payloadAsString, equals("Test payload"));
+        testCompleter.complete();
+      }));
 
       return testCompleter.future;
     });

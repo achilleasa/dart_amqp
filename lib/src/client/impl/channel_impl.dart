@@ -468,6 +468,7 @@ class _ChannelImpl implements Channel {
       bool exclusive = false,
       bool autoDelete = false,
       bool noWait = false,
+      bool declare = true,
       Map<String, Object>? arguments}) {
     QueueDeclare queueRequest = QueueDeclare()
       ..reserved_1 = 0
@@ -480,6 +481,12 @@ class _ChannelImpl implements Channel {
       ..arguments = arguments;
 
     Completer<Queue> opCompleter = Completer<Queue>();
+
+    if (!declare) {
+      opCompleter.complete(_QueueImpl(this, name));
+      return opCompleter.future;
+    }
+
     writeMessage(queueRequest,
         completer: opCompleter,
         futurePayload: _QueueImpl(this, name),
