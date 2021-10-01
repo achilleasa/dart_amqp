@@ -53,3 +53,4 @@ part "protocol/messages/bindings/exchange.dart";
 part "protocol/messages/bindings/queue.dart";
 part "protocol/messages/bindings/basic.dart";
 part "protocol/messages/bindings/tx.dart";
+part "protocol/messages/bindings/confirm.dart";

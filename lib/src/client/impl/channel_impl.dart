@@ -15,11 +15,20 @@ class _ChannelImpl implements Channel {
   Exception? _channelCloseException;
   final _basicReturnStream = StreamController<BasicReturnMessage>.broadcast();
 
+  // Support for delivery confirmations
+  late Map<int, _PublishNotificationImpl> _pendingDeliveries;
+  late int _nextPublishSeqNo;
+  final _publishNotificationStream =
+      StreamController<PublishNotification>.broadcast();
+
   _ChannelImpl(this.channelId, this._client) {
     _frameWriter = FrameWriter(_client.tuningSettings);
     _pendingOperations = ListQueue<Completer>();
     _pendingOperationPayloads = ListQueue<Object>();
     _consumers = <String, _ConsumerImpl>{};
+
+    _pendingDeliveries = <int, _PublishNotificationImpl>{};
+    _nextPublishSeqNo = 0; // delivery confirmations are disabled
 
     // If we are opening a user channel signal to the server; otherwise perform connection handshake
     if (channelId > 0) {
@@ -68,6 +77,14 @@ class _ChannelImpl implements Channel {
     if (completer != null) {
       _pendingOperations.addLast(completer);
       _pendingOperationPayloads.addLast(futurePayload ?? true);
+    }
+
+    // If this is a publish request and delivery confirmations are enabled
+    // add it to the pending delivery list.
+    if (message is BasicPublish && _nextPublishSeqNo > 0) {
+      _pendingDeliveries[_nextPublishSeqNo] =
+          _PublishNotificationImpl(payloadContent, properties, false);
+      _nextPublishSeqNo++;
     }
 
     _frameWriter
@@ -235,6 +252,12 @@ class _ChannelImpl implements Channel {
       case BasicRecoverOk:
         _completeOperation(serverMessage.message);
         break;
+      case ConfirmSelectOk:
+        // When confirmed deliveries get enabled, we use increasing sequence
+        // numbers (starting from 1) to match published messages to ACKs/NACKs.
+        _nextPublishSeqNo = 1;
+        _completeOperation(serverMessage.message);
+        break;
       // Queues
       case QueueDeclareOk:
         QueueDeclareOk serverResponse = serverMessage.message as QueueDeclareOk;
@@ -293,6 +316,17 @@ class _ChannelImpl implements Channel {
         break;
       case ExchangeDeleteOk:
         _completeOperation(serverMessage.message);
+        break;
+      // Confirmations
+      case BasicAck:
+        BasicAck serverResponse = (serverMessage.message as BasicAck);
+        _handlePublishConfirmation(
+            serverResponse.deliveryTag, true, serverResponse.multiple);
+        break;
+      case BasicNack:
+        BasicNack serverResponse = (serverMessage.message as BasicNack);
+        _handlePublishConfirmation(
+            serverResponse.deliveryTag, false, serverResponse.multiple);
         break;
     }
   }
@@ -560,5 +594,58 @@ class _ChannelImpl implements Channel {
     Completer<Channel> opCompleter = Completer<Channel>();
     writeMessage(recoverRequest, completer: opCompleter, futurePayload: this);
     return opCompleter.future;
+  }
+
+  @override
+  StreamSubscription<PublishNotification> publishNotifier(
+          void Function(PublishNotification notification) onData,
+          {Function? onError,
+          void Function()? onDone,
+          bool cancelOnError = false}) =>
+      _publishNotificationStream.stream.listen(onData,
+          onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+
+  @override
+  Future confirmPublishedMessages() {
+    Completer opCompleter = Completer();
+    if (_nextPublishSeqNo > 0) {
+      opCompleter.complete(); // already enabled
+    } else {
+      ConfirmSelect confirmRequest = ConfirmSelect();
+      writeMessage(confirmRequest, completer: opCompleter);
+    }
+    return opCompleter.future;
+  }
+
+  void _handlePublishConfirmation(int seqNo, bool ack, bool multipleMessages) {
+    if (!multipleMessages) {
+      // Ack/Nack specific seqNo
+      _PublishNotificationImpl? notification = _pendingDeliveries.remove(seqNo);
+      if (notification != null &&
+          _publishNotificationStream.hasListener &&
+          !_publishNotificationStream.isClosed) {
+        notification.published = ack;
+        _publishNotificationStream.add(notification);
+      }
+      return;
+    }
+
+    // Multi Ack/Nack; messages up to seqNo
+    for (var pendingSeqNo in _pendingDeliveries.keys) {
+      if (pendingSeqNo > seqNo) {
+        // only interested in keys up to pendingSeqNo
+        break;
+      }
+
+      _PublishNotificationImpl? notification = _pendingDeliveries.remove(seqNo);
+      if (notification != null &&
+          _publishNotificationStream.hasListener &&
+          !_publishNotificationStream.isClosed) {
+        notification.published = ack;
+        _publishNotificationStream.add(notification);
+      }
+    }
+
+    return;
   }
 }

@@ -242,6 +242,44 @@ class BasicAck implements Message {
 
   BasicAck();
 
+  BasicAck.fromStream(TypeDecoder decoder) {
+    deliveryTag = decoder.readUInt64();
+    int _bitmask;
+    _bitmask = decoder.readUInt8();
+    multiple = _bitmask & 0x1 != 0;
+  }
+
+  @override
+  void serialize(TypeEncoder encoder) {
+    encoder
+      ..writeUInt16(msgClassId)
+      ..writeUInt16(msgMethodId)
+      ..writeUInt64(deliveryTag)
+      ..writeBits([multiple]);
+  }
+}
+
+class BasicNack implements Message {
+  @override
+  final bool msgHasContent = false;
+  @override
+  final int msgClassId = 60;
+  @override
+  final int msgMethodId = 120;
+
+  // Message arguments
+  int deliveryTag = 0;
+  bool multiple = false;
+
+  BasicNack();
+
+  BasicNack.fromStream(TypeDecoder decoder) {
+    deliveryTag = decoder.readUInt64();
+    int _bitmask;
+    _bitmask = decoder.readUInt8();
+    multiple = _bitmask & 0x1 != 0;
+  }
+
   @override
   void serialize(TypeEncoder encoder) {
     encoder
