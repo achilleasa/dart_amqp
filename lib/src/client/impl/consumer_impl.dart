@@ -36,7 +36,7 @@ class _ConsumerImpl implements Consumer {
 
     Completer<Consumer> completer = Completer<Consumer>();
     channel.writeMessage(cancelRequest,
-        completer: completer, futurePayload: this);
+        completer: completer, futurePayload: this, noWait: noWait);
     completer.future.then((_) => _controller.close());
     return completer.future;
   }

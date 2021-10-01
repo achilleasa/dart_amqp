@@ -32,7 +32,7 @@ class _QueueImpl implements Queue {
 
     Completer<Queue> completer = Completer<Queue>();
     channel.writeMessage(deleteRequest,
-        completer: completer, futurePayload: this);
+        completer: completer, futurePayload: this, noWait: noWait);
     return completer.future;
   }
 
@@ -45,7 +45,7 @@ class _QueueImpl implements Queue {
 
     Completer<Queue> completer = Completer<Queue>();
     channel.writeMessage(purgeRequest,
-        completer: completer, futurePayload: this);
+        completer: completer, futurePayload: this, noWait: noWait);
     return completer.future;
   }
 
@@ -76,7 +76,7 @@ class _QueueImpl implements Queue {
 
     Completer<Queue> completer = Completer<Queue>();
     channel.writeMessage(bindRequest,
-        completer: completer, futurePayload: this);
+        completer: completer, futurePayload: this, noWait: noWait);
     return completer.future;
   }
 
@@ -103,7 +103,7 @@ class _QueueImpl implements Queue {
 
     Completer<Queue> completer = Completer<Queue>();
     channel.writeMessage(unbindRequest,
-        completer: completer, futurePayload: this);
+        completer: completer, futurePayload: this, noWait: noWait);
     return completer.future;
   }
 
@@ -150,7 +150,9 @@ class _QueueImpl implements Queue {
 
     Completer<Consumer> completer = Completer<Consumer>();
     channel.writeMessage(consumeRequest,
-        completer: completer, futurePayload: _ConsumerImpl(channel, this, ""));
+        completer: completer,
+        futurePayload: _ConsumerImpl(channel, this, ""),
+        noWait: noWait);
     return completer.future;
   }
 

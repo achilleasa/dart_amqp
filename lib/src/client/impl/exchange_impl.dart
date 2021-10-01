@@ -22,7 +22,7 @@ class _ExchangeImpl implements Exchange {
 
     Completer<Exchange> completer = Completer<Exchange>();
     channel.writeMessage(deleteRequest,
-        completer: completer, futurePayload: this);
+        completer: completer, futurePayload: this, noWait: noWait);
     return completer.future;
   }
 
