@@ -61,7 +61,7 @@ The following table summarizes the methods available to an AMQP client. For deta
 The following table summarizes the methods available to an AMQP channel obtained via the `channel()` method of a `client` instance. For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/channel.dart).
 
 | Method                     | Description
-|----------------------------|
+|----------------------------|------------------
 | close()                    | Close the channel and abort any pending operations.
 | queue()                    | Define a named queue.
 | privateQueue()             | Define a private queue with a random name that will be deleted when the channel closes.
@@ -93,7 +93,7 @@ on the other end.
 The following table summarizes the methods available to an AMQP exchange declared via the the `exchange()` method of a `channel` instance. For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/exchange.dart).
 
 | Method                     | Description
-|----------------------------|
+|----------------------------|------------------
 | name()                     | A getter for the exchange name.
 | type()                     | A getter for the exchange [type](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/enums/exchange_type.dart).
 | channel()                  | A getter for the [channel](#channels) where this exchange was declared.
@@ -136,7 +136,7 @@ payload of the incoming message as well as the incoming message properties
 and provides helper methods for replying, ack-ing and rejecting messages. The following table summarizes the methods provided by `AmqpMessage`.  For detailed documentation on each method and its arguments please consult the class [documentation](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/amqp_message.dart).
 
 | Method            | Description
-|-------------------|
+|-------------------|------------------
 | payload()         | A getter for retrieving the raw message paylaod as an Uint8List.
 | payloadAsString() | A getter for retrieving the message payload as an UTF8 String.
 | payloadAsJson()   | A getter for retrieving the message payload as a parsed JSON document.
