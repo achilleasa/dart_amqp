@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.1
+
+- Merged [#61](https://github.com/achilleasa/dart_amqp/pull/61) to support
+publish confirmations.
+- Merged [#63](https://github.com/achilleasa/dart_amqp/pull/63) to allow applications
+to register a handler for deciding how to deal with TLS certificate-related errors.
+- Merged [#64](https://github.com/achilleasa/dart_amqp/pull/64) to fix a bug
+where calls specifying `noWait: true` would obtain a Future result that would never complete.
+- Merged [#65](https://github.com/achilleasa/dart_amqp/pull/65) to allow clients
+with read-only access to the broker to skip the declaration of the queues that they intend to consume from.
+- Merged [#66](https://github.com/achilleasa/dart_amqp/pull/66) which fixes table layout issues in the documentation.
+
 ## 0.2.0
 
 - Merged [#55](https://github.com/achilleasa/dart_amqp/pull/55) which enables
