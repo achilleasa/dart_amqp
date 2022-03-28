@@ -110,7 +110,9 @@ class _ClientImpl implements Client {
       }
 
       // Connection-class messages should only be received on channel 0
-      if (serverMessage.message!.msgClassId == 10 &&
+      // Heartbeat frames don't have a message so we skip those for this check
+      if (serverMessage is! HeartbeatFrameImpl &&
+          serverMessage.message!.msgClassId == 10 &&
           serverMessage.channel != 0) {
         throw ConnectionException(
             "Received CONNECTION class message on a channel > 0",
@@ -161,6 +163,18 @@ class _ClientImpl implements Client {
   void _handleException(ex) {
     // Ignore exceptions while shutting down
     if (_clientClosed != null) {
+      return;
+    }
+
+    // When heartbeats time out we should close the connection without following
+    // Connection.Close/Close-Ok handshaking.
+    if (ex is HeartbeatTimeoutException) {
+      for (final channel in _channels.values) {
+        channel.dispose();
+      }
+      _channels.clear();
+      _connected!.completeError(ex);
+      _socket?.close();
       return;
     }
 
@@ -254,6 +268,11 @@ class _ClientImpl implements Client {
         .then((_) => _socket!.close(), onError: (e) {
       // Mute exception as the socket may be already closed
     }).whenComplete(() {
+      final zeroChannel = _channels[0];
+
+      zeroChannel?._stopMonitoringHeartbeats();
+      zeroChannel?._stopHeartbeating();
+
       _socket!.destroy();
       _socket = null;
       _connected = null;

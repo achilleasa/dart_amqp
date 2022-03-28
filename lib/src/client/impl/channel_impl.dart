@@ -21,6 +21,12 @@ class _ChannelImpl implements Channel {
   final _publishNotificationStream =
       StreamController<PublishNotification>.broadcast();
 
+  /// Executes when heartbeat wasn't received for 2 * heartbeatInterval
+  Timer? _heartbeatTimeout;
+
+  /// Executes every heartbeatInterval
+  Timer? _heartbeatTimer;
+
   _ChannelImpl(this.channelId, this._client) {
     _frameWriter = FrameWriter(_client.tuningSettings);
     _pendingOperations = ListQueue<Completer>();
@@ -156,13 +162,18 @@ class _ChannelImpl implements Channel {
           ..maxChannels = _client.tuningSettings.maxChannels > 0
               ? _client.tuningSettings.maxChannels
               : serverResponse.channelMax
-          ..heartbeatPeriod = Duration.zero;
+          ..heartbeatPeriod = Duration(seconds: serverResponse.heartbeat);
+
+        if (_client.tuningSettings.heartbeatPeriod != Duration.zero) {
+          // The client should start sending heartbeats after receiving Connection.Tune
+          _startHeartbeating();
+        }
 
         // Respond with the mirrored tuning settings
         ConnectionTuneOk clientResponse = ConnectionTuneOk()
           ..frameMax = serverResponse.frameMax
           ..channelMax = _client.tuningSettings.maxChannels
-          ..heartbeat = 0;
+          ..heartbeat = _client.tuningSettings.heartbeatPeriod.inSeconds;
 
         _lastHandshakeMessage = clientResponse;
         writeMessage(clientResponse);
@@ -178,6 +189,9 @@ class _ChannelImpl implements Channel {
       case ConnectionOpenOk:
         _lastHandshakeMessage = null;
         _completeOperation(serverMessage.message);
+        // The client should start monitoring incoming heartbeats after receiving Connection.Open
+        // TODO: Why are we listening for Connection.OpenOk as a client?
+        _startMonitoringForNextHeartbeat();
         break;
       default:
         throw FatalException(
@@ -221,6 +235,8 @@ class _ChannelImpl implements Channel {
     }
     writeMessage(closeRequest, completer: _channelClosed, futurePayload: this);
     _channelClosed!.future
+        .then((_) => _heartbeatTimeout?.cancel())
+        .then((_) => _heartbeatTimer?.cancel())
         .then((_) => _basicReturnStream.close())
         .then((_) => _client._removeChannel(channelId));
     return _channelClosed!.future;
@@ -231,6 +247,10 @@ class _ChannelImpl implements Channel {
     if (_client.handshaking) {
       _processHandshake(serverMessage);
       return;
+    }
+
+    if (_heartbeatTimeout != null) {
+      _startMonitoringForNextHeartbeat();
     }
 
     if (serverMessage is HeartbeatFrameImpl) {
@@ -667,5 +687,51 @@ class _ChannelImpl implements Channel {
     }
 
     return;
+  }
+
+  /// Disposes of heartbeat timers and basic return stream.
+  ///
+  /// Used in case the channel needs to be rapidly disposed of without
+  /// going through the Connection.Close/CloseOk handshake protocol.
+  void dispose() {
+    _heartbeatTimeout?.cancel();
+    _heartbeatTimer?.cancel();
+    _basicReturnStream.close();
+  }
+
+  /// Start sending heartbeats.
+  void _startHeartbeating() {
+    _heartbeatTimer?.cancel();
+    // TODO: only send heartbeats when nothing else has been sent for the interval
+    _heartbeatTimer = Timer.periodic(
+      _client.tuningSettings.heartbeatPeriod,
+      (_) => writeHeartbeat(),
+    );
+  }
+
+  /// Stop sending heartbeats.
+  void _stopHeartbeating() {
+    _heartbeatTimer?.cancel();
+  }
+
+  /// Monitor next incoming heartbeat.
+  ///
+  /// Call this again when next frame is received as any frame can count as
+  /// a heartbeat.
+  /// When this function isn't called for
+  /// `heartbeatPeriod * 2` then an exception will be raised.
+  void _startMonitoringForNextHeartbeat() {
+    _heartbeatTimeout?.cancel();
+    _heartbeatTimeout = Timer(
+      _client.tuningSettings.heartbeatPeriod * 2,
+      () {
+        throw HeartbeatTimeoutException();
+      },
+    );
+  }
+
+  /// Stops monitoring for incoming heartbeats.
+  void _stopMonitoringHeartbeats() {
+    _heartbeatTimeout?.cancel();
   }
 }
