@@ -130,7 +130,9 @@ class _ChannelImpl implements Channel {
           ..clientProperties = {
             "product": "Dart AMQP client",
             "version": "0.2.3",
-            "platform": "Dart/${Platform.operatingSystem}"
+            "platform": "Dart/${Platform.operatingSystem}",
+            if (_client.settings.connectionName != null)
+              "connection_name": _client.settings.connectionName!,
           }
           ..locale = 'en_US'
           ..mechanism = _client.settings.authProvider.saslType
