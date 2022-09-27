@@ -50,8 +50,13 @@ class _ExchangeImpl implements Exchange {
   }
 
   @override
-  Future<Consumer> bindPrivateQueueConsumer(List<String>? routingKeys,
-      {String? consumerTag, bool noAck = true}) async {
+  Future<Consumer> bindPrivateQueueConsumer(
+    List<String>? routingKeys, {
+    String? consumerTag,
+    bool noAck = true,
+    bool noWait = false,
+    Map<String, Object>? arguments,
+  }) async {
     // Fanout and headers exchanges do not need to specify any keys. Use the default one if none is specified
     if ((type == ExchangeType.FANOUT || type == ExchangeType.HEADERS) &&
         (routingKeys == null || routingKeys.isEmpty)) {
@@ -63,7 +68,8 @@ class _ExchangeImpl implements Exchange {
           "One or more routing keys needs to be specified for this exchange type");
     }
 
-    Queue queue = await channel.privateQueue();
+    Queue queue =
+        await channel.privateQueue(noWait: noWait, arguments: arguments);
     for (String routingKey in routingKeys) {
       await queue.bind(this, routingKey);
     }
@@ -72,8 +78,17 @@ class _ExchangeImpl implements Exchange {
 
   @override
   Future<Consumer> bindQueueConsumer(
-      String queueName, List<String>? routingKeys,
-      {String? consumerTag, bool noAck = true}) async {
+    String queueName,
+    List<String>? routingKeys, {
+    String? consumerTag,
+    bool noAck = true,
+    bool passive = false,
+    bool durable = false,
+    bool exclusive = false,
+    bool autoDelete = false,
+    bool noWait = false,
+    bool declare = true,
+  }) async {
     // Fanout and headers exchanges do not need to specify any keys. Use the default one if none is specified
     if ((type == ExchangeType.FANOUT || type == ExchangeType.HEADERS) &&
         (routingKeys == null || routingKeys.isEmpty)) {
@@ -85,7 +100,13 @@ class _ExchangeImpl implements Exchange {
           "One or more routing keys needs to be specified for this exchange type");
     }
 
-    Queue queue = await channel.queue(queueName);
+    Queue queue = await channel.queue(queueName,
+        passive: passive,
+        durable: durable,
+        exclusive: exclusive,
+        autoDelete: autoDelete,
+        noWait: noWait,
+        declare: declare);
     for (String routingKey in routingKeys) {
       await queue.bind(this, routingKey);
     }
