@@ -42,8 +42,16 @@ abstract class Exchange {
   ///
   /// The [noAck] flag will notify the server whether the consumer is expected to acknowledge incoming
   /// messages or not.
-  Future<Consumer> bindPrivateQueueConsumer(List<String>? routingKeys,
-      {String consumerTag, bool noAck = true});
+  ///
+  /// The [noWait] and [arguments] parameters are used in the same way
+  /// as they are in [Channel.privateQueue].
+  Future<Consumer> bindPrivateQueueConsumer(
+    List<String>? routingKeys, {
+    String consumerTag,
+    bool noAck = true,
+    bool noWait = false,
+    Map<String, Object>? arguments,
+  });
 
   /// Allocate a named [Queue], bind it to this exchange using the supplied [routingKeys],
   /// allocate a [Consumer] and return a [Future<Consumer>].
@@ -53,6 +61,20 @@ abstract class Exchange {
   ///
   /// The [noAck] flag will notify the server whether the consumer is expected to acknowledge incoming
   /// messages or not.
-  Future<Consumer> bindQueueConsumer(String queueName, List<String> routingKeys,
-      {String consumerTag, bool noAck = true});
+  ///
+  /// The [passive], [durable], [exclusive], [autoDelete], [noWait] and
+  /// [declare] parameters are used in the same way as they are in
+  /// [Channel.queue].
+  Future<Consumer> bindQueueConsumer(
+    String queueName,
+    List<String> routingKeys, {
+    String consumerTag,
+    bool noAck = true,
+    bool passive = false,
+    bool durable = false,
+    bool exclusive = false,
+    bool autoDelete = false,
+    bool noWait = false,
+    bool declare = true,
+  });
 }
