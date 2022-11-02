@@ -49,10 +49,22 @@ abstract class Channel {
       bool noWait = false,
       Map<String, Object> arguments});
 
-  /// Setup the [prefetchSize] and [prefetchCount] QoS parameters.
+  /// Setup the [prefetchSize] and [prefetchCount] QoS parameters. The value
+  /// of the [global] flag is interpreted differently between the AMQP 0-9-1
+  /// spec and RabbitMQ.
+  ///
+  /// For RabbitMQ, if [global] is true, then [prefetchCount] is shared between
+  /// all consumers of this channel. Otherwise, [prefetchCount] is applied
+  /// separately to each new consumer of the channel.
+  ///
+  /// According to the AMQP spec, if [global] is true, then [prefetchCount] is
+  /// shared between all consumers on the connection. Otherwise,
+  /// [prefetchCount] is shared between all consumers of this channel.
+  ///
   /// Returns a [Future<Channel>] with the affected channel once the server
   /// confirms the updated QoS settings.
-  Future<Channel> qos(int? prefetchSize, int? prefetchCount);
+  Future<Channel> qos(int? prefetchSize, int? prefetchCount,
+      {bool global = true});
 
   /// Acknowledge a [deliveryTag]. The [multiple] flag can be set to true
   /// to notify the server that the client ack-ed all pending messages up to [deliveryTag].
