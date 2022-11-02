@@ -1,4 +1,4 @@
-# dart_ampq
+# dart_amqp
 
 [![Build Status](https://travis-ci.com/achilleasa/dart_amqp.svg?branch=master)](https://travis-ci.com/achilleasa/dart_amqp)
 [![Coverage Status](https://coveralls.io/repos/github/achilleasa/dart_amqp/badge.svg?branch=master)](https://coveralls.io/github/achilleasa/dart_amqp?branch=master)
