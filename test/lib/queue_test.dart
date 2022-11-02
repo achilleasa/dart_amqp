@@ -5,11 +5,6 @@ import "dart:async";
 import 'package:dart_amqp/dart_amqp.dart';
 import "package:test/test.dart";
 
-import "package:dart_amqp/src/client.dart";
-import "package:dart_amqp/src/protocol.dart";
-import "package:dart_amqp/src/enums.dart";
-import "package:dart_amqp/src/exceptions.dart";
-
 import "mocks/mocks.dart" as mock;
 
 // This test expects a local running rabbitmq instance at the default port
