@@ -24,6 +24,9 @@ abstract class AmqpMessage {
   /// exchange (e.g. posted directly to a queue).
   String? get routingKey;
 
+  /// Get the [deliveryTag] for this message.
+  int get deliveryTag;
+
   /// Get the [properties] that were included with the message metadata
   MessageProperties? get properties;
 
