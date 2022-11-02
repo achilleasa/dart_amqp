@@ -22,13 +22,13 @@ jobs:
         - gem install coveralls-lcov
       script:
         - export PATH=$PATH:"${TRAVIS_HOME}/.pub-cache/bin"
-        - pub get
+        - dart pub get
         - dart format --set-exit-if-changed .
-        - dartanalyzer --fatal-warnings --fatal-hints --fatal-lints ./
+        - dart analyze --fatal-warnings --fatal-infos ./
         - AMQP_RUN_TLS_TESTS=true dart --pause-isolates-on-exit --disable-service-auth-codes --enable-vm-service=9292 test/run_all.dart &
-        - pub global activate coverage
-        - pub global run coverage:collect_coverage --port=9292 --out=coverage/coverage.json --wait-paused --resume-isolates
-        - pub global run coverage:format_coverage --lcov --in=coverage/coverage.json --out=coverage/lcov.info --packages=.packages --report-on=lib --check-ignore
+        - dart pub global activate coverage
+        - dart pub global run coverage:collect_coverage --port=9292 --out=coverage/coverage.json --wait-paused --resume-isolates
+        - dart pub global run coverage:format_coverage --lcov --in=coverage/coverage.json --out=coverage/lcov.info --report-on=lib --check-ignore
       after_success:
         - coveralls-lcov coverage/lcov.info
 cache:
