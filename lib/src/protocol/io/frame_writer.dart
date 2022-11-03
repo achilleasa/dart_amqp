@@ -1,6 +1,6 @@
 part of dart_amqp.protocol;
 
-final Uint8List FRAME_TERMINATOR_SEQUENCE =
+final Uint8List frameTerminatorSequence =
     Uint8List.fromList([RawFrameParser.FRAME_TERMINATOR]);
 
 class FrameWriter {
@@ -34,7 +34,7 @@ class FrameWriter {
 
     _outputEncoder.writer
       ..addFirst(_bufferEncoder.writer.joinChunks())
-      ..addLast(FRAME_TERMINATOR_SEQUENCE);
+      ..addLast(frameTerminatorSequence);
 
     _bufferEncoder.writer.clear();
 
@@ -78,7 +78,7 @@ class FrameWriter {
       _outputEncoder.writer
         ..addLast(_bufferEncoder.writer.joinChunks())
         ..addLast(serializedContentHeader)
-        ..addLast(FRAME_TERMINATOR_SEQUENCE);
+        ..addLast(frameTerminatorSequence);
       _bufferEncoder.writer.clear();
 
       // Emit the payload data split in ceil( length / maxFrameLength ) chunks
@@ -96,7 +96,7 @@ class FrameWriter {
         _outputEncoder.writer
           ..addLast(Uint8List.view(
               serializedContent.buffer, offset, _frameHeader.size))
-          ..addLast(FRAME_TERMINATOR_SEQUENCE);
+          ..addLast(frameTerminatorSequence);
       }
     }
   }

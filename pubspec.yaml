@@ -13,6 +13,6 @@ dev_dependencies:
   mockito: ^5.0.9
   http: ^0.13.3
   xml: ^5.1.1
-  lints: ^1.0.1
+  lints: ^2.0.1
 false_secrets:
   - test/lib/mocks/certs/*.pem

@@ -62,9 +62,9 @@ class ChannelFlow implements Message {
 
   ChannelFlow();
   ChannelFlow.fromStream(TypeDecoder decoder) {
-    int _bitmask;
-    _bitmask = decoder.readUInt8();
-    active = _bitmask & 0x1 != 0;
+    int bitmask;
+    bitmask = decoder.readUInt8();
+    active = bitmask & 0x1 != 0;
   }
   @override
   void serialize(TypeEncoder encoder) {
@@ -88,9 +88,9 @@ class ChannelFlowOk implements Message {
 
   ChannelFlowOk();
   ChannelFlowOk.fromStream(TypeDecoder decoder) {
-    int _bitmask;
-    _bitmask = decoder.readUInt8();
-    active = _bitmask & 0x1 != 0;
+    int bitmask;
+    bitmask = decoder.readUInt8();
+    active = bitmask & 0x1 != 0;
   }
   @override
   void serialize(TypeEncoder encoder) {
