@@ -23,7 +23,7 @@ class _AmqpMessageImpl implements AmqpMessage {
 
   @override
   String get routingKey => (message.message as BasicDeliver).routingKey;
-  
+
   @override
   int get deliveryTag => (message.message as BasicDeliver).deliveryTag;
 
