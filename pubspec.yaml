@@ -6,6 +6,7 @@ homepage: https://github.com/achilleasa/dart_amqp
 environment:
   sdk: ">=2.12.0 <3.0.0"
 dependencies:
+  async: ^2.10.0
   logging: ^1.0.1
 dev_dependencies:
   test: ^1.17.5
@@ -13,3 +14,5 @@ dev_dependencies:
   http: ^0.13.3
   xml: ^5.1.1
   lints: ^1.0.1
+false_secrets:
+  - test/lib/mocks/certs/*.pem
