@@ -273,30 +273,30 @@ ${String.fromCharCodes(List<int>.filled(className.length + methodName.length + 1
           // Declare a temp var for parsing bitmasks in c-tor and reset bit offset
           if (!declaredBitVar && implementedByClient) {
             ctors.write("""
-    int _bitmask;
+    int bitmask;
 """);
             declaredBitVar = true;
           }
           if (implementedByClient) {
             ctors.write("""
-    _bitmask = decoder.readUInt8();
+    bitmask = decoder.readUInt8();
 """);
           }
 
-          // Unserialize field value from read _bitmask
+          // Unserialize field value from read bitmask
           bitOffset = 0;
           if (implementedByClient) {
             ctors.write(
-                "    $fieldName = _bitmask & 0x${(1 << bitOffset).toRadixString(16)} != 0;\n");
+                "    $fieldName = bitmask & 0x${(1 << bitOffset).toRadixString(16)} != 0;\n");
           }
           bitOffset++;
         } else {
           serializerMethod.write(", $fieldName");
 
-          // Unserialize field value from read _bitmask
+          // Unserialize field value from read bitmask
           if (implementedByClient) {
             ctors.write(
-                "    $fieldName = _bitmask & 0x${(1 << bitOffset).toRadixString(16)} != 0;\n");
+                "    $fieldName = bitmask & 0x${(1 << bitOffset).toRadixString(16)} != 0;\n");
           }
           bitOffset++;
         }

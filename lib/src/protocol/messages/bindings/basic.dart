@@ -217,9 +217,9 @@ class BasicDeliver implements Message {
   BasicDeliver.fromStream(TypeDecoder decoder) {
     consumerTag = decoder.readShortString();
     deliveryTag = decoder.readUInt64();
-    int _bitmask;
-    _bitmask = decoder.readUInt8();
-    redelivered = _bitmask & 0x1 != 0;
+    int bitmask;
+    bitmask = decoder.readUInt8();
+    redelivered = bitmask & 0x1 != 0;
     exchange = decoder.readShortString();
     routingKey = decoder.readShortString();
   }
@@ -244,9 +244,9 @@ class BasicAck implements Message {
 
   BasicAck.fromStream(TypeDecoder decoder) {
     deliveryTag = decoder.readUInt64();
-    int _bitmask;
-    _bitmask = decoder.readUInt8();
-    multiple = _bitmask & 0x1 != 0;
+    int bitmask;
+    bitmask = decoder.readUInt8();
+    multiple = bitmask & 0x1 != 0;
   }
 
   @override
@@ -275,9 +275,9 @@ class BasicNack implements Message {
 
   BasicNack.fromStream(TypeDecoder decoder) {
     deliveryTag = decoder.readUInt64();
-    int _bitmask;
-    _bitmask = decoder.readUInt8();
-    multiple = _bitmask & 0x1 != 0;
+    int bitmask;
+    bitmask = decoder.readUInt8();
+    multiple = bitmask & 0x1 != 0;
   }
 
   @override
