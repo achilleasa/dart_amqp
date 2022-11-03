@@ -1,10 +1,14 @@
 # Changelog
 
+## 0.2.3
+
+- Merged [#85](https://github.com/achilleasa/dart_amqp/pull/85) to fix some minor lint issues that were discovered after bumping the lint_core dep version.
+
 ## 0.2.2
 
 - Merged [#78](https://github.com/achilleasa/dart_amqp/pull/78) to support queue properties for `bindQueueConsumer` and `bindPrivateQueueConsumer`.
 - Merged [#80](https://github.com/achilleasa/dart_amqp/pull/80) to expose the `deliveryTag` field from `AmqpMessage` instances.
-- Merged [#82](https://github.com/achilleasa/dart_amqp/pull/82) to support changine the value of the `global` parameter when invoking `channel.qos()`.
+- Merged [#82](https://github.com/achilleasa/dart_amqp/pull/82) to support changing the value of the `global` parameter when invoking `channel.qos()`.
 - Merged [#84](https://github.com/achilleasa/dart_amqp/pull/84) to support heartbeats.
 
 ## 0.2.1
