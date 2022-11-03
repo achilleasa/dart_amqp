@@ -35,7 +35,7 @@ The class exposes the following parameters:
 |-----------------|------------------|----------------------
 | maxChannels     | 0 (no limit)     | The maximum number of channels that can be opened by the client. When set to zero, the maximum number of channels is 65535.
 | maxFrameSize    | 4096 bytes       | The maximum frame size that can be parsed by the client. According to the spec, this is set to a high-enough initial value so that the client can parse the messages exchanged during the handshake. The client will negotiate with the server during the handshake phase and adjust this value upwards.
-| heartbeatPeriod | 0 sec            | The heartbeat period expressed as a [Duration](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart:core.Duration) object. Heartbeats are not currently supported by the client so this value is set to 0 (disabled).
+| heartbeatPeriod | 0 sec            | The preferred heartbeat period (or `Duration.zero` to disable heartbeats) expressed as a [Duration](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart:core.Duration) object.
 
 
 ### Creating a new client
@@ -55,6 +55,36 @@ The following table summarizes the methods available to an AMQP client. For deta
 | close()            | Clean up any open channels and shutdown the connection. Returns a `Future` to be completed when the shutdown is complete.
 | channel()	     | Allocate a user channel and return a `Future<Channel>`.
 | errorListener()    | Register a listener for exceptions caught by the client.
+
+### Heartbeat support 
+
+Heartbeat support will be enabled if both the client and the server specify a
+non-zero (> 1s) heartbeat period during the initial connection handshake flow.
+The effective heartbeat period is calculated as the **minimum** value requested
+by the client and the server.
+
+If the effective heartbeat period is zero, heartbeat support is disabled.
+
+When heartbeats are enabled, the client will start sending heartbeat messages 
+to the server in the background. At the same time, the client will monitor 
+incoming messages and will raise a [HeartbeatFailedException](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/exceptions/heartbeat_failed_exception.dart)
+if the server does not send any message within the agreed upon period.
+
+Clients can specify their preferred heartbeat period when creating the client 
+as follows:
+
+```dart
+Client client = Client(
+  settings: ConnectionSettings(
+    tuningSettings: TuningSettings(
+      heartbeatPeriod: const Duration(seconds: 60),
+    ),
+  ),
+);
+```
+
+After a successful connection (e.g. `await client.connect()`), the negotiated 
+heartbeat period can be inspected via `client.tuningSettings.heartbeatPeriod`.
 
 ## Channels
 
