@@ -1,7 +1,6 @@
 library dart_amqp.test.auth;
 
 import "package:test/test.dart";
-import "package:mockito/mockito.dart";
 
 import "package:dart_amqp/src/authentication.dart";
 import "package:dart_amqp/src/client.dart";
@@ -9,122 +8,6 @@ import "package:dart_amqp/src/protocol.dart";
 import "package:dart_amqp/src/exceptions.dart";
 
 import "mocks/mocks.dart" as mock;
-
-class ConnectionStartMock extends Mock implements ConnectionStart {
-  @override
-  final bool msgHasContent = false;
-  @override
-  final int msgClassId = 10;
-  @override
-  final int msgMethodId = 10;
-
-  // Message arguments
-  @override
-  int versionMajor = 0;
-  @override
-  int versionMinor = 0;
-  @override
-  Map<String, Object?>? serverProperties;
-  @override
-  String mechanisms = "";
-  @override
-  String locales = "";
-
-  @override
-  void serialize(TypeEncoder encoder) {
-    encoder
-      ..writeUInt16(msgClassId)
-      ..writeUInt16(msgMethodId)
-      ..writeUInt8(versionMajor)
-      ..writeUInt8(versionMinor)
-      ..writeFieldTable(serverProperties)
-      ..writeLongString(mechanisms)
-      ..writeLongString(locales);
-  }
-}
-
-class ConnectionSecureMock extends Mock implements ConnectionSecure {
-  @override
-  final bool msgHasContent = false;
-  @override
-  final int msgClassId = 10;
-  @override
-  final int msgMethodId = 20;
-
-  // Message arguments
-  @override
-  String? challenge;
-
-  @override
-  void serialize(TypeEncoder encoder) {
-    encoder
-      ..writeUInt16(msgClassId)
-      ..writeUInt16(msgMethodId)
-      ..writeLongString(challenge);
-  }
-}
-
-class ConnectionTuneMock extends Mock implements ConnectionTune {
-  @override
-  final bool msgHasContent = false;
-  @override
-  final int msgClassId = 10;
-  @override
-  final int msgMethodId = 30;
-
-  // Message arguments
-  @override
-  int channelMax = 0;
-  @override
-  int frameMax = 0;
-  @override
-  int heartbeat = 0;
-
-  @override
-  void serialize(TypeEncoder encoder) {
-    encoder
-      ..writeUInt16(msgClassId)
-      ..writeUInt16(msgMethodId)
-      ..writeUInt16(channelMax)
-      ..writeUInt32(frameMax)
-      ..writeUInt16(heartbeat);
-  }
-}
-
-class ConnectionOpenOkMock extends Mock implements ConnectionOpenOk {
-  @override
-  final bool msgHasContent = false;
-  @override
-  final int msgClassId = 10;
-  @override
-  final int msgMethodId = 41;
-  @override
-  String? reserved_1;
-
-  @override
-  void serialize(TypeEncoder encoder) {
-    encoder
-      ..writeUInt16(msgClassId)
-      ..writeUInt16(msgMethodId)
-      ..writeShortString(reserved_1);
-  }
-}
-
-class ConnectionCloseOkMock extends Mock implements ConnectionCloseOk {
-  @override
-  final bool msgHasContent = false;
-  @override
-  final int msgClassId = 10;
-  @override
-  final int msgMethodId = 51;
-
-  @override
-  void serialize(TypeEncoder encoder) {
-    encoder
-      ..writeUInt16(msgClassId)
-      ..writeUInt16(msgMethodId);
-  }
-}
 
 class FooAuthProvider implements Authenticator {
   @override
@@ -134,45 +17,6 @@ class FooAuthProvider implements Authenticator {
   String answerChallenge(String? challenge) {
     return "";
   }
-}
-
-void generateHandshakeMessages(
-    FrameWriter frameWriter, mock.MockServer server, int numChapRounds) {
-  // Connection start
-  frameWriter.writeMessage(
-      0,
-      ConnectionStartMock()
-        ..versionMajor = 0
-        ..versionMinor = 9
-        ..serverProperties = {"product": "foo"}
-        ..mechanisms = "PLAIN"
-        ..locales = "en");
-  server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
-  frameWriter.outputEncoder.writer.clear();
-
-  // Challenge - response rounds
-  for (int round = 0; round < numChapRounds; round++) {
-    // Connection secure
-    frameWriter.writeMessage(
-        0, ConnectionSecureMock()..challenge = "round$round");
-    server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
-    frameWriter.outputEncoder.writer.clear();
-  }
-
-  // Connection tune
-  frameWriter.writeMessage(
-      0,
-      ConnectionTuneMock()
-        ..channelMax = 0
-        ..frameMax = (TuningSettings()).maxFrameSize
-        ..heartbeat = 0);
-  server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
-  frameWriter.outputEncoder.writer.clear();
-
-  // Connection open ok
-  frameWriter.writeMessage(0, ConnectionOpenOkMock());
-  server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
-  frameWriter.outputEncoder.writer.clear();
 }
 
 main({bool enableLogger = true}) {
@@ -224,10 +68,10 @@ main({bool enableLogger = true}) {
     });
 
     test("multiple challenge-response rounds", () async {
-      generateHandshakeMessages(frameWriter, server, 10);
+      server.generateHandshakeMessages(frameWriter, numChapRounds: 10);
 
       // Encode final connection close
-      frameWriter.writeMessage(0, ConnectionCloseOkMock());
+      frameWriter.writeMessage(0, mock.ConnectionCloseOkMock());
       server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
       frameWriter.outputEncoder.writer.clear();
 

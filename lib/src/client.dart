@@ -5,6 +5,8 @@ import "dart:io";
 import "dart:typed_data";
 import "dart:collection";
 
+import 'package:async/async.dart';
+
 // Internal lib dependencies
 import "logging.dart";
 import "exceptions.dart";
