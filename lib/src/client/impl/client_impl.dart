@@ -23,6 +23,10 @@ class _ClientImpl implements Client {
   // Error Stream
   final _error = StreamController<Exception>.broadcast();
 
+  // The heartbeattRecvTimer is reset every time we receive _any_ message from
+  // the server. If the timer expires, a HeartbeatFailed exception will be raised.
+  RestartableTimer? _heartbeatRecvTimer;
+
   _ClientImpl({ConnectionSettings? settings}) {
     // Use defaults if no settings specified
     this.settings = settings ?? ConnectionSettings();
@@ -97,16 +101,27 @@ class _ClientImpl implements Client {
 
   void _handleMessage(DecodedMessage serverMessage) {
     try {
-      // Heartbeat frames should be received on channel 0
-      if (serverMessage is HeartbeatFrameImpl && serverMessage.channel != 0) {
-        throw ConnectionException("Received HEARTBEAT message on a channel > 0",
-            ErrorType.COMMAND_INVALID, 0, 0);
-      }
-
       // If we are still handshaking and we receive a message on another channel this is an error
       if (!_connected!.isCompleted && serverMessage.channel != 0) {
         throw FatalException(
             "Received message for channel ${serverMessage.channel} while still handshaking");
+      }
+
+      // Reset heartbeat timer if it has been initialized.
+      _heartbeatRecvTimer?.reset();
+
+      // Heartbeat frames should be received on channel 0
+      if (serverMessage is HeartbeatFrameImpl) {
+        if (serverMessage.channel != 0) {
+          throw ConnectionException(
+              "Received HEARTBEAT message on a channel > 0",
+              ErrorType.COMMAND_INVALID,
+              0,
+              0);
+        }
+
+        // No further processing required.
+        return;
       }
 
       // Connection-class messages should only be received on channel 0
@@ -117,6 +132,20 @@ class _ClientImpl implements Client {
             ErrorType.COMMAND_INVALID,
             serverMessage.message!.msgClassId,
             serverMessage.message!.msgMethodId);
+      }
+
+      // If we got a ConnectionOpen message from the server and a heartbeat
+      // period has been configured, start monitoring incoming heartbeats.
+      if (serverMessage.message is ConnectionOpenOk &&
+          tuningSettings.heartbeatPeriod.inSeconds > 0) {
+        _heartbeatRecvTimer =
+            RestartableTimer(tuningSettings.heartbeatPeriod, () {
+          // Set the timer to null to avoid accidentally resetting it while
+          // shutting down.
+          _heartbeatRecvTimer = null;
+          _handleException(HeartbeatFailedException(
+              "Server did not respond to heartbeats for ${tuningSettings.heartbeatPeriod.inSeconds}s"));
+        });
       }
 
       // Fetch target channel and forward frame for processing
@@ -194,6 +223,7 @@ class _ClientImpl implements Client {
     }
 
     switch (ex.runtimeType) {
+      case HeartbeatFailedException:
       case FatalException:
       case ConnectionException:
 

@@ -21,6 +21,11 @@ class _ChannelImpl implements Channel {
   final _publishNotificationStream =
       StreamController<PublishNotification>.broadcast();
 
+  // After receiving a ConnectionTune message with a non-zero heartbeat value,
+  // the client initializes heartbeatSendTimer to send heartbeats to the server
+  // approximately twice within the agreed upon period.
+  Timer? _heartbeatSendTimer;
+
   _ChannelImpl(this.channelId, this._client) {
     _frameWriter = FrameWriter(_client.tuningSettings);
     _pendingOperations = ListQueue<Completer>();
@@ -156,16 +161,34 @@ class _ChannelImpl implements Channel {
           ..maxChannels = _client.tuningSettings.maxChannels > 0
               ? _client.tuningSettings.maxChannels
               : serverResponse.channelMax
-          ..heartbeatPeriod = Duration.zero;
+          ..heartbeatPeriod = minDuration(
+            Duration(seconds: serverResponse.heartbeat),
+            _client.tuningSettings.heartbeatPeriod,
+          );
 
         // Respond with the mirrored tuning settings
         ConnectionTuneOk clientResponse = ConnectionTuneOk()
           ..frameMax = serverResponse.frameMax
           ..channelMax = _client.tuningSettings.maxChannels
-          ..heartbeat = 0;
+          ..heartbeat = _client.tuningSettings.heartbeatPeriod.inSeconds;
 
         _lastHandshakeMessage = clientResponse;
         writeMessage(clientResponse);
+
+        // If heartbeats are enabled, start sending them out periodically
+        // from this point onwards approximately twice within the agreed upon
+        // period.
+        if (_client.tuningSettings.heartbeatPeriod.inSeconds > 0) {
+          connectionLogger.info(
+              "Enabling heartbeat support (negotiated interval: ${_client.tuningSettings.heartbeatPeriod.inSeconds}s)");
+
+          var interval =
+              _client.tuningSettings.heartbeatPeriod.inMilliseconds ~/ 2;
+          _heartbeatSendTimer =
+              Timer.periodic(Duration(milliseconds: interval), (_) {
+            writeHeartbeat();
+          });
+        }
 
         // Also respond with a connection open request. The _channelOpened future has already been
         // pushed to the pending operations stack in the constructor so we do not need to do it here
@@ -207,6 +230,7 @@ class _ChannelImpl implements Channel {
     Message closeRequest;
 
     if (channelId == 0) {
+      _heartbeatSendTimer?.cancel();
       closeRequest = ConnectionClose()
         ..replyCode = replyCode?.value ?? 0
         ..replyText = replyText
@@ -234,7 +258,6 @@ class _ChannelImpl implements Channel {
     }
 
     if (serverMessage is HeartbeatFrameImpl) {
-      connectionLogger.info("Received heartbeat frame");
       return;
     }
 
@@ -668,4 +691,11 @@ class _ChannelImpl implements Channel {
 
     return;
   }
+}
+
+Duration minDuration(Duration a, b) {
+  if (a < b) {
+    return a;
+  }
+  return b;
 }

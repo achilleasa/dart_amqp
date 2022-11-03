@@ -156,4 +156,73 @@ main({bool enableLogger = true}) {
       return testCompleter.future;
     });
   }, skip: skipTLSTests);
+
+  group("Client heartbeat test:", () {
+    late Client client;
+    late mock.MockServer server;
+    late FrameWriter frameWriter;
+    late TuningSettings tuningSettings;
+    setUp(() {
+      tuningSettings = TuningSettings();
+      frameWriter = FrameWriter(tuningSettings);
+      server = mock.MockServer();
+      client = Client(
+        settings: ConnectionSettings(
+          port: 9000,
+          tuningSettings: tuningSettings,
+        ),
+      );
+      return server.listen('127.0.0.1', 9000);
+    });
+
+    tearDown(() async {
+      await client.close();
+      await server.shutdown();
+    });
+
+    test("client disables heartbeats if they are not enabled by the client",
+        () async {
+      server.generateHandshakeMessages(frameWriter,
+          heartbeatPeriod: const Duration(seconds: 42));
+
+      // Encode final connection close
+      frameWriter.writeMessage(0, mock.ConnectionCloseOkMock());
+      server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
+      frameWriter.outputEncoder.writer.clear();
+
+      tuningSettings.heartbeatPeriod = Duration.zero;
+      await client.connect();
+
+      // Client should force heartbeatPeriod to Duration.zero even when the
+      // server requests a non-zero heartbeat period.
+      expect(client.tuningSettings.heartbeatPeriod, equals(Duration.zero));
+    });
+
+    test("client raises exception if server stops sending heartbeats",
+        () async {
+      server.generateHandshakeMessages(frameWriter,
+          heartbeatPeriod: const Duration(seconds: 1));
+
+      try {
+        tuningSettings.heartbeatPeriod = const Duration(seconds: 123);
+        await client.connect();
+        // The effective period is 1s; calculated as:
+        // min(server period, client period)
+        expect(client.tuningSettings.heartbeatPeriod,
+            equals(const Duration(seconds: 1)));
+
+        // Perform a blocking call until the heartbeat timer expires.
+        await client.channel();
+      } catch (e) {
+        expect(e, const TypeMatcher<HeartbeatFailedException>());
+        expect((e as HeartbeatFailedException).message,
+            equals("Server did not respond to heartbeats for 1s"));
+
+        // Encode final connection close
+        frameWriter.writeMessage(0, mock.ConnectionCloseOkMock());
+        server.replayList.add(frameWriter.outputEncoder.writer.joinChunks());
+        frameWriter.outputEncoder.writer.clear();
+      }
+    });
+  });
 }
