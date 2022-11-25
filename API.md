@@ -17,6 +17,7 @@ The class constructor support the following named parameters:
 | maxConnectionAttempts | The number of connection attempts till a connection error is reported. Defaults to 1.
 | reconnectWaitTime     | A [Duration](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart:core.Duration) specifying the time between reconnection attempts. Defaults to 1500 ms.
 | tuningSettings        | A [TuningSettings](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/protocol/io/tuning_settings.dart) instance to use. If not specified, the [default](#tuning-settings) tuning settings will be used.
+| connectionName        | A client-provided connection name which can help to identify this connection in server logs.
 
 ### Authentication providers
 
