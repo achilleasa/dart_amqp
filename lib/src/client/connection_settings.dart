@@ -32,6 +32,9 @@ class ConnectionSettings {
   SecurityContext? tlsContext;
   bool Function(X509Certificate)? onBadCertificate;
 
+  // Connection identifier
+  String? connectionName;
+
   ConnectionSettings({
     this.host = "127.0.0.1",
     this.port = 5672,
@@ -42,5 +45,6 @@ class ConnectionSettings {
     TuningSettings? tuningSettings,
     this.tlsContext,
     this.onBadCertificate,
+    this.connectionName,
   }) : tuningSettings = tuningSettings ?? TuningSettings();
 }
