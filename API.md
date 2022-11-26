@@ -6,18 +6,20 @@
 
 The [ConnectionSettings](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/connection_settings.dart) class allows you to override the default connection settings used by the AMQP client. An instance of this class can be passed to the **settings** named 
 
-The class constructor support the following named parameters:
+The class constructor supports the following named parameters:
 
-| Parameter name        | Description
-|-----------------------|---------------------
-| host                  | The host to connect to. If not specified, defaults to "127.0.0.1".
-| port                  | The port to connect to. If not specified defaults to 5672.
-| virtualHost           | The AMQP virtual host parameter. Defaults to "/".
-| authProvider          | An instanciated authentication provider to use. If not specified, a [PlainAuthenticationProvider](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/authentication/plain_authenticator.dart) with the default "**guest:guest**" credentials will be used. See the section on [authentication](#authentication-providers) for more info.
-| maxConnectionAttempts | The number of connection attempts till a connection error is reported. Defaults to 1.
-| reconnectWaitTime     | A [Duration](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart:core.Duration) specifying the time between reconnection attempts. Defaults to 1500 ms.
-| tuningSettings        | A [TuningSettings](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/protocol/io/tuning_settings.dart) instance to use. If not specified, the [default](#tuning-settings) tuning settings will be used.
-| connectionName        | A client-provided connection name which can help to identify this connection in server logs.
+| Parameter name        | Default                                                                                                                                                                | Description
+|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| host                  | 127.0.0.1                                                                                                                                                              | The host to connect to.
+| port                  | 5672                                                                                                                                                                   | The port to connect to.
+| virtualHost           | "/"                                                                                                                                                                    | The AMQP virtual host parameter.
+| authProvider          | [PlainAuthenticationProvider](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/authentication/plain_authenticator.dart) with "**guest:guest**" credentials. | An authentication provider instance to use. See the section on [authentication](#authentication-providers) for more info.
+| maxConnectionAttempts | 1                                                                                                                                                                      | The number of connection attempts till a connection error is reported.
+| reconnectWaitTime     | 1500ms                                                                                                                                                                 | A [Duration](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart:core.Duration) specifying the time between reconnection attempts.
+| tuningSettings        | null                                                                                                                                                                   | A [TuningSettings](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/protocol/io/tuning_settings.dart) instance to use. If not specified, the [default](#tuning-settings) tuning settings will be used.
+| tlsContext            | null                                                                                                                                                                   | A [SecurityContext](https://api.dart.dev/stable/2.18.5/dart-io/SecurityContext-class.html) with the required TLS settings for connecting to the broker. If not specified, the client will attempt to establish a non-TLS connection instead.
+| onBadCertificate      | null                                                                                                                                                                   | A user-defined function for deciding whether the certificate presented by the broker is valid.
+| connectionName        | ""                                                                                                                                                                     | A client-provided connection name which can help to identify this connection in server logs.
 
 ### Authentication providers
 
