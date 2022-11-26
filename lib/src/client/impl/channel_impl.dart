@@ -129,7 +129,7 @@ class _ChannelImpl implements Channel {
         ConnectionStartOk clientResponse = ConnectionStartOk()
           ..clientProperties = {
             "product": "Dart AMQP client",
-            "version": "0.2.3",
+            "version": "0.2.4",
             "platform": "Dart/${Platform.operatingSystem}",
             if (_client.settings.connectionName != null)
               "connection_name": _client.settings.connectionName!,

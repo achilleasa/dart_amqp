@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.4
+
+- Merged [#89](https://github.com/achilleasa/dart_amqp/pull/89) to allow clients to specify a connection name as part of the `ConnectionSettings` object for debugging purposes.
+- Merged [#90](https://github.com/achilleasa/dart_amqp/pull/90) to ensure that the API docs for `ConnectionSettings` are up to date.
+
 ## 0.2.3
 
 - Merged [#85](https://github.com/achilleasa/dart_amqp/pull/85) to fix some minor lint issues that were discovered after bumping the lint_core dep version.
