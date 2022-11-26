@@ -8,7 +8,7 @@ The [ConnectionSettings](https://github.com/achilleasa/dart_amqp/blob/master/lib
 
 The class constructor supports the following named parameters:
 
-| Parameter name        | Default                                                                                                                                                                | Description
+| Parameter name        | Default value                                                                                                                                                          | Description
 |-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | host                  | 127.0.0.1                                                                                                                                                              | The host to connect to.
 | port                  | 5672                                                                                                                                                                   | The port to connect to.
