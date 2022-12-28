@@ -4,7 +4,7 @@
 
 ### Connection settings
 
-The [ConnectionSettings](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/connection_settings.dart) class allows you to override the default connection settings used by the AMQP client. An instance of this class can be passed to the **settings** named 
+The [ConnectionSettings](https://github.com/achilleasa/dart_amqp/blob/master/lib/src/client/connection_settings.dart) class allows you to override the default connection settings used by the AMQP client. An instance of this class can be passed to the **settings** named parameter.
 
 The class constructor supports the following named parameters:
 
