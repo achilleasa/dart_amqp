@@ -60,10 +60,21 @@ class _ChannelImpl implements Channel {
   }
 
   void writeHeartbeat() {
+    if (_channelClosed != null || _client._socket == null) {
+      return; // no-op
+    }
+
     // Transmit heartbeat
-    _frameWriter
-      ..writeHeartbeat()
-      ..pipe(_client._socket!);
+    try {
+      _frameWriter
+        ..writeHeartbeat()
+        ..pipe(_client._socket!);
+    } catch (_) {
+      // An exception will be raised if we attempt to send a hearbeat
+      // immediately after the connection to the server is lost. We can safely
+      // ignore this error; clients will be notified of the lost connection via
+      // a raised StateError.
+    }
   }
 
   /// Encode and transmit [message] optionally accompanied by a server frame with [payloadContent].
