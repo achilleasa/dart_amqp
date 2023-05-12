@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.5
+
+- Merged [#95](https://github.com/achilleasa/dart_amqp/pull/95) to guard against sending heartbeats if the underlying socket is closed
+
 ## 0.2.4
 
 - Merged [#89](https://github.com/achilleasa/dart_amqp/pull/89) to allow clients to specify a connection name as part of the `ConnectionSettings` object for debugging purposes.
