@@ -138,6 +138,8 @@ class _ClientImpl implements Client {
       // period has been configured, start monitoring incoming heartbeats.
       if (serverMessage.message is ConnectionOpenOk &&
           tuningSettings.heartbeatPeriod.inSeconds > 0) {
+        connectionLogger.warning("ConnectionOpenOk received, setting _heartbeatRecvTimer -- current state: ${_heartbeatRecvTimer?.isActive}");
+        _heartbeatRecvTimer?.cancel();
         _heartbeatRecvTimer =
             RestartableTimer(tuningSettings.heartbeatPeriod, () {
           // Set the timer to null to avoid accidentally resetting it while
