@@ -161,7 +161,8 @@ class _ClientImpl implements Client {
       if (serverMessage.message is ConnectionClose) {
         // Ack the closing of the connection
         _channels[0]!.writeMessage(ConnectionCloseOk());
-
+        connectionLogger.warning("ConnectionClose received, canceling _heartbeatRecvTimer -- current state: ${_heartbeatRecvTimer?.isActive}");
+        _heartbeatRecvTimer?.cancel();
         ConnectionClose serverResponse =
             (serverMessage.message as ConnectionClose);
         throw ConnectionException(
