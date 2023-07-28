@@ -488,6 +488,7 @@ class _ChannelImpl implements Channel {
     }
     _pendingOperations.clear();
     _pendingOperationPayloads.clear();
+    _consumers.forEach((key, value) {value._controller.addError(exception);});
   }
 
   /// Close the channel and return a [Future<Channel>] to be completed when the channel is closed.
