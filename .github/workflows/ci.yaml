@@ -1,0 +1,56 @@
+name: Build Status
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+  
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@v1
+
+      - name: Prepare RabbitMQ configuration
+        run: |
+          echo "
+          loopback_users = none
+          listeners.ssl.default = 5671
+
+          ssl_options.cacertfile = /rabbitmq-certs/ca_certificate.pem
+          ssl_options.certfile   = /rabbitmq-certs/server_certificate.pem
+          ssl_options.keyfile    = /rabbitmq-certs/server_key.pem
+          ssl_options.verify     = verify_peer
+          ssl_options.fail_if_no_peer_cert = false
+          " >  ${{ github.workspace }}/.rabbitmq.conf
+
+      - name: Start RabbitMQ
+        uses: namoshek/rabbitmq-github-action@v1
+        with:
+          version: '3.8.9'
+          ports: '5671:5671 5672:5672'
+          certificates: ${{ github.workspace }}/test/lib/mocks/certs
+          config: ${{ github.workspace }}/.rabbitmq.conf
+          container-name: 'rabitmq'
+
+      - name: Wait for RabbitMQ to start
+        run: sleep 3
+
+      - name: Install Dart dependencies
+        run: dart pub get
+  
+      - name: Check formatting
+        run: dart format --set-exit-if-changed .
+
+      - name: Lint
+        run: dart analyze --fatal-warnings --fatal-infos ./
+
+      - name: Run tests and collect coverage
+        run: |
+          dart pub global activate coverage
+          dart pub global run coverage:test_with_coverage --test test/run_all.dart
+      
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2

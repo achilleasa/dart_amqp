@@ -37,14 +37,22 @@ class _ConsumerImpl implements Consumer {
     Completer<Consumer> completer = Completer<Consumer>();
     channel.writeMessage(cancelRequest,
         completer: completer, futurePayload: this, noWait: noWait);
-    completer.future.then((_) => _controller.close());
+    completer.future.then((_) => close());
     return completer.future;
   }
 
   void onMessage(DecodedMessageImpl serverMessage) {
+    // Ignore message if the stream is closed
+    if (_controller.isClosed) {
+      return;
+    }
+
     // Ensure that messate contains a non-null property object
     serverMessage.properties ??= MessageProperties();
-
     _controller.add(_AmqpMessageImpl.fromDecodedMessage(this, serverMessage));
+  }
+
+  void close() {
+    _controller.close();
   }
 }
