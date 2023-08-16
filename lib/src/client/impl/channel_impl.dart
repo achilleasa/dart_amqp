@@ -259,6 +259,8 @@ class _ChannelImpl implements Channel {
     writeMessage(closeRequest, completer: _channelClosed, futurePayload: this);
     _channelClosed!.future
         .then((_) => _basicReturnStream.close())
+        .then((_) => _abortOperationsAndCloseConsumers(ChannelException(
+            "Channel closed", channelId, ErrorType.CHANNEL_ERROR)))
         .then((_) => _client._removeChannel(channelId));
     return _channelClosed!.future;
   }
@@ -422,12 +424,8 @@ class _ChannelImpl implements Channel {
               ErrorType.valueOf(closeResponse.replyCode));
         }
 
-        // Mark the channel as closed
-        _channelClosed ??= Completer<Channel>();
-        if (!_channelClosed!.isCompleted) {
-          _channelClosed!.complete(this);
-        }
         _channelCloseException = ex;
+        handleException(ex);
 
         break;
     }
@@ -479,7 +477,10 @@ class _ChannelImpl implements Channel {
     if (_client.handshaking) {
       return;
     }
+    _abortOperationsAndCloseConsumers(exception);
+  }
 
+  void _abortOperationsAndCloseConsumers(Exception exception) {
     // Abort any pending operations unless we are currently opening the channel
     for (Completer completer in _pendingOperations) {
       if (!completer.isCompleted) {
@@ -488,7 +489,12 @@ class _ChannelImpl implements Channel {
     }
     _pendingOperations.clear();
     _pendingOperationPayloads.clear();
-    _consumers.forEach((key, value) {value._controller.addError(exception);});
+
+    // Close any active consumers.
+    for (_ConsumerImpl consumer in _consumers.values) {
+      consumer.close();
+    }
+    _consumers.clear();
   }
 
   /// Close the channel and return a [Future<Channel>] to be completed when the channel is closed.

@@ -1,5 +1,7 @@
 library dart_amqp.test.channels;
 
+import "dart:async";
+
 import "package:test/test.dart";
 
 import "package:dart_amqp/src/client.dart";
@@ -87,6 +89,38 @@ main({bool enableLogger = true}) {
       test("recover()", () async {
         Channel channel = await client.channel();
         channel = await channel.recover(true);
+      });
+
+      test(
+          "channel-closing exceptions should close any active consumer streams",
+          () async {
+        Channel channel = await client.channel();
+        Queue queue = await channel.queue("test-close-consumer-on-exception",
+            autoDelete: true);
+        Consumer consumer = await queue.consume();
+        Completer listenerDone = Completer();
+        consumer.listen((event) {}, onDone: () {
+          listenerDone.complete(true);
+        });
+
+        expect(() => channel.queue("bogus", passive: true),
+            throwsA((e) => e is QueueNotFoundException));
+        expect(listenerDone.future, completion(equals(true)));
+      });
+
+      test("closing a channel should close any active consumer streams",
+          () async {
+        Channel channel = await client.channel();
+        Queue queue = await channel
+            .queue("test-close-consumer-on-channel-close", autoDelete: true);
+        Consumer consumer = await queue.consume();
+        Completer listenerDone = Completer();
+        consumer.listen((event) {}, onDone: () {
+          listenerDone.complete(true);
+        });
+
+        await channel.close();
+        expect(listenerDone.future, completion(equals(true)));
       });
     });
   });
