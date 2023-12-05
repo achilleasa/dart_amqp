@@ -61,6 +61,7 @@ class _ChannelImpl implements Channel {
 
   void writeHeartbeat() {
     if (_channelClosed != null || _client._socket == null) {
+      connectionLogger.warning("writeHeartbeat skipped for vhost=${_client.settings.virtualHost}, host=${_client.settings.host}: _channelClosed=$_channelClosed _client._socket=${_client._socket}");
       return; // no-op
     }
 
@@ -69,7 +70,9 @@ class _ChannelImpl implements Channel {
       _frameWriter
         ..writeHeartbeat()
         ..pipe(_client._socket!);
-    } catch (_) {
+      connectionLogger.info("writeHeartbeat transmitted for vhost=${_client.settings.virtualHost}, host=${_client.settings.host}");
+    } catch (e, st) {
+      connectionLogger.warning("writeHeartbeat failed for vhost=${_client.settings.virtualHost}, host=${_client.settings.host}: $e", null, st);
       // An exception will be raised if we attempt to send a hearbeat
       // immediately after the connection to the server is lost. We can safely
       // ignore this error; clients will be notified of the lost connection via
