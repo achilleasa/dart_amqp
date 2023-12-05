@@ -163,7 +163,7 @@ class _ClientImpl implements Client {
         ConnectionClose serverResponse =
             (serverMessage.message as ConnectionClose);
         throw ConnectionException(
-            serverResponse.replyText!,
+            serverResponse.replyText ?? "Server closed the connection",
             ErrorType.valueOf(serverResponse.replyCode),
             serverResponse.msgClassId,
             serverResponse.msgMethodId);
