@@ -36,6 +36,8 @@ class _ClientImpl implements Client {
   /// [reconnectWaitTime] ms up to [maxConnectionAttempts] times. If all connection attempts
   /// fail, then the [_connected] [Future] returned by a call to [open[ will also fail
 
+  final amqpMessageDecoder = AmqpMessageDecoder();
+
   Future _reconnect() {
     _connected ??= Completer();
 
@@ -62,7 +64,7 @@ class _ClientImpl implements Client {
       RawFrameParser(tuningSettings)
           .transformer
           .bind(_socket!)
-          .transform(AmqpMessageDecoder().transformer)
+          .transform(amqpMessageDecoder.transformer)
           .listen(_handleMessage,
               onError: _handleException,
               onDone: () =>
@@ -152,7 +154,7 @@ class _ClientImpl implements Client {
           _heartbeatRecvTimer = null;
           var ago = lastMessageDateTime != null ? DateTime.now().millisecondsSinceEpoch - lastMessageDateTime!.millisecondsSinceEpoch : -1;
           _handleException(HeartbeatFailedException(
-              "Server did not respond to heartbeats for ${tuningSettings.heartbeatPeriod.inSeconds}s, lastMessage was ${ago}ms ago at $lastMessageDateTime, lastMessage=$lastMessage"));
+              "Server did not respond to heartbeats for ${tuningSettings.heartbeatPeriod.inSeconds}s, lastMessage was ${ago}ms ago at $lastMessageDateTime, lastMessage=$lastMessage, amqpMessageDecoder. incompleteMessages=${amqpMessageDecoder.incompleteMessages}"));
         });
       }
 

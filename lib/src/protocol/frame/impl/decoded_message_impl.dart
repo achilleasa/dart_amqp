@@ -10,7 +10,12 @@ class DecodedMessageImpl implements DecodedMessage {
   @override
   Uint8List? payload;
 
-  DecodedMessageImpl(this.channel, this.message);
+  final DateTime created;
+
+  DecodedMessageImpl(this.channel, this.message):created = DateTime.now();
+
+  @override
+  String toString()=>"channel=$channel, message=${message.runtimeType}, age=${DateTime.now().millisecondsSinceEpoch - created.millisecondsSinceEpoch}ms";
 
   @override
   MessageProperties? get properties => contentHeader?.properties;
