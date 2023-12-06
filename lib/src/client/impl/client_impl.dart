@@ -99,6 +99,9 @@ class _ClientImpl implements Client {
   bool get handshaking =>
       _socket != null && _connected != null && !_connected!.isCompleted;
 
+  DateTime? lastMessageDateTime;
+  DecodedMessage? lastMessage;
+
   void _handleMessage(DecodedMessage serverMessage) {
     try {
       // If we are still handshaking and we receive a message on another channel this is an error
@@ -109,6 +112,8 @@ class _ClientImpl implements Client {
 
       // Reset heartbeat timer if it has been initialized.
       _heartbeatRecvTimer?.reset();
+      lastMessage = serverMessage;
+      lastMessageDateTime = DateTime.now();
 
       // Heartbeat frames should be received on channel 0
       if (serverMessage is HeartbeatFrameImpl) {
@@ -145,8 +150,9 @@ class _ClientImpl implements Client {
           // Set the timer to null to avoid accidentally resetting it while
           // shutting down.
           _heartbeatRecvTimer = null;
+          var ago = lastMessageDateTime != null ? DateTime.now().millisecondsSinceEpoch - lastMessageDateTime!.millisecondsSinceEpoch : -1;
           _handleException(HeartbeatFailedException(
-              "Server did not respond to heartbeats for ${tuningSettings.heartbeatPeriod.inSeconds}s"));
+              "Server did not respond to heartbeats for ${tuningSettings.heartbeatPeriod.inSeconds}s, lastMessage was ${ago}ms ago at $lastMessageDateTime, lastMessage=$lastMessage"));
         });
       }
 

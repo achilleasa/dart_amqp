@@ -70,7 +70,6 @@ class _ChannelImpl implements Channel {
       _frameWriter
         ..writeHeartbeat()
         ..pipe(_client._socket!);
-      connectionLogger.info("writeHeartbeat transmitted for vhost=${_client.settings.virtualHost}, host=${_client.settings.host}");
     } catch (e, st) {
       connectionLogger.warning("writeHeartbeat failed for vhost=${_client.settings.virtualHost}, host=${_client.settings.host}: $e", null, st);
       // An exception will be raised if we attempt to send a hearbeat
