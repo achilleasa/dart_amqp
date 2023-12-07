@@ -23,6 +23,7 @@ class _ClientImpl implements Client {
   int heartbeatCounter = 0;
   DateTime? lastMessageDateTime;
   DecodedMessage? lastMessage;
+  final Duration smallGap = const Duration(milliseconds: 100);
 
   // Error Stream
   final _error = StreamController<Exception>.broadcast();
@@ -151,7 +152,7 @@ class _ClientImpl implements Client {
       if (serverMessage.message is ConnectionOpenOk &&
           tuningSettings.heartbeatPeriod.inSeconds > 0) {
         _heartbeatRecvTimer =
-            RestartableTimer(tuningSettings.heartbeatPeriod, () {
+            RestartableTimer(tuningSettings.heartbeatPeriod + smallGap, () {
           // Set the timer to null to avoid accidentally resetting it while
           // shutting down.
           _heartbeatRecvTimer = null;
