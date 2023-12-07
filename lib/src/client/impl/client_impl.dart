@@ -112,7 +112,7 @@ class _ClientImpl implements Client {
             "Received message for channel ${serverMessage.channel} while still handshaking");
       }
 
-      if (heartbeatCounter >= 20 || heartbeatCounter % 2 == 0) {
+      if (heartbeatCounter <= 20 || heartbeatCounter % 2 == 0) {
         // Reset heartbeat timer if it has been initialized.
         _heartbeatRecvTimer?.reset();
         lastMessage = serverMessage;
@@ -146,7 +146,7 @@ class _ClientImpl implements Client {
             serverMessage.message!.msgMethodId);
       }
 
-      if (heartbeatCounter >= 20 || heartbeatCounter % 2 == 0) {
+      if (heartbeatCounter <= 20 || heartbeatCounter % 2 == 0) {
         // If we got a ConnectionOpen message from the server and a heartbeat
         // period has been configured, start monitoring incoming heartbeats.
         if (serverMessage.message is ConnectionOpenOk &&
