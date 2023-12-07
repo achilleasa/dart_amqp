@@ -146,24 +146,20 @@ class _ClientImpl implements Client {
             serverMessage.message!.msgMethodId);
       }
 
-      if (heartbeatCounter <= 20 || heartbeatCounter % 2 == 0) {
-        // If we got a ConnectionOpen message from the server and a heartbeat
-        // period has been configured, start monitoring incoming heartbeats.
-        if (serverMessage.message is ConnectionOpenOk &&
-            tuningSettings.heartbeatPeriod.inSeconds > 0) {
-          _heartbeatRecvTimer =
-              RestartableTimer(tuningSettings.heartbeatPeriod, () {
-                // Set the timer to null to avoid accidentally resetting it while
-                // shutting down.
-                _heartbeatRecvTimer = null;
-                var ago = lastMessageDateTime != null ? DateTime.now().millisecondsSinceEpoch - lastMessageDateTime!.millisecondsSinceEpoch : -1;
-                _handleException(HeartbeatFailedException(
-                    "Server did not respond to heartbeats for ${tuningSettings.heartbeatPeriod.inSeconds}s, lastMessage was ${ago}ms ago at $lastMessageDateTime, lastMessage=$lastMessage"));
-              });
-          connectionLogger.warning("hb reset 2 on message $heartbeatCounter");
-        }
-      } else {
-        connectionLogger.warning("hb reset 2 SKIPPED on message $heartbeatCounter");
+      // If we got a ConnectionOpen message from the server and a heartbeat
+      // period has been configured, start monitoring incoming heartbeats.
+      if (serverMessage.message is ConnectionOpenOk &&
+          tuningSettings.heartbeatPeriod.inSeconds > 0) {
+        _heartbeatRecvTimer =
+            RestartableTimer(tuningSettings.heartbeatPeriod, () {
+              // Set the timer to null to avoid accidentally resetting it while
+              // shutting down.
+              _heartbeatRecvTimer = null;
+              var ago = lastMessageDateTime != null ? DateTime.now().millisecondsSinceEpoch - lastMessageDateTime!.millisecondsSinceEpoch : -1;
+              _handleException(HeartbeatFailedException(
+                  "Server did not respond to heartbeats for ${tuningSettings.heartbeatPeriod.inSeconds}s, lastMessage was ${ago}ms ago at $lastMessageDateTime, lastMessage=$lastMessage"));
+            });
+        connectionLogger.warning("hb reset 2 on message $heartbeatCounter");
       }
 
       // Fetch target channel and forward frame for processing
