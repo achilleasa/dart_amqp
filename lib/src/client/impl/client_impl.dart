@@ -20,6 +20,10 @@ class _ClientImpl implements Client {
   Completer? _connected;
   Completer? _clientClosed;
 
+  int heartbeatCounter = 0;
+  DateTime? lastMessageDateTime;
+  DecodedMessage? lastMessage;
+
   // Error Stream
   final _error = StreamController<Exception>.broadcast();
 
@@ -101,14 +105,22 @@ class _ClientImpl implements Client {
 
   void _handleMessage(DecodedMessage serverMessage) {
     try {
+      heartbeatCounter++;
       // If we are still handshaking and we receive a message on another channel this is an error
       if (!_connected!.isCompleted && serverMessage.channel != 0) {
         throw FatalException(
             "Received message for channel ${serverMessage.channel} while still handshaking");
       }
 
-      // Reset heartbeat timer if it has been initialized.
-      _heartbeatRecvTimer?.reset();
+      if (heartbeatCounter >= 20 || heartbeatCounter % 2 == 0) {
+        // Reset heartbeat timer if it has been initialized.
+        _heartbeatRecvTimer?.reset();
+        lastMessage = serverMessage;
+        lastMessageDateTime = DateTime.now();
+        connectionLogger.warning("hb reset on message $heartbeatCounter");
+      } else {
+        connectionLogger.warning("hb reset SKIPPED on message $heartbeatCounter");
+      }
 
       // Heartbeat frames should be received on channel 0
       if (serverMessage is HeartbeatFrameImpl) {
@@ -134,18 +146,24 @@ class _ClientImpl implements Client {
             serverMessage.message!.msgMethodId);
       }
 
-      // If we got a ConnectionOpen message from the server and a heartbeat
-      // period has been configured, start monitoring incoming heartbeats.
-      if (serverMessage.message is ConnectionOpenOk &&
-          tuningSettings.heartbeatPeriod.inSeconds > 0) {
-        _heartbeatRecvTimer =
-            RestartableTimer(tuningSettings.heartbeatPeriod, () {
-          // Set the timer to null to avoid accidentally resetting it while
-          // shutting down.
-          _heartbeatRecvTimer = null;
-          _handleException(HeartbeatFailedException(
-              "Server did not respond to heartbeats for ${tuningSettings.heartbeatPeriod.inSeconds}s"));
-        });
+      if (heartbeatCounter >= 20 || heartbeatCounter % 2 == 0) {
+        // If we got a ConnectionOpen message from the server and a heartbeat
+        // period has been configured, start monitoring incoming heartbeats.
+        if (serverMessage.message is ConnectionOpenOk &&
+            tuningSettings.heartbeatPeriod.inSeconds > 0) {
+          _heartbeatRecvTimer =
+              RestartableTimer(tuningSettings.heartbeatPeriod, () {
+                // Set the timer to null to avoid accidentally resetting it while
+                // shutting down.
+                _heartbeatRecvTimer = null;
+                var ago = lastMessageDateTime != null ? DateTime.now().millisecondsSinceEpoch - lastMessageDateTime!.millisecondsSinceEpoch : -1;
+                _handleException(HeartbeatFailedException(
+                    "Server did not respond to heartbeats for ${tuningSettings.heartbeatPeriod.inSeconds}s, lastMessage was ${ago}ms ago at $lastMessageDateTime, lastMessage=$lastMessage"));
+              });
+          connectionLogger.warning("hb reset 2 on message $heartbeatCounter");
+        }
+      } else {
+        connectionLogger.warning("hb reset 2 SKIPPED on message $heartbeatCounter");
       }
 
       // Fetch target channel and forward frame for processing
