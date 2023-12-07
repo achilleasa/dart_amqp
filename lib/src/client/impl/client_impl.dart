@@ -152,13 +152,13 @@ class _ClientImpl implements Client {
           tuningSettings.heartbeatPeriod.inSeconds > 0) {
         _heartbeatRecvTimer =
             RestartableTimer(tuningSettings.heartbeatPeriod, () {
-              // Set the timer to null to avoid accidentally resetting it while
-              // shutting down.
-              _heartbeatRecvTimer = null;
-              var ago = lastMessageDateTime != null ? DateTime.now().millisecondsSinceEpoch - lastMessageDateTime!.millisecondsSinceEpoch : -1;
-              _handleException(HeartbeatFailedException(
-                  "Server did not respond to heartbeats for ${tuningSettings.heartbeatPeriod.inSeconds}s, lastMessage was ${ago}ms ago at $lastMessageDateTime, lastMessage=$lastMessage"));
-            });
+          // Set the timer to null to avoid accidentally resetting it while
+          // shutting down.
+          _heartbeatRecvTimer = null;
+          var ago = lastMessageDateTime != null ? DateTime.now().millisecondsSinceEpoch - lastMessageDateTime!.millisecondsSinceEpoch : -1;
+          _handleException(HeartbeatFailedException(
+              "Server did not respond to heartbeats for ${tuningSettings.heartbeatPeriod.inSeconds}s, lastMessage was ${ago}ms ago at $lastMessageDateTime, lastMessage=$lastMessage"));
+        });
         connectionLogger.warning("hb reset 2 on message $heartbeatCounter");
       }
 
