@@ -138,6 +138,7 @@ class _ClientImpl implements Client {
       // period has been configured, start monitoring incoming heartbeats.
       if (serverMessage.message is ConnectionOpenOk &&
           tuningSettings.heartbeatPeriod.inSeconds > 0) {
+        _heartbeatRecvTimer?.cancel();
         _heartbeatRecvTimer =
             RestartableTimer(tuningSettings.heartbeatPeriod, () {
           // Set the timer to null to avoid accidentally resetting it while
@@ -269,6 +270,9 @@ class _ClientImpl implements Client {
   }
 
   Future _close({bool closeErrorStream = false}) {
+    _heartbeatRecvTimer?.cancel();
+    _heartbeatRecvTimer = null;
+
     if (_socket == null) {
       return Future.value();
     }
