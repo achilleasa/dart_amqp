@@ -211,12 +211,15 @@ main({bool enableLogger = true}) {
         expect(client.tuningSettings.heartbeatPeriod,
             equals(const Duration(seconds: 1)));
 
-        // Perform a blocking call until the heartbeat timer expires.
+        // Perform a blocking call until we miss
+        // tuningSettings.maxMissedHeartbeats consecutive heartbeats.
         await client.channel();
       } catch (e) {
         expect(e, const TypeMatcher<HeartbeatFailedException>());
-        expect((e as HeartbeatFailedException).message,
-            equals("Server did not respond to heartbeats for 1s"));
+        expect(
+            (e as HeartbeatFailedException).message,
+            equals(
+                "Server did not respond to heartbeats for 1s (missed consecutive heartbeats: 3)"));
 
         // Encode final connection close
         frameWriter.writeMessage(0, mock.ConnectionCloseOkMock());
