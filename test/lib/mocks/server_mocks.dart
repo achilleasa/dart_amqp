@@ -45,7 +45,7 @@ class MockServer {
   Future listen(String host, int port) async {
     mockLogger.info("Binding MockServer to $host:$port");
 
-    _server = await ServerSocket.bind(host, port);
+    _server = await ServerSocket.bind(host, port, shared: true);
     mockLogger.info("[$host:$port] Listening for incoming connections");
     _server!.listen(_handleConnection);
   }
