@@ -138,6 +138,7 @@ class _ClientImpl implements Client {
       // period has been configured, start monitoring incoming heartbeats.
       if (serverMessage.message is ConnectionOpenOk &&
           tuningSettings.heartbeatPeriod.inSeconds > 0) {
+        _heartbeatRecvTimer?.cancel();
         _heartbeatRecvTimer =
             RestartableTimer(tuningSettings.heartbeatPeriod, () {
           // Set the timer to null to avoid accidentally resetting it while
@@ -214,7 +215,7 @@ class _ClientImpl implements Client {
     if (handshaking) {
       _channels.clear();
       _connected!.completeError(ex);
-      close();
+      _close();
       return;
     }
 
@@ -233,7 +234,7 @@ class _ClientImpl implements Client {
             .reversed
             .forEach((_ChannelImpl channel) => channel.handleException(ex));
 
-        close();
+        _close();
         break;
       case ChannelException:
         // Forward to the appropriate channel and remove it from our list
@@ -265,6 +266,13 @@ class _ClientImpl implements Client {
   /// when the client has shut down
   @override
   Future close() {
+    return _close(closeErrorStream: true);
+  }
+
+  Future _close({bool closeErrorStream = false}) {
+    _heartbeatRecvTimer?.cancel();
+    _heartbeatRecvTimer = null;
+
     if (_socket == null) {
       return Future.value();
     }
@@ -287,7 +295,9 @@ class _ClientImpl implements Client {
       _socket!.destroy();
       _socket = null;
       _connected = null;
-      _error.close();
+      if (closeErrorStream) {
+        _error.close();
+      }
       _clientClosed!.complete();
       _clientClosed = null;
     });
