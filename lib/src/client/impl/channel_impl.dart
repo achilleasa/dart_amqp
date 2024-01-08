@@ -200,6 +200,7 @@ class _ChannelImpl implements Channel {
           _heartbeatSendTimer =
               Timer.periodic(Duration(milliseconds: interval), (_) {
             writeHeartbeat();
+            _client._heartbeatsInFlight();
           });
         }
 

@@ -32,6 +32,10 @@ class _ClientImpl implements Client {
   // consecutive number of maxMissedHeartbeats (see tuningSettings).
   RestartableTimer? _heartbeatRecvTimer;
 
+  // heartbeatsInflight counts the number of heartbeats sent since the last time
+  // we received _any_ message from the server
+  int _heartbeatsInflight = 0;
+
   _ClientImpl({ConnectionSettings? settings}) {
     // Use defaults if no settings specified
     this.settings = settings ?? ConnectionSettings();
@@ -112,8 +116,8 @@ class _ClientImpl implements Client {
             "Received message for channel ${serverMessage.channel} while still handshaking");
       }
 
-      // Reset heartbeat timer if it has been initialized.
-      _heartbeatRecvTimer?.reset();
+      // Reset heartbeat inflight counter.
+      _heartbeatsInflight = 0;
 
       // Heartbeat frames should be received on channel 0
       if (serverMessage is HeartbeatFrameImpl) {
@@ -137,24 +141,6 @@ class _ClientImpl implements Client {
             ErrorType.COMMAND_INVALID,
             serverMessage.message!.msgClassId,
             serverMessage.message!.msgMethodId);
-      }
-
-      // If we got a ConnectionOpen message from the server and a heartbeat
-      // period has been configured, start monitoring incoming heartbeats.
-      if (serverMessage.message is ConnectionOpenOk &&
-          tuningSettings.heartbeatPeriod.inSeconds > 0) {
-        // Raise an exception if we miss maxMissedHeartbeats consecutive
-        // heartbeats.
-        Duration missInterval =
-            tuningSettings.heartbeatPeriod * tuningSettings.maxMissedHeartbeats;
-        _heartbeatRecvTimer?.cancel();
-        _heartbeatRecvTimer = RestartableTimer(missInterval, () {
-          // Set the timer to null to avoid accidentally resetting it while
-          // shutting down.
-          _heartbeatRecvTimer = null;
-          _handleException(HeartbeatFailedException(
-              "Server did not respond to heartbeats for ${tuningSettings.heartbeatPeriod.inSeconds}s (missed consecutive heartbeats: ${tuningSettings.maxMissedHeartbeats})"));
-        });
       }
 
       // Fetch target channel and forward frame for processing
@@ -193,6 +179,13 @@ class _ClientImpl implements Client {
       }
     } catch (e) {
       _handleException(e);
+    }
+  }
+
+  void _heartbeatsInFlight(){
+    if(++_heartbeatsInflight > tuningSettings.maxMissedHeartbeats){
+      _handleException(HeartbeatFailedException(
+          "Server did not respond to heartbeats, missed consecutive heartbeats: ${tuningSettings.maxMissedHeartbeats})"));
     }
   }
 
