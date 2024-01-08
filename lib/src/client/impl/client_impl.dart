@@ -182,8 +182,8 @@ class _ClientImpl implements Client {
     }
   }
 
-  void _heartbeatsInFlight(){
-    if(++_heartbeatsInflight > tuningSettings.maxMissedHeartbeats){
+  void _heartbeatsInFlight() {
+    if (++_heartbeatsInflight > tuningSettings.maxMissedHeartbeats) {
       _handleException(HeartbeatFailedException(
           "Server did not respond to heartbeats, missed consecutive heartbeats: ${tuningSettings.maxMissedHeartbeats})"));
     }
