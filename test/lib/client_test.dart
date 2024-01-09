@@ -219,7 +219,7 @@ main({bool enableLogger = true}) {
         expect(
             (e as HeartbeatFailedException).message,
             equals(
-                "Server did not respond to heartbeats for 1s (missed consecutive heartbeats: 3)"));
+                "Server did not respond to heartbeats, missed consecutive heartbeats: 3)"));
 
         // Encode final connection close
         frameWriter.writeMessage(0, mock.ConnectionCloseOkMock());
