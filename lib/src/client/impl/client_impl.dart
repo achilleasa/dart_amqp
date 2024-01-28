@@ -24,7 +24,12 @@ class _ClientImpl implements Client {
   final _error = StreamController<Exception>.broadcast();
 
   // The heartbeattRecvTimer is reset every time we receive _any_ message from
-  // the server. If the timer expires, a HeartbeatFailed exception will be raised.
+  // the server. If the timer expires, and a HeartbeatFailed exception will be
+  // raised.
+  //
+  // The timer is set to a multiple of the negotiated interval to reset the
+  // connection if we have not received any message from the server for a
+  // consecutive number of maxMissedHeartbeats (see tuningSettings).
   RestartableTimer? _heartbeatRecvTimer;
 
   _ClientImpl({ConnectionSettings? settings}) {
@@ -138,14 +143,17 @@ class _ClientImpl implements Client {
       // period has been configured, start monitoring incoming heartbeats.
       if (serverMessage.message is ConnectionOpenOk &&
           tuningSettings.heartbeatPeriod.inSeconds > 0) {
+        // Raise an exception if we miss maxMissedHeartbeats consecutive
+        // heartbeats.
+        Duration missInterval =
+            tuningSettings.heartbeatPeriod * tuningSettings.maxMissedHeartbeats;
         _heartbeatRecvTimer?.cancel();
-        _heartbeatRecvTimer =
-            RestartableTimer(tuningSettings.heartbeatPeriod, () {
+        _heartbeatRecvTimer = RestartableTimer(missInterval, () {
           // Set the timer to null to avoid accidentally resetting it while
           // shutting down.
           _heartbeatRecvTimer = null;
           _handleException(HeartbeatFailedException(
-              "Server did not respond to heartbeats for ${tuningSettings.heartbeatPeriod.inSeconds}s"));
+              "Server did not respond to heartbeats for ${tuningSettings.heartbeatPeriod.inSeconds}s (missed consecutive heartbeats: ${tuningSettings.maxMissedHeartbeats})"));
         });
       }
 

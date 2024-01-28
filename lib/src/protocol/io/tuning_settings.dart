@@ -14,15 +14,17 @@ class TuningSettings {
   // min(client hb period, server hb period). In other words, clients may force
   // a lower heartbeat period but they are never allowed to increase it beyond
   // the value suggested by the remote server.
-  //
+  Duration heartbeatPeriod = Duration.zero;
+
   // When a non-zero heartbeat period is negotiated with the remote server, a
   // [HeartbeatFailedException] will be raised if the server does not respond
-  // to heartbeat requests within the configured heartbeat period.
-  Duration heartbeatPeriod = Duration.zero;
+  // to [maxMissedHeartbeats] consecutive heartbeat requests.
+  int maxMissedHeartbeats = 3;
 
   TuningSettings({
     this.maxChannels = 0,
     this.maxFrameSize = 4096,
     this.heartbeatPeriod = Duration.zero,
+    this.maxMissedHeartbeats = 3,
   });
 }

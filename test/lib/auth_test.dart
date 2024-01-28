@@ -58,8 +58,8 @@ main({bool enableLogger = true}) {
       tuningSettings = TuningSettings();
       frameWriter = FrameWriter(tuningSettings);
       server = mock.MockServer();
-      client = Client(settings: ConnectionSettings(port: 9000));
-      return server.listen('127.0.0.1', 9000);
+      client = Client(settings: ConnectionSettings(port: 9001));
+      return server.listen('127.0.0.1', 9001);
     });
 
     tearDown(() async {

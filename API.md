@@ -34,11 +34,12 @@ you don't have to deal with tuning at the application level. The client will use
 
 The class exposes the following parameters:
 
-| Param name      | Default value    | Description
-|-----------------|------------------|----------------------
-| maxChannels     | 0 (no limit)     | The maximum number of channels that can be opened by the client. When set to zero, the maximum number of channels is 65535.
-| maxFrameSize    | 4096 bytes       | The maximum frame size that can be parsed by the client. According to the spec, this is set to a high-enough initial value so that the client can parse the messages exchanged during the handshake. The client will negotiate with the server during the handshake phase and adjust this value upwards.
-| heartbeatPeriod | 0 sec            | The preferred heartbeat period (or `Duration.zero` to disable heartbeats) expressed as a [Duration](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart:core.Duration) object.
+| Param name          | Default value | Description
+|---------------------|---------------|
+| maxChannels         | 0 (no limit)  | The maximum number of channels that can be opened by the client. When set to zero, the maximum number of channels is 65535.
+| maxFrameSize        | 4096 bytes    | The maximum frame size that can be parsed by the client. According to the spec, this is set to a high-enough initial value so that the client can parse the messages exchanged during the handshake. The client will negotiate with the server during the handshake phase and adjust this value upwards.
+| heartbeatPeriod     | 0 sec         | The preferred heartbeat period (or `Duration.zero` to disable heartbeats) expressed as a [Duration](https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart:core.Duration) object.
+| maxMissedHeartbeats | 3             | If heartbeats are enabled, raise an exception if `maxMissedHeartbeats` consecutive heartbeats have been sent by the client without receiving any response from the broker.
 
 
 ### Creating a new client
