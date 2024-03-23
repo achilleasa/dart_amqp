@@ -563,6 +563,7 @@ class _ChannelImpl implements Channel {
       {bool passive = false,
       bool durable = false,
       bool noWait = false,
+      bool declare = true,
       Map<String, Object>? arguments}) {
     if (name.isEmpty) {
       throw ArgumentError("The name of the exchange cannot be empty");
@@ -579,6 +580,12 @@ class _ChannelImpl implements Channel {
       ..arguments = arguments;
 
     Completer<Exchange> opCompleter = Completer<Exchange>();
+
+    if (!declare) {
+      opCompleter.complete(_ExchangeImpl(this, name, type));
+      return opCompleter.future;
+    }
+
     writeMessage(exchangeRequest,
         completer: opCompleter,
         futurePayload: _ExchangeImpl(this, name, type),

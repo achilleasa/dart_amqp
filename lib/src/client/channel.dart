@@ -47,6 +47,7 @@ abstract class Channel {
       {bool passive = false,
       bool durable = false,
       bool noWait = false,
+      bool declare = true,
       Map<String, Object> arguments});
 
   /// Setup the [prefetchSize] and [prefetchCount] QoS parameters. The value
