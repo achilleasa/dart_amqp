@@ -43,10 +43,14 @@ abstract class Channel {
   /// returned future will fail with a [ExchangeNotFoundException] if the exchange does not exist.
   ///
   /// The [durable] flag will enable the exchange to persist across server restarts.
+  ///
+  /// The [declare] flag can be set to false to skip the exchange declaration step
+  /// for clients with read-only access to the broker.
   Future<Exchange> exchange(String name, ExchangeType type,
       {bool passive = false,
       bool durable = false,
       bool noWait = false,
+      bool declare = true,
       Map<String, Object> arguments});
 
   /// Setup the [prefetchSize] and [prefetchCount] QoS parameters. The value

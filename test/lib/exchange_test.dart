@@ -203,6 +203,38 @@ main({bool enableLogger = true}) {
       await boundQueue.unbind(exchange, "");
     });
 
+    test("publish to exchange without exchange declaration", () async {
+      Completer testCompleter = Completer();
+
+      // Use the second client to define the queue and the exchange in advance
+      Channel channel2 = await client2.channel();
+      Queue queue = await channel2.queue("q_test_ro");
+      Exchange exchange = await channel2.exchange("exc_test_ro", ExchangeType.FANOUT);
+      queue.bind(exchange, '');
+
+      // Pretend we are a RO consumer that cannot declare the exchange but
+      // should still be able to publish to it.
+      Channel channel = await client.channel();
+      Exchange exchangeRo = await channel
+          .exchange("exc_test_ro", ExchangeType.FANOUT, declare: false);
+
+      expect(exchangeRo.channel, const TypeMatcher<Channel>());
+      expect(exchangeRo.type, equals(ExchangeType.FANOUT));
+      expect(exchangeRo.name, "exc_test_ro");
+
+      exchangeRo.publish("Test payload", "");
+
+      Consumer consumer = await queue.consume();
+      consumer.listen((AmqpMessage reply) {
+        expect(reply.payloadAsString, equals("Test payload"));
+
+        // Pass!
+        testCompleter.complete();
+      });
+
+      return testCompleter.future;
+    });
+
     group("exceptions", () {
       test("missing exchange name", () async {
         Channel channel = await client.channel();
