@@ -209,7 +209,8 @@ main({bool enableLogger = true}) {
       // Use the second client to define the queue and the exchange in advance
       Channel channel2 = await client2.channel();
       Queue queue = await channel2.queue("q_test_ro");
-      Exchange exchange = await channel2.exchange("exc_test_ro", ExchangeType.FANOUT);
+      Exchange exchange =
+          await channel2.exchange("exc_test_ro", ExchangeType.FANOUT);
       queue.bind(exchange, '');
 
       // Pretend we are a RO consumer that cannot declare the exchange but
