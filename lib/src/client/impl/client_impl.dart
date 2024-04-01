@@ -51,6 +51,7 @@ class _ClientImpl implements Client {
       fs = SecureSocket.connect(
         settings.host,
         settings.port,
+        timeout: settings.connectTimeout,
         context: settings.tlsContext,
         onBadCertificate: settings.onBadCertificate,
       );
