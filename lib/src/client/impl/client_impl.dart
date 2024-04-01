@@ -57,7 +57,7 @@ class _ClientImpl implements Client {
     } else {
       connectionLogger.info(
           "Trying to connect to ${settings.host}:${settings.port} [attempt ${_connectionAttempt + 1}/${settings.maxConnectionAttempts}]");
-      fs = Socket.connect(settings.host, settings.port);
+      fs = Socket.connect(settings.host, settings.port, timeout: settings.connectTimeout);
     }
 
     fs.then((Socket s) {
