@@ -44,11 +44,15 @@ abstract class Channel {
   ///
   /// The [durable] flag will enable the exchange to persist across server restarts.
   ///
+  /// The [autoDelete] flag will notify the server that the exchange should be
+  /// deleted when no more connections
+  ///
   /// The [declare] flag can be set to false to skip the exchange declaration step
   /// for clients with read-only access to the broker.
   Future<Exchange> exchange(String name, ExchangeType type,
       {bool passive = false,
       bool durable = false,
+      bool autoDelete = false,
       bool noWait = false,
       bool declare = true,
       Map<String, Object> arguments});

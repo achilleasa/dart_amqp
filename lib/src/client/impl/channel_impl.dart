@@ -562,6 +562,7 @@ class _ChannelImpl implements Channel {
   Future<Exchange> exchange(String name, ExchangeType type,
       {bool passive = false,
       bool durable = false,
+      bool autoDelete = false,
       bool noWait = false,
       bool declare = true,
       Map<String, Object>? arguments}) {
@@ -574,8 +575,8 @@ class _ChannelImpl implements Channel {
       ..type = type.value
       ..passive = passive
       ..durable = durable
+      ..autoDelete = autoDelete
       ..reserved_2 = false
-      ..reserved_3 = false
       ..noWait = noWait
       ..arguments = arguments;
 

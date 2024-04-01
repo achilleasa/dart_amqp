@@ -22,8 +22,8 @@ class ExchangeDeclare implements Message {
   String? type;
   bool passive = false;
   bool durable = false;
+  bool autoDelete = false;
   bool reserved_2 = false;
-  bool reserved_3 = false;
   bool noWait = false;
   Map<String, Object>? arguments;
 
@@ -37,7 +37,7 @@ class ExchangeDeclare implements Message {
       ..writeUInt16(reserved_1)
       ..writeShortString(exchange)
       ..writeShortString(type)
-      ..writeBits([passive, durable, reserved_2, reserved_3, noWait])
+      ..writeBits([passive, durable, autoDelete, reserved_2, noWait])
       ..writeFieldTable(arguments);
   }
 }
