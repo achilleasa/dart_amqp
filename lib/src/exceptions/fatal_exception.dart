@@ -1,4 +1,4 @@
-part of dart_amqp.exceptions;
+part of "../exceptions.dart";
 
 class FatalException implements Exception {
   final String message;

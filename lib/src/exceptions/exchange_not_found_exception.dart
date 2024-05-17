@@ -1,4 +1,4 @@
-part of dart_amqp.exceptions;
+part of "../exceptions.dart";
 
 class ExchangeNotFoundException extends ChannelException {
   ExchangeNotFoundException(String message, int channel, ErrorType errorType)
