@@ -1,4 +1,4 @@
-part of dart_amqp.enums;
+part of "../enums.dart";
 
 class ErrorType extends Enum<int> {
   static const ErrorType SUCCESS = ErrorType._(200, false);

@@ -1,4 +1,4 @@
-part of dart_amqp.enums;
+part of "../enums.dart";
 
 class FrameType extends Enum<int> {
   static const FrameType METHOD = FrameType._(1);

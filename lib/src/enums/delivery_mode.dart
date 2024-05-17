@@ -1,4 +1,4 @@
-part of dart_amqp.enums;
+part of "../enums.dart";
 
 class DeliveryMode extends Enum<int> {
   static const DeliveryMode TRANSIENT = DeliveryMode._(1);

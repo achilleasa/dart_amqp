@@ -1,4 +1,4 @@
-part of dart_amqp.enums;
+part of "../enums.dart";
 
 /// An abstract class for modeling enums
 abstract class Enum<T> {
