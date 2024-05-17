@@ -1,4 +1,4 @@
-part of dart_amqp.authentication;
+part of "../authentication.dart";
 
 class AmqPlainAuthenticator implements Authenticator {
   final String userName;
