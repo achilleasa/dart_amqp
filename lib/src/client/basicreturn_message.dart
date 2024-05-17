@@ -1,4 +1,4 @@
-part of dart_amqp.client;
+part of "../client.dart";
 
 abstract class BasicReturnMessage {
   /// Get the payload as a [Uint8List]

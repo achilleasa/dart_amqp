@@ -1,4 +1,4 @@
-part of dart_amqp.client;
+part of "../../client.dart";
 
 class _ClientImpl implements Client {
   // Configuration options
