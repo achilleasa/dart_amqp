@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0
+
+- Merged [#102](https://github.com/achilleasa/dart_amqp/pull/102) to shutdown consumer streams when the underlying channel is closed.
+- Merged [#105](https://github.com/achilleasa/dart_amqp/pull/105) to avoid using a null-check on a potentially null value in Connection Closed messages.
+- Merged [#111](https://github.com/achilleasa/dart_amqp/pull/111) which adds a new tuning param (maxMissedHeartbeats) and raises HeartbeatFailedException when enough heartbeats are missed.
+- Merged [#112](https://github.com/achilleasa/dart_amqp/pull/112) to fix some logic bugs in the reconnection flow.
+- Merged [#116](https://github.com/achilleasa/dart_amqp/pull/116) to support publishing messages without having to declare an Exchange first.
+- Bumped minor version due to the hearbeat-related changes.
+
 ## 0.2.5
 
 - Merged [#95](https://github.com/achilleasa/dart_amqp/pull/95) to guard against sending heartbeats if the underlying socket is closed
