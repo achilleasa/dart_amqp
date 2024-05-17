@@ -5,7 +5,7 @@
 
 // ignore_for_file: empty_constructor_bodies
 
-part of dart_amqp.protocol;
+part of "../../../protocol.dart";
 
 class ConfirmSelect implements Message {
   @override

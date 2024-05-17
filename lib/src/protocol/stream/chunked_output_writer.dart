@@ -1,4 +1,4 @@
-part of dart_amqp.protocol;
+part of "../../protocol.dart";
 
 class ChunkedOutputWriter {
   final ListQueue<Uint8List> _bufferedChunks = ListQueue<Uint8List>();

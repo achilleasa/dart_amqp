@@ -1,4 +1,4 @@
-part of dart_amqp.protocol;
+part of "../../protocol.dart";
 
 class TypeEncoder {
   late ChunkedOutputWriter _writer;
