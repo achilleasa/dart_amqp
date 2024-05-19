@@ -1,4 +1,4 @@
-part of dart_amqp.tests.mocks;
+part of "mocks.dart";
 
 class MockServer {
   ServerSocket? _server;
