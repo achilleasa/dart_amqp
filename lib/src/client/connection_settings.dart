@@ -1,4 +1,4 @@
-part of dart_amqp.client;
+part of "../client.dart";
 
 class ConnectionSettings {
   // The host to connect to

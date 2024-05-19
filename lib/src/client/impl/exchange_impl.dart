@@ -1,4 +1,4 @@
-part of dart_amqp.client;
+part of "../../client.dart";
 
 class _ExchangeImpl implements Exchange {
   final String _name;

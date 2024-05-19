@@ -1,4 +1,4 @@
-part of dart_amqp.protocol;
+part of "../../protocol.dart";
 
 abstract class Header {
   void serialize(TypeEncoder encoder);

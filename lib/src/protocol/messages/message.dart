@@ -6,7 +6,7 @@
 //
 // Do not modify
 
-part of dart_amqp.protocol;
+part of "../../protocol.dart";
 
 abstract class Message {
   int get msgClassId;

@@ -1,4 +1,4 @@
-part of dart_amqp.authentication;
+part of "../authentication.dart";
 
 abstract class Authenticator {
   /// Get the SASL type of this authenticator

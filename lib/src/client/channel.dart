@@ -1,4 +1,4 @@
-part of dart_amqp.client;
+part of "../client.dart";
 
 abstract class Channel {
   /// Close the channel, abort any pending operations and return a [Future<Channel>] to be completed

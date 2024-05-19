@@ -1,4 +1,4 @@
-part of dart_amqp.client;
+part of "../client.dart";
 
 abstract class Exchange {
   /// Get the name of the exchange

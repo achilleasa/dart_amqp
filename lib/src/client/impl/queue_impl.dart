@@ -1,4 +1,4 @@
-part of dart_amqp.client;
+part of "../../client.dart";
 
 class _QueueImpl implements Queue {
   // https://github.com/dart-lang/linter/issues/2697

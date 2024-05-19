@@ -1,4 +1,4 @@
-part of dart_amqp.protocol;
+part of "../../protocol.dart";
 
 class ProtocolHeader implements Header {
   static const int LENGTH_IN_BYTES = 8;

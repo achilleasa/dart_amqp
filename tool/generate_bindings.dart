@@ -25,7 +25,7 @@ class AmqpBindingsBuilder {
 //
 // Do not modify
 
-part of dart_amqp.protocol;
+part of "../../protocol.dart";
 
 abstract class Message {
 
@@ -60,7 +60,7 @@ abstract class Message {
 //
 // Do not modify
 
-library dart_amqp.protocol;
+part of "../../../protocol.dart";
 
 import "dart:async";
 import "dart:convert";

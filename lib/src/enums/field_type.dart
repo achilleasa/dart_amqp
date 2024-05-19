@@ -1,4 +1,4 @@
-part of dart_amqp.enums;
+part of "../enums.dart";
 
 class FieldType extends Enum<int> {
   static const FieldType BOOLEAN = FieldType._(116);

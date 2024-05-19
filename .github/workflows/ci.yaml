@@ -12,6 +12,8 @@ jobs:
   
       - name: Setup Dart SDK
         uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
 
       - name: Prepare RabbitMQ configuration
         run: |

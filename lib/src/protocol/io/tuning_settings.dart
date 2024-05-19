@@ -1,4 +1,4 @@
-part of dart_amqp.protocol;
+part of "../../protocol.dart";
 
 class TuningSettings {
   // The maximum number of channels to allow. A value of 0 indicates that there

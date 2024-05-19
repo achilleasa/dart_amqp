@@ -1,4 +1,4 @@
-part of dart_amqp.protocol;
+part of "../../protocol.dart";
 
 class ChunkedInputReader {
   final _bufferedChunks = ListQueue<List<int>>();

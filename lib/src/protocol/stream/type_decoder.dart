@@ -1,4 +1,4 @@
-part of dart_amqp.protocol;
+part of "../../protocol.dart";
 
 class TypeDecoder {
   int _offset = 0;

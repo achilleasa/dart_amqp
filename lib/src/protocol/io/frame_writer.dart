@@ -1,4 +1,4 @@
-part of dart_amqp.protocol;
+part of "../../protocol.dart";
 
 final Uint8List frameTerminatorSequence =
     Uint8List.fromList([RawFrameParser.FRAME_TERMINATOR]);

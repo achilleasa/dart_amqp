@@ -1,4 +1,4 @@
-part of dart_amqp.enums;
+part of "../enums.dart";
 
 class ExchangeType extends BaseExchange<String> {
   static const ExchangeType FANOUT = ExchangeType._("fanout");

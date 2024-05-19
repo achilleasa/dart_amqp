@@ -1,4 +1,4 @@
-part of dart_amqp.exceptions;
+part of "../exceptions.dart";
 
 class QueueNotFoundException extends ChannelException {
   QueueNotFoundException(String message, int channel, ErrorType errorType)
