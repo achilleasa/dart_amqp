@@ -4,15 +4,15 @@ description: >
 version: 0.3.0
 homepage: https://github.com/achilleasa/dart_amqp
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.12.0 <4.0.0"
 dependencies:
   async: ^2.10.0
   logging: ^1.0.1
 dev_dependencies:
   test: ^1.17.5
   mockito: ^5.0.9
-  http: ^0.13.3
-  xml: ^5.1.1
-  lints: ^2.0.1
+  http: ^1.2.0
+  xml: ^6.2.2
+  lints: ^4.0.0
 false_secrets:
   - test/lib/mocks/certs/*.pem
