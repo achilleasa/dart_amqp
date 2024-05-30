@@ -20,6 +20,7 @@ The class constructor supports the following named parameters:
 | tlsContext            | null                                                                                                                                                                   | A [SecurityContext](https://api.dart.dev/stable/2.18.5/dart-io/SecurityContext-class.html) with the required TLS settings for connecting to the broker. If not specified, the client will attempt to establish a non-TLS connection instead.
 | onBadCertificate      | null                                                                                                                                                                   | A user-defined function for deciding whether the certificate presented by the broker is valid.
 | connectionName        | ""                                                                                                                                                                     | A client-provided connection name which can help to identify this connection in server logs.
+| connectTimeout        | null                                                                                                                                                                   | The duration time to wait for socket connection to be established
 
 ### Authentication providers
 
