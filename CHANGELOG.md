@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1
+
+- Merged [#118](https://github.com/achilleasa/dart_amqp/pull/118) to support setting a timeout for establishing connections to the broker.
+
 ## 0.3.0
 
 - Merged [#102](https://github.com/achilleasa/dart_amqp/pull/102) to shutdown consumer streams when the underlying channel is closed.
