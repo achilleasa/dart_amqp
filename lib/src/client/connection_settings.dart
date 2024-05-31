@@ -35,6 +35,9 @@ class ConnectionSettings {
   // Connection identifier
   String? connectionName;
 
+  // The time to wait for socket connection to be established
+  Duration? connectTimeout;
+
   ConnectionSettings({
     this.host = "127.0.0.1",
     this.port = 5672,
@@ -46,5 +49,6 @@ class ConnectionSettings {
     this.tlsContext,
     this.onBadCertificate,
     this.connectionName,
+    this.connectTimeout,
   }) : tuningSettings = tuningSettings ?? TuningSettings();
 }
