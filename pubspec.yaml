@@ -8,6 +8,8 @@ environment:
 dependencies:
   async: ^2.10.0
   logging: ^1.0.1
+  universal_io: ^2.2.2
+  web_socket_channel: ^3.0.0
 dev_dependencies:
   test: ^1.17.5
   mockito: ^5.0.9

@@ -13,6 +13,8 @@ import "dart:collection";
 import "dart:math" as math;
 
 // Internal lib dependencies
+import "package:dart_amqp/src/uint64_converter.dart";
+
 import "enums.dart";
 import "exceptions.dart";
 

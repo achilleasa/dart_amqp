@@ -44,7 +44,14 @@ class TypeDecoder {
   }
 
   int readUInt64() {
-    int val = _buffer.getUint64(_offset, endianess);
+    final int val;
+    const kIsWeb = bool.fromEnvironment('dart.library.js_util');
+    if (kIsWeb) {
+      val = Uint64Converter.getUint64(_buffer, _offset);
+    } else {
+      val = _buffer.getUint64(_offset, endianess);
+    }
+
     _offset += 8;
 
     return val;

@@ -1,20 +1,21 @@
 library dart_amqp.client;
 
 import "dart:async";
-import "dart:io";
+import "package:dart_amqp/dart_amqp.dart";
+import "package:universal_io/io.dart";
 import "dart:typed_data";
 import "dart:collection";
 
 import 'package:async/async.dart';
+import "package:web_socket_channel/web_socket_channel.dart";
 
 // Internal lib dependencies
 import "logging.dart";
-import "exceptions.dart";
-import "enums.dart";
 import "protocol.dart";
-import "authentication.dart";
 
-part "client/connection_settings.dart";
+part "client/base_connection_settings.dart";
+part "client/impl/connection_settings.dart";
+part "client/impl/websocket_connection_settings.dart";
 
 // client interfaces
 part "client/client.dart";

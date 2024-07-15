@@ -1,5 +1,5 @@
-import "dart:io";
 import "package:dart_amqp/dart_amqp.dart";
+import "package:universal_io/io.dart";
 
 void main(List<String> args) async {
   if (args.isEmpty || !args.every(["info", "warning", "error"].contains)) {

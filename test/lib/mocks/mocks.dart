@@ -1,7 +1,7 @@
 library dart_amqp.tests.mocks;
 
 import "dart:typed_data";
-import "dart:io";
+import "package:universal_io/io.dart";
 import "dart:async";
 import "dart:convert";
 

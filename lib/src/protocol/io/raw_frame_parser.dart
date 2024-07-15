@@ -11,7 +11,7 @@ class RawFrameParser {
 
   RawFrameParser(this.tuningSettings);
 
-  void handleData(List<int>? chunk, EventSink<RawFrame> sink) {
+  void handleData(dynamic chunk, EventSink<RawFrame> sink) {
     try {
       // Append incoming chunk to input buffer
       if (chunk != null) {
@@ -102,8 +102,8 @@ class RawFrameParser {
     sink.addError(error, stackTrace);
   }
 
-  StreamTransformer<List<int>, RawFrame> get transformer =>
-      StreamTransformer<List<int>, RawFrame>.fromHandlers(
+  StreamTransformer<dynamic, RawFrame> get transformer =>
+      StreamTransformer<dynamic, RawFrame>.fromHandlers(
           handleData: handleData,
           handleDone: handleDone,
           handleError: handleError);

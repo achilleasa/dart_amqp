@@ -3,7 +3,7 @@ part of "../../client.dart";
 class _ClientImpl implements Client {
   // Configuration options
   @override
-  late ConnectionSettings settings;
+  late BaseConnectionSettings settings;
 
   // Tuning settings
   @override
@@ -12,6 +12,7 @@ class _ClientImpl implements Client {
   // The connection to the server
   int _connectionAttempt = 0;
   Socket? _socket;
+  WebSocketChannel? _webSocketChannel;
 
   // The list of open channels. Channel 0 is always reserved for signaling
   final Map<int, _ChannelImpl> _channels = <int, _ChannelImpl>{};
@@ -32,7 +33,7 @@ class _ClientImpl implements Client {
   // consecutive number of maxMissedHeartbeats (see tuningSettings).
   RestartableTimer? _heartbeatRecvTimer;
 
-  _ClientImpl({ConnectionSettings? settings}) {
+  _ClientImpl({BaseConnectionSettings? settings}) {
     // Use defaults if no settings specified
     this.settings = settings ?? ConnectionSettings();
   }
@@ -44,67 +45,115 @@ class _ClientImpl implements Client {
   Future _reconnect() {
     _connected ??= Completer();
 
-    Future<Socket> fs;
-    if (settings.tlsContext != null) {
+    Future<Socket>? fs;
+    if (settings.uri != null) {
+      try {
+        connectionLogger.info(
+            "Trying to connect to ${settings.uri} [attempt ${_connectionAttempt + 1}/${settings.maxConnectionAttempts}]");
+        WebSocketChannel webSocketChannel =
+            WebSocketChannel.connect(settings.uri!);
+
+        webSocketChannel.ready.then(
+          (value) {
+            _webSocketChannel = webSocketChannel;
+
+            // Bind processors and initiate handshake
+            _bindProcessorsAndInitHandshake(_webSocketChannel!.stream);
+
+            // Allocate channel 0 for handshaking and transmit the AMQP header to bootstrap the handshake
+            _allocateChannelZero();
+          },
+        ).catchError((err, trace) {
+          _reconnectionOnError();
+        });
+      } catch (_) {
+        print("Can't connect to ${settings.uri}");
+      }
+    } else if (settings.tlsContext != null && _isHostAndPortSet) {
       connectionLogger.info(
           "Trying to connect to ${settings.host}:${settings.port} using TLS [attempt ${_connectionAttempt + 1}/${settings.maxConnectionAttempts}]");
       fs = SecureSocket.connect(
         settings.host,
-        settings.port,
+        settings.port!,
         timeout: settings.connectTimeout,
         context: settings.tlsContext,
         onBadCertificate: settings.onBadCertificate,
       );
-    } else {
+    } else if (_isHostAndPortSet) {
       connectionLogger.info(
           "Trying to connect to ${settings.host}:${settings.port} [attempt ${_connectionAttempt + 1}/${settings.maxConnectionAttempts}]");
-      fs = Socket.connect(settings.host, settings.port,
+      fs = Socket.connect(settings.host, settings.port!,
           timeout: settings.connectTimeout);
+    } else {
+      throw throw ArgumentError(
+          "Specify websocketUri to connect through websocket or set host and port to use default connection");
     }
 
-    fs.then((Socket s) {
+    fs?.then((Socket s) {
       _socket = s;
 
       // Bind processors and initiate handshake
-      RawFrameParser(tuningSettings)
-          .transformer
-          .bind(_socket!)
-          .transform(AmqpMessageDecoder().transformer)
-          .listen(_handleMessage,
-              onError: _handleException,
-              onDone: () =>
-                  _handleException(const SocketException("Socket closed")));
+      _bindProcessorsAndInitHandshake(_socket!);
 
       // Allocate channel 0 for handshaking and transmit the AMQP header to bootstrap the handshake
-      _channels.clear();
-      _channels.putIfAbsent(0, () => _ChannelImpl(0, this));
+      _allocateChannelZero();
     }).catchError((err, trace) {
-      // Connection attempt completed with an error (probably protocol mismatch)
-      if (_connected!.isCompleted) {
-        return;
-      }
-
-      if (++_connectionAttempt >= settings.maxConnectionAttempts) {
-        String errorMessage =
-            "Could not connect to ${settings.host}:${settings.port} after ${settings.maxConnectionAttempts} attempts. Giving up";
-        connectionLogger.severe(errorMessage);
-        _connected!.completeError(ConnectionFailedException(errorMessage));
-
-        // Clear _connected future so the client can invoke open() in the future
-        _connected = null;
-      } else {
-        // Retry after reconnectWaitTime ms
-        Timer(settings.reconnectWaitTime, _reconnect);
-      }
+      _reconnectionOnError();
     });
 
     return _connected!.future;
   }
 
+  void _bindProcessorsAndInitHandshake(Stream stream) {
+    RawFrameParser(tuningSettings)
+        .transformer
+        .bind(stream)
+        .transform(AmqpMessageDecoder().transformer)
+        .listen(_handleMessage,
+            onError: _handleException,
+            onDone: () =>
+                _handleException(const SocketException("Socket closed")));
+  }
+
+  void _allocateChannelZero() {
+    _channels.clear();
+    _channels.putIfAbsent(0, () => _ChannelImpl(0, this));
+  }
+
+  bool get _isHostAndPortSet => settings.host != null && settings.port != null;
+
+  Future _reconnectionOnError() async {
+    // Connection attempt completed with an error (probably protocol mismatch)
+    if (_connected!.isCompleted) {
+      return;
+    }
+
+    if (++_connectionAttempt >= settings.maxConnectionAttempts) {
+      String errorMessage;
+      if (settings.uri != null) {
+        errorMessage =
+            "Could not connect to ${settings.uri} after ${settings.maxConnectionAttempts} attempts. Giving up";
+      } else {
+        errorMessage =
+            "Could not connect to ${settings.host}:${settings.port} after ${settings.maxConnectionAttempts} attempts. Giving up";
+      }
+      connectionLogger.severe(errorMessage);
+      _connected!.completeError(ConnectionFailedException(errorMessage));
+
+      // Clear _connected future so the client can invoke open() in the future
+      _connected = null;
+    } else {
+      // Retry after reconnectWaitTime ms
+      Timer(settings.reconnectWaitTime, _reconnect);
+    }
+  }
+
   /// Check if a connection is currently in handshake state
   @override
   bool get handshaking =>
-      _socket != null && _connected != null && !_connected!.isCompleted;
+      (_socket != null || _webSocketChannel != null) &&
+      _connected != null &&
+      !_connected!.isCompleted;
 
   void _handleMessage(DecodedMessage serverMessage) {
     try {
@@ -283,7 +332,7 @@ class _ClientImpl implements Client {
     _heartbeatRecvTimer?.cancel();
     _heartbeatRecvTimer = null;
 
-    if (_socket == null) {
+    if (_socket == null && _webSocketChannel == null) {
       return Future.value();
     }
 
@@ -298,11 +347,15 @@ class _ClientImpl implements Client {
             .toList()
             .reversed
             .map((_ChannelImpl channel) => channel.close()))
-        .then((_) => _socket!.flush())
-        .then((_) => _socket!.close(), onError: (e) {
+        .then((_) => _socket?.flush())
+        .then((_) {
+      _webSocketChannel?.sink.close();
+      _socket?.close();
+    }, onError: (e) {
       // Mute exception as the socket may be already closed
     }).whenComplete(() {
-      _socket!.destroy();
+      _webSocketChannel = null;
+      _socket?.destroy();
       _socket = null;
       _connected = null;
       if (closeErrorStream) {

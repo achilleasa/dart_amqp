@@ -420,7 +420,7 @@ main({bool enableLogger = true}) {
 
         // ignore: unawaited_futures
         server.shutdown().then((_) async {
-          await server.listen(client.settings.host, client.settings.port);
+          await server.listen(client.settings.host!, client.settings.port!);
           generateHandshakeMessages(frameWriter, server);
           await client.connect();
           client.errorListener((ex) => handleError(ex));

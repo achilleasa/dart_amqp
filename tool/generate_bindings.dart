@@ -1,8 +1,8 @@
-import "dart:io";
 import "dart:async";
 import "package:xml/xml.dart" as xml;
 import "package:http/http.dart" as http;
 import "package:logging/logging.dart";
+import "package:universal_io/io.dart";
 
 final Logger logger = Logger("tools");
 

@@ -1,11 +1,11 @@
 part of "../client.dart";
 
 abstract class Client {
-  factory Client({ConnectionSettings? settings}) =>
+  factory Client({BaseConnectionSettings? settings}) =>
       _ClientImpl(settings: settings);
 
   // Configuration options
-  ConnectionSettings get settings;
+  BaseConnectionSettings get settings;
   TuningSettings get tuningSettings;
 
   /// Check if a connection is currently in handshake state

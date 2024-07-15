@@ -52,9 +52,14 @@ class TypeEncoder {
   }
 
   void writeUInt64(int value) {
-    Uint8List buf = Uint8List(8);
-    ByteData.view(buf.buffer).setUint64(0, value, endianess);
-    _writer.addLast(buf);
+    const kIsWeb = bool.fromEnvironment('dart.library.js_util');
+    if (kIsWeb) {
+      _writer.addLast(Uint64Converter.uint64ToUint8List(value));
+    } else {
+      Uint8List buf = Uint8List(8);
+      ByteData.view(buf.buffer).setUint64(0, value, endianess);
+      _writer.addLast(buf);
+    }
   }
 
   writeFloat(double value) {

@@ -1,6 +1,6 @@
-import "dart:io";
 import "dart:async";
 import "package:dart_amqp/dart_amqp.dart";
+import "package:universal_io/io.dart";
 
 class FibonacciRpcClient {
   int _nextCorrelationId = 1;

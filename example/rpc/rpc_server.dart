@@ -1,5 +1,5 @@
-import "dart:io";
 import "package:dart_amqp/dart_amqp.dart";
+import "package:universal_io/io.dart";
 
 // Slow implementation of fib
 int fib(int n) {
