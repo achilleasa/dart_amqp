@@ -701,7 +701,8 @@ class _ChannelImpl implements Channel {
     }
 
     // Multi Ack/Nack; messages up to seqNo
-    for (var pendingSeqNo in _pendingDeliveries.keys) {
+    var pdkeys = _pendingDeliveries.keys.toList();
+    for (var pendingSeqNo in pdkeys) {
       if (pendingSeqNo > seqNo) {
         // only interested in keys up to pendingSeqNo
         break;
