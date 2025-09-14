@@ -16,8 +16,8 @@ class _ClientStompImpl implements Client {
   final Map<int, _ChannelStompImpl> _channels = <int, _ChannelStompImpl>{};
 
   // Connection status
-  Completer? _connected;
-  Completer? _clientClosed;
+  Completer<void>? _connected;
+  Completer<void>? _clientClosed;
   bool _isConnected = false;
 
   // Error Stream
@@ -42,7 +42,7 @@ class _ClientStompImpl implements Client {
       return _connected!.future;
     }
 
-    _connected = Completer();
+    _connected = Completer<void>();
 
     try {
       // Real STOMP client implementation
@@ -57,8 +57,9 @@ class _ClientStompImpl implements Client {
           stompConnectHeaders: {
             'login': settings.authProvider is PlainAuthenticator ? (settings.authProvider as PlainAuthenticator).userName : 'guest',
             'passcode': settings.authProvider is PlainAuthenticator ? (settings.authProvider as PlainAuthenticator).password : 'guest',
-            'host': '/',
-            if (settings.connectionName != null) 'client-id': settings.connectionName! else 'client-id': 'dart_amqp_client_${DateTime.now().millisecondsSinceEpoch}'
+            // STOMP vhost should reflect the AMQP virtual host
+            'host': settings.virtualHost,
+            'client-id': settings.connectionName ?? 'dart_amqp_client_${DateTime.now().millisecondsSinceEpoch}'
           },
           heartbeatOutgoing: const Duration(seconds: 10),
           heartbeatIncoming: const Duration(seconds: 10),
@@ -102,6 +103,11 @@ class _ClientStompImpl implements Client {
     if (_connected != null && !_connected!.isCompleted) {
       _connected!.completeError(ConnectionFailedException("STOMP connection lost"));
     }
+    // Propagate disconnect to channels and notify error stream
+    if (_error.hasListener && !_error.isClosed) {
+      _error.add(ConnectionFailedException("STOMP connection lost"));
+    }
+    _channels.values.toList().reversed.forEach((_ChannelStompImpl channel) => channel.handleException(ConnectionFailedException("STOMP connection lost")));
   }
 
   void _onWebSocketError(dynamic error) {

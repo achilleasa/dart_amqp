@@ -52,6 +52,8 @@ class _ChannelStompImpl implements Channel {
     Future.wait(futures).whenComplete(() {
       _queues.clear();
       _exchanges.clear();
+      // Remove this channel from the client's registry to free the id
+      client._channels.remove(_id);
       _channelClosed!.complete(this);
     });
 
@@ -194,5 +196,6 @@ class _ChannelStompImpl implements Channel {
     }
   }
 
-  _QueueStompImpl? _removeQueue(String queueName) => _queues.remove(queueName);
+  // Helper used previously to manage queue lifecycle; currently unnecessary
+  // and removed to satisfy linter about unused declarations.
 }
