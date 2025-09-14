@@ -178,6 +178,13 @@ class _ConsumerStompImpl implements Consumer {
         }
       }
 
+      // Optional routing key filter (exact match)
+      if (_routingKeyFilter != null && _routingKeyFilter!.isNotEmpty) {
+        if (routingKey.isEmpty || routingKey != _routingKeyFilter) {
+          return; // discard non-matching messages
+        }
+      }
+
       // Create AmqpMessage from STOMP frame
       final amqpMessage = _AmqpMessageStompImpl(
         consumer: this,
@@ -222,35 +229,6 @@ class _ConsumerStompImpl implements Consumer {
       // If extraction fails, return empty
     }
     return Uint8List(0);
-  }
-
-  /// Check if a routing key matches a pattern with wildcards
-  bool _matchesRoutingPattern(String pattern, String routingKey) {
-    // Handle exact match first (no wildcards)
-    if (!pattern.contains('*') && !pattern.contains('#')) {
-      return pattern == routingKey;
-    }
-
-    // Convert AMQP pattern to regex
-    String regexPattern = pattern;
-
-    // Escape special regex characters except * and # and .
-    regexPattern = regexPattern.replaceAll(RegExp(r'[+^${}()|[\]\\]'), r'\$&');
-
-    // Convert AMQP wildcards to regex
-    regexPattern = regexPattern.replaceAll('*', r'[^.]+'); // * matches one word (not containing dots)
-    regexPattern = regexPattern.replaceAll('#', r'.*'); // # matches zero or more words (including dots)
-
-    // Anchor the pattern to match the entire string
-    regexPattern = '^$regexPattern\$';
-
-    try {
-      final regex = RegExp(regexPattern);
-      return regex.hasMatch(routingKey);
-    } catch (e) {
-      // If regex compilation fails, fall back to exact match
-      return pattern == routingKey;
-    }
   }
 
   @override
