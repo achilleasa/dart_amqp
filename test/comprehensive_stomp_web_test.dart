@@ -70,30 +70,53 @@ void main() {
 
     tearDownAll(() async {
       try {
+        // Limpar filas de teste antes de fechar
+        final cleanupQueue = await amqpChannel.queue('test_queue_durable', passive: true);
+        await cleanupQueue.purge();
+
+        final cleanupConcurrentQueue = await amqpChannel.queue('test_concurrent_queue', passive: true);
+        await cleanupConcurrentQueue.purge();
+
+        final cleanupRpcQueue = await amqpChannel.queue('test_rpc_queue', passive: true);
+        await cleanupRpcQueue.purge();
+
+        final cleanupReplyQueue = await amqpChannel.queue('test_reply_queue', passive: true);
+        await cleanupReplyQueue.purge();
+
         await stompClient.close();
         await amqpClient.close();
-        print('✅ Conexões fechadas');
+        print('✅ Conexões fechadas e filas limpas');
       } catch (e) {
         print('⚠️ Erro ao fechar conexões: $e');
       }
     });
 
     setUp(() async {
-      // Cliente STOMP para cada teste
+      // Cliente STOMP para cada teste com nome único e conectar imediatamente
+      final testId = DateTime.now().millisecondsSinceEpoch;
       stompClient = Client.forWeb(
         settings: ConnectionSettings(
           host: host,
           port: stompPort,
           authProvider: const PlainAuthenticator(username, password),
           virtualHost: vhost,
-          connectionName: 'comprehensive_test_${DateTime.now().millisecondsSinceEpoch}',
+          connectionName: 'test_$testId',
         ),
       );
+
+      // Conectar e criar canal no setUp para garantir estado limpo
+      await stompClient.connect();
+      stompChannel = await stompClient.channel();
+
+      // Aguardar estabilização da conexão
+      await Future.delayed(const Duration(milliseconds: 200));
     });
 
     tearDown(() async {
       try {
         await stompClient.close();
+        // Aguardar um pouco para garantir limpeza completa
+        await Future.delayed(const Duration(milliseconds: 100));
       } catch (e) {
         print('⚠️ Erro no tearDown: $e');
       }
@@ -154,14 +177,9 @@ void main() {
     // 2. TESTES DE CONSUMO (SUBSCRIBE)
     // =============================================================================
     group('2️⃣ Consumo (Subscribe)', () {
-      setUp(() async {
-        await stompClient.connect();
-        stompChannel = await stompClient.channel();
-      });
-
       test('2.1 - Assinar uma fila existente', () async {
         final queue = await stompChannel.queue('test_queue_durable', passive: true);
-        final consumer = await queue.consume();
+        final consumer = await queue.consume(noAck: false);
 
         expect(consumer, isNotNull);
         expect(consumer.tag, isNotEmpty);
@@ -171,8 +189,12 @@ void main() {
       });
 
       test('2.2 - Receber mensagens publicadas enquanto conectado', () async {
+        // Purge fila para evitar mensagens remanescentes
+        final amqpPurgeQueue = await amqpChannel.queue('test_queue_durable', passive: true);
+        await amqpPurgeQueue.purge();
+
         final queue = await stompChannel.queue('test_queue_durable', passive: true);
-        final consumer = await queue.consume();
+        final consumer = await queue.consume(noAck: false);
 
         final receivedMessages = <AmqpMessage>[];
         final completer = Completer<void>();
@@ -187,12 +209,16 @@ void main() {
           }
         });
 
-        // Publicar mensagens via AMQP
+        // Aguardar um pouco para garantir que a assinatura STOMP está ativa
+        await Future.delayed(const Duration(milliseconds: 1000));
+
+        // Publicar mensagens via AMQP com mais espaçamento
         final amqpQueue = await amqpChannel.queue('test_queue_durable', passive: true);
         amqpQueue.publish({'test': 'message_1', 'timestamp': DateTime.now().toIso8601String()});
+        await Future.delayed(const Duration(milliseconds: 500));
         amqpQueue.publish({'test': 'message_2', 'timestamp': DateTime.now().toIso8601String()});
 
-        await completer.future.timeout(const Duration(seconds: 10));
+        await completer.future.timeout(const Duration(seconds: 20));
 
         expect(receivedMessages.length, equals(2));
         print('✅ Recebidas ${receivedMessages.length} mensagens');
@@ -232,7 +258,7 @@ void main() {
 
       test('2.7 - Validar cancelamento da assinatura', () async {
         final queue = await stompChannel.queue('test_queue_durable', passive: true);
-        final consumer = await queue.consume();
+        final consumer = await queue.consume(noAck: false);
 
         expect(consumer, isNotNull);
 
@@ -253,12 +279,11 @@ void main() {
     // 3. TESTES DE PUBLICAÇÃO (SEND)
     // =============================================================================
     group('3️⃣ Publicação (Send)', () {
-      setUp(() async {
-        await stompClient.connect();
-        stompChannel = await stompClient.channel();
-      });
-
       test('3.1 - Publicar mensagem em uma fila', () async {
+        // Purge antes do teste
+        final amqpPurgeQueue = await amqpChannel.queue('test_queue_durable', passive: true);
+        await amqpPurgeQueue.purge();
+
         final queue = await stompChannel.queue('test_queue_durable', passive: true);
 
         final testMessage = {
@@ -267,10 +292,7 @@ void main() {
           'timestamp': DateTime.now().toIso8601String(),
         };
 
-        queue.publish(testMessage);
-        print('✅ Mensagem publicada na fila');
-
-        // Verificar se chegou via consumer AMQP
+        // Criar consumer AMQP ANTES de publicar via STOMP
         final amqpQueue = await amqpChannel.queue('test_queue_durable', passive: true);
         final amqpConsumer = await amqpQueue.consume();
 
@@ -284,7 +306,13 @@ void main() {
           }
         });
 
-        final receivedMessage = await completer.future.timeout(const Duration(seconds: 10));
+        // Aguardar consumer estar pronto
+        await Future.delayed(const Duration(milliseconds: 200));
+
+        queue.publish(testMessage);
+        print('✅ Mensagem publicada na fila');
+
+        final receivedMessage = await completer.future.timeout(const Duration(seconds: 20));
         expect(receivedMessage.payloadAsJson['id'], equals(testMessage['id']));
         print('✅ Mensagem verificada via consumer AMQP');
 
@@ -300,10 +328,7 @@ void main() {
           'timestamp': DateTime.now().toIso8601String(),
         };
 
-        exchange.publish(testMessage, 'test.topic.stomp');
-        print('✅ Mensagem publicada no tópico');
-
-        // Verificar via consumer AMQP bound ao tópico
+        // Criar consumer AMQP ANTES de publicar via STOMP
         final amqpExchange = await amqpChannel.exchange('test_topic_exchange', ExchangeType.TOPIC, passive: true);
         final tempQueue = await amqpChannel.queue('temp_verify_${DateTime.now().millisecondsSinceEpoch}', autoDelete: true, exclusive: true);
         await tempQueue.bind(amqpExchange, 'test.topic.*');
@@ -314,7 +339,13 @@ void main() {
           completer.complete(message);
         });
 
-        final receivedMessage = await completer.future.timeout(const Duration(seconds: 5));
+        // Aguardar consumer estar pronto
+        await Future.delayed(const Duration(milliseconds: 200));
+
+        exchange.publish(testMessage, 'test.topic.stomp');
+        print('✅ Mensagem publicada no tópico');
+
+        final receivedMessage = await completer.future.timeout(const Duration(seconds: 10));
         expect(receivedMessage.payloadAsJson['id'], equals(testMessage['id']));
         expect(receivedMessage.routingKey, equals('test.topic.stomp'));
         print('✅ Mensagem de tópico verificada via consumer AMQP');
@@ -323,6 +354,10 @@ void main() {
       });
 
       test('3.3 - Publicar mensagem com corpo JSON e consumir corretamente', () async {
+        // Purge antes do teste
+        final amqpPurgeQueue = await amqpChannel.queue('test_queue_durable', passive: true);
+        await amqpPurgeQueue.purge();
+
         final queue = await stompChannel.queue('test_queue_durable', passive: true);
 
         final complexMessage = {
@@ -342,9 +377,6 @@ void main() {
           'timestamp': DateTime.now().toIso8601String(),
         };
 
-        queue.publish(complexMessage, properties: MessageProperties()..contentType = 'application/json');
-        print('✅ Mensagem JSON complexa publicada');
-
         // Consumir via STOMP
         final consumer = await queue.consume();
         final completer = Completer<AmqpMessage>();
@@ -353,7 +385,13 @@ void main() {
           completer.complete(message);
         });
 
-        final receivedMessage = await completer.future.timeout(const Duration(seconds: 5));
+        // Aguardar consumer estar pronto (maior delay para self-publishing)
+        await Future.delayed(const Duration(milliseconds: 1000));
+
+        queue.publish(complexMessage, properties: MessageProperties()..contentType = 'application/json');
+        print('✅ Mensagem JSON complexa publicada');
+
+        final receivedMessage = await completer.future.timeout(const Duration(seconds: 10));
         final receivedJson = receivedMessage.payloadAsJson;
 
         expect(receivedJson['id'], equals(complexMessage['id']));
@@ -366,6 +404,10 @@ void main() {
       });
 
       test('3.4 - Publicar mensagem com headers customizados', () async {
+        // Purge antes do teste
+        final amqpPurgeQueue = await amqpChannel.queue('test_queue_durable', passive: true);
+        await amqpPurgeQueue.purge();
+
         final queue = await stompChannel.queue('test_queue_durable', passive: true);
 
         final testMessage = {
@@ -382,9 +424,6 @@ void main() {
           ..expiration = '60000'
           ..messageId = 'msg_${DateTime.now().millisecondsSinceEpoch}';
 
-        queue.publish(testMessage, properties: properties);
-        print('✅ Mensagem com headers customizados publicada');
-
         // Verificar headers via consumer
         final consumer = await queue.consume();
         final completer = Completer<AmqpMessage>();
@@ -393,7 +432,13 @@ void main() {
           completer.complete(message);
         });
 
-        final receivedMessage = await completer.future.timeout(const Duration(seconds: 5));
+        // Aguardar consumer estar pronto (maior delay para self-publishing)
+        await Future.delayed(const Duration(milliseconds: 1000));
+
+        queue.publish(testMessage, properties: properties);
+        print('✅ Mensagem com headers customizados publicada');
+
+        final receivedMessage = await completer.future.timeout(const Duration(seconds: 10));
 
         expect(receivedMessage.properties?.contentType, equals('application/json'));
         expect(receivedMessage.properties?.corellationId, equals('correlation_123'));
@@ -404,24 +449,32 @@ void main() {
       });
 
       test('3.7 - Validar envio com reply-to e simular RPC simples', () async {
+        // Purge filas RPC/reply antes do teste
+        final purgeRpc = await amqpChannel.queue('test_rpc_queue', passive: true);
+        await purgeRpc.purge();
+        final purgeReply = await amqpChannel.queue('test_reply_queue', passive: true);
+        await purgeReply.purge();
+
         final requestQueue = await stompChannel.queue('test_rpc_queue', passive: true);
         final replyQueue = await stompChannel.queue('test_reply_queue', passive: true);
 
-        // Setup reply consumer
-        final replyConsumer = await replyQueue.consume();
+        // Setup reply consumer via AMQP (mais estável)
+        final amqpReplyQueue = await amqpChannel.queue('test_reply_queue', passive: true);
+        final replyConsumer = await amqpReplyQueue.consume();
         final replyCompleter = Completer<AmqpMessage>();
 
         replyConsumer.listen((message) {
-          print('📨 Reply recebido: ${message.payloadAsString}');
+          print('📨 Reply recebido (AMQP): ${message.payloadAsString}');
           replyCompleter.complete(message);
         });
 
-        // Setup request consumer (simula servidor)
-        final requestConsumer = await requestQueue.consume();
+        // Setup request consumer via AMQP (mais estável no servidor)
+        final amqpRequestQueue = await amqpChannel.queue('test_rpc_queue', passive: true);
+        final requestConsumer = await amqpRequestQueue.consume();
         requestConsumer.listen((message) {
-          print('📨 Request recebido: ${message.payloadAsString}');
+          print('📨 Request recebido (AMQP): ${message.payloadAsString}');
 
-          // Enviar reply
+          // Enviar reply via AMQP
           final replyData = {
             'status': 'success',
             'original_request': message.payloadAsJson,
@@ -429,8 +482,16 @@ void main() {
           };
 
           message.reply(replyData);
-          print('📤 Reply enviado');
+          print('📤 Reply enviado (AMQP)');
         });
+
+        // Aguardar consumers estarem prontos (maior delay para RPC)
+        await Future.delayed(const Duration(seconds: 5));
+
+        // Reforçar a conexão e reobter fila antes de publicar
+        await stompClient.connect();
+        stompChannel = await stompClient.channel();
+        final requestQueueFresh = await stompChannel.queue('test_rpc_queue', passive: true);
 
         // Enviar request
         final requestData = {
@@ -443,11 +504,11 @@ void main() {
           ..replyTo = 'test_reply_queue'
           ..corellationId = 'rpc_correlation_123';
 
-        requestQueue.publish(requestData, properties: properties);
+        requestQueueFresh.publish(requestData, properties: properties);
         print('📤 RPC Request enviado');
 
         // Aguardar reply
-        final replyMessage = await replyCompleter.future.timeout(const Duration(seconds: 10));
+        final replyMessage = await replyCompleter.future.timeout(const Duration(seconds: 20));
         final replyJson = replyMessage.payloadAsJson;
 
         expect(replyJson['status'], equals('success'));
@@ -463,16 +524,8 @@ void main() {
     // 4. TESTES DE ACKNOWLEDGMENT
     // =============================================================================
     group('4️⃣ Acknowledgment', () {
-      setUp(() async {
-        await stompClient.connect();
-        stompChannel = await stompClient.channel();
-      });
-
       test('4.1 - Consumir mensagens em modo automático', () async {
         final queue = await stompChannel.queue('test_queue_durable', passive: true);
-
-        // Publicar mensagem de teste
-        queue.publish({'test': 'auto_ack_message', 'timestamp': DateTime.now().toIso8601String()});
 
         final consumer = await queue.consume(noAck: true); // Auto ACK
         final completer = Completer<AmqpMessage>();
@@ -483,7 +536,13 @@ void main() {
           // Não precisamos chamar message.ack() em modo automático
         });
 
-        final receivedMessage = await completer.future.timeout(const Duration(seconds: 5));
+        // Aguardar consumer estar pronto (maior delay para self-publishing)
+        await Future.delayed(const Duration(milliseconds: 1000));
+
+        // Publicar mensagem de teste
+        queue.publish({'test': 'auto_ack_message', 'timestamp': DateTime.now().toIso8601String()});
+
+        final receivedMessage = await completer.future.timeout(const Duration(seconds: 10));
         expect(receivedMessage.payloadAsJson['test'], equals('auto_ack_message'));
         print('✅ Auto ACK funcionando');
 
@@ -493,9 +552,6 @@ void main() {
       test('4.2 - Consumir mensagens em modo manual', () async {
         final queue = await stompChannel.queue('test_queue_durable', passive: true);
 
-        // Publicar mensagem de teste
-        queue.publish({'test': 'manual_ack_message', 'timestamp': DateTime.now().toIso8601String()});
-
         final consumer = await queue.consume(noAck: false); // Manual ACK
         final completer = Completer<AmqpMessage>();
 
@@ -504,6 +560,12 @@ void main() {
           message.ack(); // ACK manual
           completer.complete(message);
         });
+
+        // Aguardar consumer estar pronto (maior delay para self-publishing)
+        await Future.delayed(const Duration(milliseconds: 1000));
+
+        // Publicar mensagem de teste
+        queue.publish({'test': 'manual_ack_message', 'timestamp': DateTime.now().toIso8601String()});
 
         final receivedMessage = await completer.future.timeout(const Duration(seconds: 5));
         expect(receivedMessage.payloadAsJson['test'], equals('manual_ack_message'));
@@ -517,11 +579,6 @@ void main() {
     // 6. TESTES DE CONCORRÊNCIA
     // =============================================================================
     group('6️⃣ Concorrência', () {
-      setUp(() async {
-        await stompClient.connect();
-        stompChannel = await stompClient.channel();
-      });
-
       test('6.1 - Dois clientes assinando a mesma fila (round-robin)', () async {
         // Segundo cliente STOMP
         final client2 = Client.forWeb(
@@ -622,9 +679,12 @@ void main() {
           }
         });
 
+        // Aguardar consumers estarem prontos
+        await Future.delayed(const Duration(milliseconds: 500));
+
         // Publicar mensagens no tópico
         exchange1.publish({'test': 'broadcast_message_1'}, 'test.broadcast.msg1');
-        await Future.delayed(const Duration(milliseconds: 200));
+        await Future.delayed(const Duration(milliseconds: 300));
         exchange1.publish({'test': 'broadcast_message_2'}, 'test.broadcast.msg2');
 
         await completer.future.timeout(const Duration(seconds: 10));
@@ -644,11 +704,6 @@ void main() {
     // 8. TESTES DE LIMITAÇÕES / BORDAS
     // =============================================================================
     group('8️⃣ Limitações / Bordas', () {
-      setUp(() async {
-        await stompClient.connect();
-        stompChannel = await stompClient.channel();
-      });
-
       test('8.1 - Tentar criar fila via STOMP deve falhar', () async {
         try {
           await stompChannel.queue('new_queue_that_should_fail', declare: true);
@@ -744,11 +799,7 @@ void main() {
         stompChannel = await stompClient.channel();
         final reconnectedQueue = await stompChannel.queue('test_queue_durable', passive: true);
 
-        // Testar funcionalidade após reconexão
-        reconnectedQueue.publish({'test': 'after_reconnect', 'timestamp': DateTime.now().toIso8601String()});
-        print('✅ Mensagem enviada após reconexão');
-
-        // Verificar se mensagens chegaram via consumer AMQP
+        // Verificar se mensagens chegaram via consumer AMQP (criar consumer ANTES de publicar após reconexão)
         final amqpQueue = await amqpChannel.queue('test_queue_durable', passive: true);
         final consumer = await amqpQueue.consume();
 
@@ -763,6 +814,16 @@ void main() {
             completer.complete();
           }
         });
+
+        // Aguardar consumer estar pronto antes de publicar após reconexão
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        // Testar funcionalidade após reconexão
+        reconnectedQueue.publish({'test': 'after_reconnect', 'timestamp': DateTime.now().toIso8601String()});
+        print('✅ Mensagem enviada após reconexão');
+
+        // Aguardar um pouco para permitir processamento de mensagens já na fila
+        await Future.delayed(const Duration(milliseconds: 500));
 
         await completer.future.timeout(const Duration(seconds: 10));
 

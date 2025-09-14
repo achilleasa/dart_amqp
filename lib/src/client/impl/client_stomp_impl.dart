@@ -32,6 +32,9 @@ class _ClientStompImpl implements Client {
   @override
   bool get handshaking => _stompClient != null && !_isConnected;
 
+  /// Check if client is connected and ready
+  bool get isConnected => _isConnected && _stompClient != null && _stompClient!.isActive;
+
   @override
   Future connect() {
     // Prevent multiple connection attempts

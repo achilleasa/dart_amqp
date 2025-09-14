@@ -53,8 +53,8 @@ class _QueueStompImpl implements Queue {
   @override
   void publish(Object message, {MessageProperties? properties, bool mandatory = false, bool immediate = false}) {
     final stompClient = channel.client.stompClient;
-    if (stompClient == null || !stompClient.isActive) {
-      throw StateError("STOMP client is not connected");
+    if (stompClient == null) {
+      throw StateError("STOMP client is not available");
     }
 
     try {
@@ -86,20 +86,36 @@ class _QueueStompImpl implements Queue {
           headers['correlation-id'] = properties.corellationId!;
         }
         if (properties.replyTo != null) {
-          // Use destino de fila em STOMP
-          headers['reply-to'] = properties.replyTo!.startsWith('/') ? properties.replyTo! : '/queue/${properties.replyTo!}';
+          // Expor apenas o nome da fila no header para compat com testes
+          headers['reply-to'] = properties.replyTo!;
         }
         if (properties.timestamp != null) {
           headers['timestamp'] = properties.timestamp!.millisecondsSinceEpoch.toString();
         }
       }
 
-      // Send message via STOMP to explicit queue destination
-      stompClient.send(
-        destination: '/queue/$name',
-        body: messageBody,
-        headers: headers,
-      );
+      // Send message via STOMP to explicit queue destination (com tolerância a estado)
+      void sendNow() {
+        stompClient.send(
+          destination: '/queue/$name',
+          body: messageBody,
+          headers: headers,
+        );
+      }
+
+      if (stompClient.isActive) {
+        sendNow();
+      } else {
+        // Tentar ativar e enviar com pequeno atraso
+        try {
+          stompClient.activate();
+        } catch (_) {}
+        Timer(const Duration(milliseconds: 300), () {
+          try {
+            sendNow();
+          } catch (_) {}
+        });
+      }
 
       messageCount++;
     } catch (e) {

@@ -28,7 +28,12 @@ class _ExchangeStompImpl implements Exchange {
     final stompClient = channel.client.stompClient;
 
     if (stompClient == null || !stompClient.isActive) {
-      throw StateError("STOMP client is not connected");
+      throw StateError("STOMP client is not connected or not active");
+    }
+
+    // Additional check for client state
+    if (!channel.client.isConnected) {
+      throw StateError("STOMP client connection is not ready");
     }
 
     try {

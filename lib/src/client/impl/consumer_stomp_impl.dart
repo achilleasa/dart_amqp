@@ -40,7 +40,7 @@ class _ConsumerStompImpl implements Consumer {
 
   void _subscribeToDestination() {
     final stompClient = channel.client.stompClient;
-    if (stompClient != null) {
+    if (stompClient != null && stompClient.isActive) {
       // Prepare headers according to RabbitMQ STOMP capabilities
       final Map<String, String> headers = <String, String>{};
 
@@ -62,6 +62,8 @@ class _ConsumerStompImpl implements Consumer {
       // RabbitMQ extension: prefetch-count
       if (_subscribeArguments != null && _subscribeArguments!['prefetch-count'] != null) {
         headers['prefetch-count'] = _subscribeArguments!['prefetch-count'].toString();
+      } else {
+        headers['prefetch-count'] = '10';
       }
 
       // Optional durable semantics if explicitly requested
@@ -72,14 +74,17 @@ class _ConsumerStompImpl implements Consumer {
         }
       }
 
-      // Note: STOMP selector removed as RabbitMQ STOMP may not support it reliably
-      // We'll rely on client-side filtering instead
-
-      _stompSubscription = stompClient.subscribe(
-        destination: _destination,
-        callback: _onStompMessage,
-        headers: headers,
-      );
+      try {
+        _stompSubscription = stompClient.subscribe(
+          destination: _destination,
+          callback: _onStompMessage,
+          headers: headers,
+        );
+      } catch (e) {
+        throw FatalException("Error creating STOMP subscription: $e");
+      }
+    } else {
+      throw StateError("STOMP client not available or not active for subscription");
     }
   }
 
@@ -117,7 +122,7 @@ class _ConsumerStompImpl implements Consumer {
               messageProperties.corellationId = value;
               break;
             case 'reply-to':
-              messageProperties.replyTo = value;
+              messageProperties.replyTo = _normalizeReplyTo(value);
               break;
             case 'timestamp':
               try {
@@ -192,12 +197,23 @@ class _ConsumerStompImpl implements Consumer {
     }
   }
 
+  String _normalizeReplyTo(String value) {
+    // Aceitar formas '/queue/{name}', '/reply-queue/{name}' e '{name}', retornando apenas o nome
+    if (value.startsWith('/queue/')) {
+      return value.substring('/queue/'.length);
+    }
+    if (value.startsWith('/reply-queue/')) {
+      return value.substring('/reply-queue/'.length);
+    }
+    return value;
+  }
+
   Uint8List _extractPayloadFromFrame(dynamic frame) {
     try {
       // Try to get body from frame
       if (frame.body != null) {
         if (frame.body is String) {
-          return Uint8List.fromList((frame.body as String).codeUnits);
+          return Uint8List.fromList(utf8.encode(frame.body as String));
         } else if (frame.body is List<int>) {
           return Uint8List.fromList(frame.body as List<int>);
         }
