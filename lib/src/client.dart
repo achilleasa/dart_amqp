@@ -4,8 +4,11 @@ import "dart:async";
 import "dart:io";
 import "dart:typed_data";
 import "dart:collection";
+import "dart:convert";
 
 import 'package:async/async.dart';
+// STOMP opcional (somente quando usar Client.forWeb/Client.stomp)
+import 'package:stomp_dart_client/stomp_dart_client.dart';
 
 // Internal lib dependencies
 import "logging.dart";
@@ -35,3 +38,9 @@ part "client/impl/consumer_impl.dart";
 part "client/impl/exchange_impl.dart";
 part "client/impl/basic_return_message_impl.dart";
 part "client/impl/publish_notification_impl.dart";
+// Implementações STOMP (opcionais)
+part "client/impl/client_stomp_impl.dart";
+part "client/impl/channel_stomp_impl.dart";
+part "client/impl/queue_stomp_impl.dart";
+part "client/impl/consumer_stomp_impl.dart";
+part "client/impl/exchange_stomp_impl.dart";

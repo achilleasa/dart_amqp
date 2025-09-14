@@ -153,31 +153,24 @@ class _ConsumerStompImpl implements Consumer {
         ackId ??= headers['message-id'];
       }
 
-      // Extract routing key from headers or destination
-      String? routingKey = headers?['routing-key'];
-      if (routingKey == null) {
-        // Try to extract from destination pattern
-        final parts = _destination.split('/');
-        if (parts.length >= 3) {
-          routingKey = parts.sublist(2).join('/');
-        } else {
-          routingKey = _destination;
-        }
-      }
-
-      // Client-side routing key filtering
-      if (_routingKeyFilter != null) {
-        if (!_matchesRoutingPattern(_routingKeyFilter!, routingKey)) {
-          // Skip this message as it doesn't match the routing pattern
-          return;
-        }
-      }
-
-      // Extract exchange name from destination
+      // Extract exchange name and routing key from destination header if available
+      String? destinationHeader = headers?['destination'];
       String exchangeName = '';
-      final parts = _destination.split('/');
+      String routingKey = '';
+
+      String sourceDestination = destinationHeader ?? _destination;
+      final parts = sourceDestination.split('/');
+      // Expect ['', 'exchange', '<name>', '<rk...>'] or ['', 'queue', '<name>']
       if (parts.length >= 3) {
-        exchangeName = parts[2];
+        if (parts[1] == 'exchange') {
+          exchangeName = parts[2];
+          if (parts.length >= 4) {
+            routingKey = parts.sublist(3).join('/');
+          }
+        } else if (parts[1] == 'queue') {
+          // For queue destinations, no exchange; routingKey can be queue name for reference
+          routingKey = parts[2];
+        }
       }
 
       // Create AmqpMessage from STOMP frame
@@ -185,7 +178,7 @@ class _ConsumerStompImpl implements Consumer {
         consumer: this,
         payload: _extractPayloadFromFrame(frame),
         properties: messageProperties,
-        routingKey: routingKey,
+        routingKey: routingKey.isEmpty ? null : routingKey,
         exchangeName: exchangeName,
         ackId: ackId,
       );
@@ -404,8 +397,10 @@ class _AmqpMessageStompImpl implements AmqpMessage {
           headers['correlation-id'] = _properties!.corellationId!;
         }
 
+        // RabbitMQ STOMP usa '/queue/{name}' para destino de fila
+        final replyDestination = _properties!.replyTo!.startsWith('/') ? _properties!.replyTo! : '/queue/${_properties!.replyTo!}';
         stompClient.send(
-          destination: _properties!.replyTo!,
+          destination: replyDestination,
           body: messageBody,
           headers: headers,
         );

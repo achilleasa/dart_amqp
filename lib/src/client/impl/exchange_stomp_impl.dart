@@ -38,6 +38,7 @@ class _ExchangeStompImpl implements Exchange {
       if (routingKey != null && routingKey.isNotEmpty) {
         destination = '/exchange/$name/$routingKey';
       } else {
+        // Para STOMP/RabbitMQ, enviar sem routing key pode falhar; ainda usamos '/exchange/name' mas alguns brokers ignoram
         destination = '/exchange/$name';
       }
 
@@ -79,17 +80,11 @@ class _ExchangeStompImpl implements Exchange {
           headers['timestamp'] = properties.timestamp!.millisecondsSinceEpoch.toString();
         }
         // Map delivery mode (persistent/non-persistent)
-        if (properties.deliveryMode != null) {
-          headers['delivery-mode'] = properties.deliveryMode.toString();
-        }
+        // delivery-mode não é padronizado em STOMP; omitimos para compat
         // Map priority
-        if (properties.priority != null) {
-          headers['priority'] = properties.priority.toString();
-        }
+        // priority não é padronizado em STOMP; omitimos
         // Map expiration (TTL)
-        if (properties.expiration != null) {
-          headers['expiration'] = properties.expiration!;
-        }
+        // expiration (TTL) não é suportado em STOMP; omitimos
       }
 
       // No need to add routing-key header when using /exchange/{name}/{rk}

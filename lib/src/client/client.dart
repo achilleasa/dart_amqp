@@ -1,8 +1,13 @@
 part of "../client.dart";
 
 abstract class Client {
-  factory Client({ConnectionSettings? settings}) =>
-      _ClientImpl(settings: settings);
+  factory Client({ConnectionSettings? settings}) => _ClientImpl(settings: settings);
+
+  // STOMP/WebSocket: cliente opcional
+  factory Client.forWeb({ConnectionSettings? settings}) => _ClientStompImpl(settings: settings);
+
+  // Alias explícito para STOMP (VM/Web)
+  factory Client.stomp({ConnectionSettings? settings}) => _ClientStompImpl(settings: settings);
 
   // Configuration options
   ConnectionSettings get settings;
@@ -24,9 +29,5 @@ abstract class Client {
   Future<Channel> channel();
 
   /// Register listener for errors
-  StreamSubscription<Exception> errorListener(
-      void Function(Exception error) onData,
-      {Function onError,
-      void Function() onDone,
-      bool cancelOnError});
+  StreamSubscription<Exception> errorListener(void Function(Exception error) onData, {Function onError, void Function() onDone, bool cancelOnError});
 }

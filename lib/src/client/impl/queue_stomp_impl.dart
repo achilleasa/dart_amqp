@@ -76,19 +76,18 @@ class _QueueStompImpl implements Queue {
         headers['content-type'] = 'text/plain';
       }
 
-      // Map AMQP message properties to STOMP headers
+      // Map AMQP message properties to STOMP headers (best-effort e compatível)
       if (properties != null) {
         if (properties.contentType != null) {
           headers['content-type'] = properties.contentType!;
         }
-        if (properties.messageId != null) {
-          headers['message-id'] = properties.messageId!;
-        }
+        // message-id não é permitido em SEND
         if (properties.corellationId != null) {
           headers['correlation-id'] = properties.corellationId!;
         }
         if (properties.replyTo != null) {
-          headers['reply-to'] = properties.replyTo!;
+          // Use destino de fila em STOMP
+          headers['reply-to'] = properties.replyTo!.startsWith('/') ? properties.replyTo! : '/queue/${properties.replyTo!}';
         }
         if (properties.timestamp != null) {
           headers['timestamp'] = properties.timestamp!.millisecondsSinceEpoch.toString();
