@@ -150,7 +150,7 @@ Future<void> main() async {
   final client = Client.forWeb(
     settings: ConnectionSettings(
       host: 'your.domain.com',
-      port: 443, // behind NGINX; or 15674 directly
+      port: 15674, // behind NGINX; or 15674 directly
       virtualHost: '/',
       authProvider: const PlainAuthenticator('user', 'pass'),
       connectionName: 'web_demo_${DateTime.now().millisecondsSinceEpoch}',
@@ -185,7 +185,7 @@ Future<void> main() async {
   final client = Client.forWeb(
     settings: ConnectionSettings(
       host: 'your.domain.com',
-      port: 443,
+      port: 15674,
       virtualHost: '/',
       authProvider: const PlainAuthenticator('user', 'pass'),
     ),
