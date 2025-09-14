@@ -9,11 +9,11 @@ void main() {
   // =============================================================================
   // CONFIGURAÇÕES DO BROKER REAL
   // =============================================================================
-  const String host = 'mq.paipfood.com';
+  const String host = 'localhost';
   const int amqpPort = 5672;
   const int stompPort = 15674;
   const String username = 'admin';
-  const String password = 'PaipFoodTeam@8';
+  const String password = 'Admin@123';
   const String vhost = '/';
 
   group('🧪 RabbitMQ Web STOMP - Teste Abrangente', () {
