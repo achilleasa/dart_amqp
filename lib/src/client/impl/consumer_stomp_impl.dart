@@ -74,6 +74,11 @@ class _ConsumerStompImpl implements Consumer {
         }
       }
 
+      // Include routing key pattern as informational header (not required by broker)
+      if (_routingKeyFilter != null && _routingKeyFilter!.isNotEmpty) {
+        headers['x-routing-key'] = _routingKeyFilter!;
+      }
+
       try {
         _stompSubscription = stompClient.subscribe(
           destination: _destination,
@@ -178,12 +183,7 @@ class _ConsumerStompImpl implements Consumer {
         }
       }
 
-      // Optional routing key filter (exact match)
-      if (_routingKeyFilter != null && _routingKeyFilter!.isNotEmpty) {
-        if (routingKey.isEmpty || routingKey != _routingKeyFilter) {
-          return; // discard non-matching messages
-        }
-      }
+      // Do not filter client-side; broker already routed by destination pattern
 
       // Create AmqpMessage from STOMP frame
       final amqpMessage = _AmqpMessageStompImpl(
