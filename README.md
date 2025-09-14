@@ -91,3 +91,140 @@ See the [Contributing Guide](https://github.com/achilleasa/dart_amqp/blob/master
 # License
 
 dart\_amqp is distributed under the [MIT license](https://github.com/achilleasa/dart_amqp/blob/master/LICENSE).
+
+<details>
+  <summary><strong>Web (Browser / Flutter Web)</strong></summary>
+
+## Overview
+
+This library supports Web via STOMP over WebSocket (RabbitMQ Web-STOMP). The Web mode focuses on publish/subscribe and consuming from already provisioned queues and exchanges. Topology management (declaring/deleting queues/exchanges) is not supported from the browser.
+
+## What works on the Web
+
+| Feature | Web support |
+|---|---|
+| Connect over WebSocket (STOMP v1.2) | ✅ |
+| Consume from existing queues | ✅ |
+| Publish to queues | ✅ |
+| Publish to exchanges with routing keys | ✅ |
+| Topic wildcards (e.g. `a.*`, `a.#`) | ✅ |
+| Manual ack per message | ✅ |
+| Auto ack | ✅ |
+| Reply using `replyTo` | ✅ |
+| Heartbeats | ✅ |
+| Declare/delete queues/exchanges | ❌ |
+| QoS (prefetch) changes | ❌ |
+| Transactions (select/commit/rollback) | ❌ |
+| Channel-level flow/recover | ❌ |
+| Basic.return and publisher confirms | ❌ |
+
+## RabbitMQ requirements
+
+- Enable STOMP and Web-STOMP plugins:
+
+```bash
+rabbitmq-plugins enable rabbitmq_stomp rabbitmq_web_stomp
+```
+
+## NGINX reverse proxy (WebSocket)
+
+```nginx
+location /ws {
+  proxy_pass http://rabbitmq:15674;
+  proxy_http_version 1.1;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection "Upgrade";
+  proxy_set_header Host $host;
+  proxy_read_timeout 600s;
+}
+```
+
+## Web usage examples (Dart)
+
+Connect and consume from an exchange (topic) and publish:
+
+```dart
+import 'package:dart_amqp/dart_amqp.dart';
+
+Future<void> main() async {
+  final client = Client.forWeb(
+    settings: ConnectionSettings(
+      host: 'your.domain.com',
+      port: 443, // behind NGINX; or 15674 directly
+      virtualHost: '/',
+      authProvider: const PlainAuthenticator('user', 'pass'),
+      connectionName: 'web_demo_${DateTime.now().millisecondsSinceEpoch}',
+    ),
+  );
+
+  await client.connect();
+  final channel = await client.channel();
+
+  // Subscribe to a topic
+  final exchange = await channel.exchange('test_topic_exchange', ExchangeType.TOPIC, passive: true);
+  final consumer = await exchange.bindPrivateQueueConsumer(['demo.web.*']);
+  consumer.listen((msg) {
+    print('Topic: ${msg.routingKey} -> ${msg.payloadAsString}');
+    msg.ack();
+  });
+
+  // Give the subscription a moment
+  await Future.delayed(const Duration(milliseconds: 300));
+
+  // Publish to the topic
+  exchange.publish({'hello': 'world', 'ts': DateTime.now().toIso8601String()}, 'demo.web.test');
+}
+```
+
+Consume and publish to an existing queue:
+
+```dart
+import 'package:dart_amqp/dart_amqp.dart';
+
+Future<void> main() async {
+  final client = Client.forWeb(
+    settings: ConnectionSettings(
+      host: 'your.domain.com',
+      port: 443,
+      virtualHost: '/',
+      authProvider: const PlainAuthenticator('user', 'pass'),
+    ),
+  );
+
+  await client.connect();
+  final channel = await client.channel();
+
+  final queue = await channel.queue('existing_queue', passive: true);
+  final consumer = await queue.consume(noAck: false); // manual ACK
+  consumer.listen((msg) {
+    print('Queue: ${msg.payloadAsString}');
+    msg.ack();
+  });
+
+  await Future.delayed(const Duration(milliseconds: 300));
+  queue.publish({'ping': 'pong', 'ts': DateTime.now().toIso8601String()});
+}
+```
+
+### Notes
+- Provision queues/exchanges via AMQP or RabbitMQ Management UI; Web cannot declare them.
+- Ensure `web_stomp.ws_path` and NGINX `location` match.
+- The STOMP `host` header is set from `ConnectionSettings.virtualHost` and must match your RabbitMQ vhost.
+
+</details>
+
+---
+
+### 🎉 **Contributors** 🎉
+
+
+<div style={{textAlign: 'center', margin: '2rem 0'}}>
+  <a href="https://github.com/achilleasa/dart_amqp/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=achilleasa/dart_amqp" alt="Contributors" />
+  </a>
+  <p style={{marginTop: '1rem', fontSize: '0.9rem', color: 'var(--ifm-color-emphasis-600)'}}>
+    <strong>Made with <a href="https://contrib.rocks" target="_blank">contrib.rocks</a></strong>
+  </p>
+</div>
+
+</div>
