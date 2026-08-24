@@ -193,12 +193,12 @@ class _ClientImpl implements Client {
             .forEach((_ChannelImpl channel) =>
                 channel._completeOperation(serverMessage.message));
       }
-    } catch (e) {
-      _handleException(e);
+    } catch (e, stackTrace) {
+      _handleException(e, stackTrace);
     }
   }
 
-  void _handleException(ex) {
+  void _handleException(Object error, [StackTrace? stackTrace]) {
     // Ignore exceptions while shutting down
     if (_clientClosed != null) {
       return;
@@ -207,51 +207,61 @@ class _ClientImpl implements Client {
     // If we are still handshaking, it could be that the server disconnected us
     // due to a failed SASL auth attempt. In this case we should trigger a connection
     // exception
-    if (ex is SocketException) {
+    Exception exception;
+    if (error is SocketException) {
       // Wrap the exception
       if (handshaking &&
           _channels.containsKey(0) &&
           (_channels[0]!._lastHandshakeMessage is ConnectionStartOk ||
               _channels[0]!._lastHandshakeMessage is ConnectionSecureOk)) {
-        ex = FatalException("Authentication failed");
+        exception = FatalException("Authentication failed",
+            sourceError: error, sourceStackTrace: stackTrace);
       } else {
-        ex = FatalException("Lost connection to the server");
+        exception = FatalException("Lost connection to the server",
+            sourceError: error, sourceStackTrace: stackTrace);
       }
+    } else if (error is Exception) {
+      exception = error;
+    } else {
+      // Dart Errors do not implement Exception. Normalise them before adding
+      // them to the public Stream<Exception> so an original TypeError cannot
+      // be hidden by a second type error in the error handler.
+      exception = FatalException("Unexpected AMQP client error: $error",
+          sourceError: error, sourceStackTrace: stackTrace);
     }
 
-    connectionLogger.severe(ex);
+    connectionLogger.severe(exception, error, stackTrace);
 
     // If we are still handshaking, abort the connection; flush the channels and shut down
     if (handshaking) {
       _channels.clear();
-      _connected!.completeError(ex);
+      _connected!.completeError(exception, stackTrace);
       _close();
       return;
     }
 
     if (_error.hasListener && !_error.isClosed) {
-      _error.add(ex);
+      _error.add(exception);
     }
 
-    switch (ex.runtimeType) {
+    switch (exception.runtimeType) {
       case HeartbeatFailedException:
       case FatalException:
       case ConnectionException:
 
         // Forward to all channels and then shutdown
-        _channels.values
-            .toList()
-            .reversed
-            .forEach((_ChannelImpl channel) => channel.handleException(ex));
+        _channels.values.toList().reversed.forEach(
+            (_ChannelImpl channel) => channel.handleException(exception));
 
         _close();
         break;
       case ChannelException:
         // Forward to the appropriate channel and remove it from our list
-        _ChannelImpl? target = _channels[ex.channel];
+        final channelException = exception as ChannelException;
+        _ChannelImpl? target = _channels[channelException.channel];
         if (target != null) {
-          target.handleException(ex);
-          _channels.remove(ex.channel);
+          target.handleException(channelException);
+          _channels.remove(channelException.channel);
         }
 
         break;

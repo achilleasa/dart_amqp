@@ -224,6 +224,31 @@ main({bool enableLogger = true}) {
         }
       });
 
+      test("normalizes non-Exception decoder errors", () async {
+        frameWriter.writeMessage(0, TxSelectOkMock());
+        Uint8List frameData = frameWriter.outputEncoder.writer.joinChunks();
+        // Replace the method class and id with values unsupported by the
+        // protocol decoder. This makes it throw an ArgumentError, which is a
+        // Dart Error rather than an Exception.
+        frameData[7] = 0;
+        frameData[8] = 255;
+        frameData[9] = 0;
+        frameData[10] = 255;
+        server.replayList.add(frameData);
+
+        try {
+          await client.connect();
+          fail("Expected a FatalException to be thrown");
+        } catch (error) {
+          expect(error, isA<FatalException>());
+          final exception = error as FatalException;
+          expect(exception.message,
+              startsWith("Unexpected AMQP client error: Invalid argument"));
+          expect(exception.sourceError, isA<ArgumentError>());
+          expect(exception.sourceStackTrace, isNotNull);
+        }
+      });
+
       test("frame on channel > 0 while handshake in progress", () async {
         frameWriter.writeMessage(
             1,
